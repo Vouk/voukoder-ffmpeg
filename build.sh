@@ -69,11 +69,11 @@ function compile_x264 {
 }
 
 function compile_x265 {
-  cd $SRC/x265/build/vc12-x86_64
+  cd $SRC/x265/build/vc15-x86_64
   rm -rf work
   mkdir work
   cd work
-  cmake -G "Visual Studio 14 Win64" ../../../source -DCMAKE_INSTALL_PREFIX=$BUILD -DENABLE_SHARED=OFF -DENABLE_CLI=OFF
+  cmake -G "Visual Studio 15 Win64" ../../../source -DCMAKE_INSTALL_PREFIX=$BUILD -DENABLE_SHARED=OFF -DENABLE_CLI=OFF
   #-DSTATIC_LINK_CRT=ON
   MSBuild.exe /property:Configuration="$MSBUILD_CONFIG" x265-static.vcxproj
   cp $MSBUILD_CONFIG/x265-static.lib $BUILD/lib/x265.lib
@@ -91,7 +91,7 @@ function compile_ffmpeg {
   elif [ "$MODE" == "release" ]; then
     CCFLAGS=-MD
   fi
-  PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CCFLAGS" --prefix=$BUILD --pkg-config-flags="--static" --disable-programs --disable-shared --enable-static --enable-gpl --enable-runtime-cpudetect --disable-protocols --disable-hwaccels --disable-devices --disable-network --enable-libx264 --enable-libx265
+  PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CCFLAGS" --prefix=$BUILD --pkg-config-flags="--static" --disable-programs --disable-shared --enable-static --enable-gpl --enable-runtime-cpudetect --disable-hwaccels --disable-devices --disable-network --enable-libx264 --enable-libx265
   make
   make install
 }
