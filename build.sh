@@ -21,7 +21,7 @@ function get_source_ffmpeg {
     git clone https://git.ffmpeg.org/ffmpeg.git $SRC/ffmpeg
   fi
   cd $SRC/ffmpeg
-  git checkout release/3.4
+  git checkout master
   git pull
   cd ../..
 }
