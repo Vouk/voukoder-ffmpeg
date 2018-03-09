@@ -3,6 +3,7 @@
 SRC=`realpath src`
 DATE_ISO=`date +%Y%m%d`
 MODE=$1
+CPU_CORES=10
 
 if [ "$MODE" == "debug" ]; then
   BUILD=`realpath build_debug`
@@ -21,6 +22,28 @@ function get_source_ffmpeg {
     git clone https://git.ffmpeg.org/ffmpeg.git $SRC/ffmpeg
   fi
   cd $SRC/ffmpeg
+  git checkout master
+  git pull
+  cd ../..
+}
+
+# Clone or update ffnvcodec
+function get_source_ffnvcodec {
+  if [ ! -d $SRC/ffnvcodec/.git ]; then
+    git clone https://github.com/FFmpeg/nv-codec-headers.git $SRC/ffnvcodec
+  fi
+  cd $SRC/ffnvcodec
+  git checkout master
+  git pull
+  cd ../..
+}
+
+# Clone or update amf
+function get_source_amf {
+  if [ ! -d $SRC/amf/.git ]; then
+    git clone https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git $SRC/amf
+  fi
+  cd $SRC/amf
   git checkout master
   git pull
   cd ../..
@@ -64,7 +87,7 @@ function compile_x264 {
   cd $SRC/x264
   make clean
   CC=cl ./configure --prefix=$BUILD --extra-cflags='-DNO_PREFIX' --disable-cli --enable-static --libdir=$BUILD/lib
-  make
+  make -j $CPU_CORES
   make install-lib-static
 }
 
@@ -75,24 +98,35 @@ function compile_x265 {
   # 12bit
   cd work12
   cmake -G "Visual Studio 15 Win64" ../../../source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON
-  MSBuild.exe /property:Configuration="$MSBUILD_CONFIG" x265-static.vcxproj
+  MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" x265-static.vcxproj
   cp $MSBUILD_CONFIG/x265-static.lib ../work/x265_12bit.lib
   # 10bit
   cd ../work10
   cmake -G "Visual Studio 15 Win64" ../../../source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF
-  MSBuild.exe /property:Configuration="$MSBUILD_CONFIG" x265-static.vcxproj
+  MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" x265-static.vcxproj
   cp $MSBUILD_CONFIG/x265-static.lib ../work/x265_10bit.lib
   # 8bit - main
   cd ../work
   cmake -G "Visual Studio 15 Win64" ../../../source -DCMAKE_INSTALL_PREFIX=$BUILD -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DEXTRA_LIB="x265_10bit.lib;x265_12bit.lib" -DLINKED_10BIT=ON -DLINKED_12BIT=ON
   #-DSTATIC_LINK_CRT=ON
-  MSBuild.exe /property:Configuration="$MSBUILD_CONFIG" x265-static.vcxproj
+  MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" x265-static.vcxproj
   cp $MSBUILD_CONFIG/x265-static.lib ./x265_main.lib
   LIB.EXE /ignore:4006 /ignore:4221 /OUT:x265.lib x265_main.lib x265_10bit.lib x265_12bit.lib
   cp x265.lib $BUILD/lib/x265.lib
   cp x265.pc $BUILD/lib/pkgconfig/x265.pc
   cp x265_config.h $BUILD/include/
   cp ../../../source/x265.h $BUILD/include/
+}
+
+# Install nv-codec-headers
+function compile_ffnvcodec { 
+  cd $SRC/ffnvcodec
+  make PREFIX=$BUILD install
+}
+
+# Install amf
+function compile_amf { 
+  cp -a $SRC/amf/amf/public/include $BUILD/include/AMF
 }
 
 # Compile ffmpeg as static lib
@@ -104,8 +138,8 @@ function compile_ffmpeg {
   elif [ "$MODE" == "release" ]; then
     CCFLAGS=-MD
   fi
-  PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CCFLAGS" --prefix=$BUILD --pkg-config-flags="--static" --disable-programs --disable-shared --enable-static --enable-gpl --enable-runtime-cpudetect --disable-hwaccels --disable-devices --disable-network --enable-avisynth --enable-libx264 --enable-libx265
-  make
+  PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CCFLAGS" --prefix=$BUILD --pkg-config-flags="--static" --disable-programs --disable-doc --disable-shared --enable-static --enable-gpl --enable-runtime-cpudetect --disable-hwaccels --disable-devices --disable-network --enable-w32threads --enable-avisynth --enable-libx264 --enable-libx265 --enable-cuda --enable-cuvid --enable-d3d11va --enable-nvenc --enable-amf
+  make -j $CPU_CORES
   make install
 }
 
@@ -120,10 +154,14 @@ function clean {
 
 clean
 get_source_ffmpeg
+get_source_ffnvcodec
+get_source_amf
 get_source_x264
 get_source_x265
 compile_x264
 compile_x265
+compile_ffnvcodec
+compile_amf
 compile_ffmpeg
 
 # Finish
