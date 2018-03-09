@@ -13,8 +13,10 @@ Builds static libraries of ffmeg and external libraries (x264 8bit, x265 8,10 an
 
 ## Install development tools
 - Install CMakeGui in Windows to have the VisualStudio templates ready
-- Install "pacman -S base-devel" in msys2
-- Install other dependencies in msys2
+- Install "pacman -S base-devel git make pkg-config" in msys2
+- Install nasm to /usr/bin/nasm.exe
+- Install cmake gui
+- Add cmake path to path variable
 
 ## Starting the build
 - Have the build.sh file at i.e. "/home/daniel/ffmpeg/build.sh"
