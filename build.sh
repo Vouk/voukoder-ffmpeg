@@ -49,6 +49,18 @@ function get_source_amf {
   cd ../..
 }
 
+# Clone or update mfx
+function get_source_mfx {
+  if [ ! -d $SRC/mfx_dispatch/.git ]; then
+    git clone https://github.com/lu-zero/mfx_dispatch.git $SRC/mfx_dispatch
+  fi
+  cd $SRC/mfx_dispatch
+  git checkout master
+  git pull
+  cd ../..
+}
+
+
 # Clone or update x264
 function get_source_x264 {
   if [ ! -d $SRC/x264/.git ]; then
@@ -129,6 +141,17 @@ function compile_amf {
   cp -a $SRC/amf/amf/public/include $BUILD/include/AMF
 }
 
+# Install mfx_dispatch
+function compile_mfx { 
+  cd $SRC/mfx_dispatch
+  cmake -G "Visual Studio 15 Win64" -DCMAKE_INSTALL_PREFIX=$BUILD
+  MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" mfx.vcxproj
+  cp $MSBUILD_CONFIG/mfx.lib $BUILD/lib/libmfx.lib
+  cp libmfx.pc $BUILD/lib/pkgconfig/libmfx.pc
+  sed -i 's/-lsupc++ .*/-llibmfx -ladvapi32/' "$BUILD/lib/pkgconfig/libmfx.pc"
+  cp -a $SRC/mfx_dispatch/mfx $BUILD/include/mfx
+}
+
 # Compile ffmpeg as static lib
 function compile_ffmpeg { 
   cd $SRC/ffmpeg
@@ -138,7 +161,7 @@ function compile_ffmpeg {
   elif [ "$MODE" == "release" ]; then
     CCFLAGS=-MD
   fi
-  PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CCFLAGS" --prefix=$BUILD --pkg-config-flags="--static" --disable-programs --disable-doc --disable-shared --enable-static --enable-gpl --enable-runtime-cpudetect --disable-hwaccels --disable-devices --disable-network --enable-w32threads --enable-avisynth --enable-libx264 --enable-libx265 --enable-cuda --enable-cuvid --enable-d3d11va --enable-nvenc --enable-amf
+  PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CCFLAGS" --prefix=$BUILD --pkg-config-flags="--static" --disable-programs --disable-doc --disable-shared --enable-static --enable-gpl --enable-runtime-cpudetect --disable-hwaccels --disable-devices --disable-network --enable-w32threads --enable-avisynth --enable-libx264 --enable-libx265 --enable-cuda --enable-cuvid --enable-d3d11va --enable-nvenc --enable-amf --enable-libmfx
   make -j $CPU_CORES
   make install
 }
@@ -156,12 +179,14 @@ clean
 get_source_ffmpeg
 get_source_ffnvcodec
 get_source_amf
+get_source_mfx
 get_source_x264
 get_source_x265
 compile_x264
 compile_x265
 compile_ffnvcodec
 compile_amf
+compile_mfx
 compile_ffmpeg
 
 # Finish
