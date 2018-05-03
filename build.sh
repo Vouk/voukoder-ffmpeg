@@ -3,7 +3,7 @@
 SRC=`realpath src`
 DATE_ISO=`date +%Y%m%d`
 MODE=$1
-CPU_CORES=10
+CPU_CORES=$NUMBER_OF_PROCESSORS
 
 if [ "$MODE" == "debug" ]; then
   BUILD=`realpath build_debug`
@@ -94,6 +94,17 @@ function get_source_fdk_aac {
   cd ../..
 }
 
+# Clone or update zimg
+function get_source_zimg {
+  if [ ! -d $SRC/zimg/.git ]; then
+    git clone git://github.com/sekrit-twc/zimg $SRC/zimg
+  fi
+  cd $SRC/zimg
+  git checkout master
+  git pull
+  cd ../..
+}
+
 # Compile x264 as static lib
 function compile_x264 {
   cd $SRC/x264
@@ -152,6 +163,17 @@ function compile_mfx {
   cp -a $SRC/mfx_dispatch/mfx $BUILD/include/mfx
 }
 
+# Install zimg
+function compile_zimg { 
+  cd $SRC/zimg
+  ./autogen.sh
+  ./configure --prefix=$BUILD
+  MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" /property:Platform=x64 _msvc/zimg/zimg.vcxproj
+  cp _msvc/zimg/x64/$MSBUILD_CONFIG/z.lib $BUILD/lib/zimg.lib
+  cp src/zimg/api/zimg.h  $BUILD/include/zimg.h
+  cp zimg.pc $BUILD/lib/pkgconfig/zimg.pc
+}
+
 # Compile ffmpeg as static lib
 function compile_ffmpeg { 
   cd $SRC/ffmpeg
@@ -161,7 +183,7 @@ function compile_ffmpeg {
   elif [ "$MODE" == "release" ]; then
     CCFLAGS=-MD
   fi
-  PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CCFLAGS" --prefix=$BUILD --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-gpl --enable-runtime-cpudetect --disable-devices --disable-network --enable-w32threads --enable-avisynth --enable-libx264 --enable-libx265 --enable-cuda --enable-cuvid --enable-d3d11va --enable-nvenc --enable-amf --enable-libmfx
+  PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CCFLAGS" --prefix=$BUILD --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-gpl --enable-runtime-cpudetect --disable-devices --disable-network --enable-w32threads --enable-libzimg --enable-avisynth --enable-libx264 --enable-libx265 --enable-cuda --enable-cuvid --enable-d3d11va --enable-nvenc --enable-amf --enable-libmfx
   make -j $CPU_CORES
   make install
 }
@@ -182,6 +204,8 @@ get_source_amf
 get_source_mfx
 get_source_x264
 get_source_x265
+get_source_zimg
+compile_zimg
 compile_x264
 compile_x265
 compile_ffnvcodec
