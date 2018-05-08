@@ -11,96 +11,40 @@ if [ "$MODE" == "debug" ]; then
 elif [ "$MODE" == "release" ]; then
   BUILD=`realpath build_release`
   MSBUILD_CONFIG=Release
+elif [ "$MODE" == "clean" ]; then
+  rm -rf src build_debug build_release
+  exit
 else
-  echo "Please supply build mode [debug|release]!"
+  echo "Please supply build mode [debug|release|clean]!"
   exit 1
 fi
+
+function git_clone {
+  if [ ! -d $SRC/$2/.git ]; then
+    git clone $1 $SRC/$2
+  fi
+  cd $SRC/$2
+  git fetch --all
+  git pull
+  cd ../..
+}
+
+function svn_checkout {
+  if [ ! -d $SRC/$2/.svn ]; then
+     svn checkout $1 src/$2
+  fi
+  cd $SRC/$2
+  svn update
+  cd ../..
+}
 
 # Clone or update ffmpeg
 function get_source_ffmpeg {
   if [ ! -d $SRC/ffmpeg/.git ]; then
-    git clone https://git.ffmpeg.org/ffmpeg.git $SRC/ffmpeg
+    git clone https://git.ffmpeg.org/ffmpeg.git --branch release/4.0 $SRC/ffmpeg
   fi
   cd $SRC/ffmpeg
-  git checkout master
-  git pull
-  cd ../..
-}
-
-# Clone or update ffnvcodec
-function get_source_ffnvcodec {
-  if [ ! -d $SRC/ffnvcodec/.git ]; then
-    git clone https://github.com/FFmpeg/nv-codec-headers.git $SRC/ffnvcodec
-  fi
-  cd $SRC/ffnvcodec
-  git checkout master
-  git pull
-  cd ../..
-}
-
-# Clone or update amf
-function get_source_amf {
-  if [ ! -d $SRC/amf/.git ]; then
-    git clone https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git $SRC/amf
-  fi
-  cd $SRC/amf
-  git checkout master
-  git pull
-  cd ../..
-}
-
-# Clone or update mfx
-function get_source_mfx {
-  if [ ! -d $SRC/mfx_dispatch/.git ]; then
-    git clone https://github.com/lu-zero/mfx_dispatch.git $SRC/mfx_dispatch
-  fi
-  cd $SRC/mfx_dispatch
-  git checkout master
-  git pull
-  cd ../..
-}
-
-
-# Clone or update x264
-function get_source_x264 {
-  if [ ! -d $SRC/x264/.git ]; then
-    git clone git://git.videolan.org/x264.git $SRC/x264
-  fi
-  cd $SRC/x264
-  git checkout master
-  git pull
-  cd ../..
-}
-
-# Clone or update x265
-function get_source_x265 {
-  if [ ! -d $SRC/x265/.git ]; then
-    git clone git://github.com/videolan/x265.git $SRC/x265
-  fi
-  cd $SRC/x265
-  git checkout master
-  git pull
-  cd ../..
-}
-
-# Clone or update fdk-aac
-function get_source_fdk_aac {
-  if [ ! -d $SRC/fdk-aac/.git ]; then
-    git clone git://github.com/mstorsjo/fdk-aac.git $SRC/fdk-aac
-  fi
-  cd $SRC/fdk-aac
-  git checkout master
-  git pull
-  cd ../..
-}
-
-# Clone or update zimg
-function get_source_zimg {
-  if [ ! -d $SRC/zimg/.git ]; then
-    git clone git://github.com/sekrit-twc/zimg $SRC/zimg
-  fi
-  cd $SRC/zimg
-  git checkout master
+  git checkout release/4.0
   git pull
   cd ../..
 }
@@ -168,10 +112,21 @@ function compile_zimg {
   cd $SRC/zimg
   ./autogen.sh
   ./configure --prefix=$BUILD
-  MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" /property:Platform=x64 _msvc/zimg/zimg.vcxproj
-  cp _msvc/zimg/x64/$MSBUILD_CONFIG/z.lib $BUILD/lib/zimg.lib
+  cd _msvc/zimg
+  MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" /property:Platform=x64 /property:WholeProgramOptimization=false zimg.vcxproj
+  cp x64/$MSBUILD_CONFIG/z.lib $BUILD/lib/zimg.lib
+  cd ../..
   cp src/zimg/api/zimg.h  $BUILD/include/zimg.h
   cp zimg.pc $BUILD/lib/pkgconfig/zimg.pc
+}
+
+function compile {
+  echo "Compiling '$1' ...";
+  cd $SRC/$1
+  make clean
+  CC=cl ./configure --prefix=$BUILD $2
+  make -j $CPU_CORES
+  make install
 }
 
 # Compile ffmpeg as static lib
@@ -179,11 +134,11 @@ function compile_ffmpeg {
   cd $SRC/ffmpeg
   make clean
   if [ "$MODE" == "debug" ]; then
-    CCFLAGS=-MDd
+    CFLAGS=-MDd
   elif [ "$MODE" == "release" ]; then
-    CCFLAGS=-MD
+    CFLAGS=-MD
   fi
-  PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CCFLAGS" --prefix=$BUILD --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-gpl --enable-runtime-cpudetect --disable-devices --disable-network --enable-w32threads --enable-libzimg --enable-avisynth --enable-libx264 --enable-libx265 --enable-cuda --enable-cuvid --enable-d3d11va --enable-nvenc --enable-amf --enable-libmfx
+  PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CFLAGS -I$BUILD/include" --extra-ldflags="-LIBPATH:$BUILD/lib" --prefix=$BUILD --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-gpl --enable-runtime-cpudetect --disable-devices --disable-network --enable-w32threads --enable-libmp3lame --enable-libzimg --enable-avisynth --enable-libx264 --enable-libx265 --enable-cuda --enable-cuvid --enable-d3d11va --enable-nvenc --enable-amf --enable-libmfx
   make -j $CPU_CORES
   make install
 }
@@ -197,20 +152,23 @@ function clean {
   mkdir $BUILD/lib/pkgconfig
 }
 
-clean
+#clean
 get_source_ffmpeg
-get_source_ffnvcodec
-get_source_amf
-get_source_mfx
-get_source_x264
-get_source_x265
-get_source_zimg
+#git_clone git://github.com/mstorsjo/fdk-aac.git fdk-aac
+git_clone git://github.com/FFmpeg/nv-codec-headers.git ffnvcodec
+git_clone git://github.com/GPUOpen-LibrariesAndSDKs/AMF.git amf
+git_clone git://github.com/lu-zero/mfx_dispatch.git mfx_dispatch
+git_clone git://git.videolan.org/x264.git x264
+git_clone git://github.com/videolan/x265.git x265
+git_clone git://github.com/sekrit-twc/zimg.git zimg
+svn_checkout svn://svn.code.sf.net/p/lame/svn/trunk/lame lame
 compile_zimg
 compile_x264
 compile_x265
 compile_ffnvcodec
 compile_amf
 compile_mfx
+compile lame "--enable-nasm --disable-frontend --disable-shared --enable-static"
 compile_ffmpeg
 
 # Finish
