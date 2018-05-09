@@ -152,7 +152,7 @@ function clean {
   mkdir $BUILD/lib/pkgconfig
 }
 
-#clean
+clean
 get_source_ffmpeg
 #git_clone git://github.com/mstorsjo/fdk-aac.git fdk-aac
 git_clone git://github.com/FFmpeg/nv-codec-headers.git ffnvcodec
