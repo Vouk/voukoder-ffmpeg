@@ -24,7 +24,7 @@ function git_clone {
     git clone $1 $SRC/$2
   fi
   cd $SRC/$2
-  git fetch --all
+  git reset --hard
   git pull
   cd ../..
 }
