@@ -58,6 +58,12 @@ function compile_x264 {
   make install-lib-static
 }
 
+function compile_fdk-aac {
+  cd $SRC/fdk-aac
+  ./autogen.sh
+  compile fdk-aac "--enable-static --enable-shared"
+}
+
 function compile_x265 {
   cd $SRC/x265/build/vc15-x86_64
   rm -rf work*
@@ -138,9 +144,20 @@ function compile_ffmpeg {
   elif [ "$MODE" == "release" ]; then
     CFLAGS=-MD
   fi
-  PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CFLAGS -I$BUILD/include" --extra-ldflags="-LIBPATH:$BUILD/lib" --prefix=$BUILD --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-gpl --enable-runtime-cpudetect --disable-devices --disable-network --enable-w32threads --enable-libmp3lame --enable-libzimg --enable-avisynth --enable-libx264 --enable-libx265 --enable-cuda --enable-cuvid --enable-d3d11va --enable-nvenc --enable-amf --enable-libmfx
+  PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CFLAGS -I$BUILD/include" --extra-ldflags="-LIBPATH:$BUILD/lib" --prefix=$BUILD --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-gpl --enable-runtime-cpudetect --disable-devices --disable-network --enable-w32threads --enable-libmp3lame --enable-libzimg --enable-avisynth --enable-libx264 --enable-libx265 --enable-cuda --enable-cuvid --enable-d3d11va --enable-nvenc --enable-amf --enable-libmfx --enable-libfdk-aac --enable-nonfree
   make -j $CPU_CORES
   make install
+}
+
+# apply various patches
+function apply_patches {
+  cd $SRC/ffmpeg
+  patch -N -p1 --dry-run --silent -i ../../patches/0001-dynamic-loading-of-shared-fdk-aac-library.patch
+  if [ $? -eq 0 ];
+  then
+    patch -N -p1 -i ../../patches/0001-dynamic-loading-of-shared-fdk-aac-library.patch
+  fi
+  cd -
 }
 
 # Clean build
@@ -154,7 +171,7 @@ function clean {
 
 clean
 get_source_ffmpeg
-#git_clone git://github.com/mstorsjo/fdk-aac.git fdk-aac
+git_clone git://github.com/mstorsjo/fdk-aac.git fdk-aac
 git_clone git://github.com/FFmpeg/nv-codec-headers.git ffnvcodec
 git_clone git://github.com/GPUOpen-LibrariesAndSDKs/AMF.git amf
 git_clone git://github.com/lu-zero/mfx_dispatch.git mfx_dispatch
@@ -162,6 +179,8 @@ git_clone git://git.videolan.org/x264.git x264
 git_clone git://github.com/videolan/x265.git x265
 git_clone git://github.com/sekrit-twc/zimg.git zimg
 svn_checkout svn://svn.code.sf.net/p/lame/svn/trunk/lame lame
+apply_patches
+compile_fdk-aac
 compile_zimg
 compile_x264
 compile_x265
