@@ -61,7 +61,7 @@ function compile_x264 {
 function compile_fdk-aac {
   cd $SRC/fdk-aac
   ./autogen.sh
-  compile fdk-aac "--disable-static --enable-shared"
+  compile fdk-aac "--disable-static --disable-shared"
 }
 
 function compile_x265 {
@@ -196,7 +196,7 @@ for file in *.a; do
   mv "$file" "`basename "$file" .a`.lib"
 done
 
-rm -rf $BUILD/lib/pkgconfig
+rm -rf $BUILD/lib/pkgconfig $BUILD/lib/fdk-aac.lib $BUILD/lib/libfdk-aac.la
 
 # Build a package
 cd $BUILD
