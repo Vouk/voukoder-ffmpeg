@@ -19,17 +19,6 @@ else
   exit 1
 fi
 
-# Clone or update ffmpeg
-function get_source_ffmpeg {
-  if [ ! -d $SRC/ffmpeg/.git ]; then
-    git clone https://git.ffmpeg.org/ffmpeg.git --branch release/4.0 $SRC/ffmpeg
-  fi
-  cd $SRC/ffmpeg
-  git checkout release/4.0
-  git pull
-  cd ../..
-}
-
 # Compile x264 as static lib
 function compile_x264 {
   cd $SRC/x264
