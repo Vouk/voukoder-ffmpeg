@@ -128,13 +128,13 @@ function clean {
 }
 
 apply_patches
+compile_ffnvcodec
+compile_amf
 compile_fdk-aac
 
 #compile_x264
 #Compile_zimg
 #compile_x265
-#compile_ffnvcodec
-#compile_amf
 #compile lame "--enable-nasm --disable-frontend --disable-shared --enable-static"
 #compile_ffmpeg
 
