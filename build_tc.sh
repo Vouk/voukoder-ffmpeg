@@ -59,14 +59,14 @@ function compile_x265 {
 
 # Install nv-codec-headers
 function compile_ffnvcodec { 
-  echo "Copying NVENC headers ..."
+  echo "### Copying NVENC headers ..."
   cd $SRC/ffnvcodec
   make PREFIX=$BUILD install
 }
 
 # Install amf
 function compile_amf {
-  echo "Copying AMF headers ..."
+  echo "### Copying AMF headers ..."
   cp -a $SRC/amf/amf/public/include $BUILD/include/AMF
 }
 
@@ -84,7 +84,7 @@ function compile_zimg {
 }
 
 function compile {
-  echo "Compiling '$1' ...";
+  echo "### Compiling '$1' ...";
   cd $SRC/$1
   make clean
   CC=cl.exe LD=link.exe ./configure --prefix=$BUILD $2
