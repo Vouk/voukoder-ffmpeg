@@ -30,7 +30,7 @@ function compile_x264 {
 
 function compile_fdk-aac {
   cd $SRC/fdk-aac
-  ./autogen.sh
+  autoreconf -fiv
   compile fdk-aac "--disable-static --disable-shared"
 }
 
