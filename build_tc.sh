@@ -4,15 +4,14 @@ SRC=`realpath src`
 DATE_ISO=`date +%Y%m%d`
 MODE=$1
 CPU_CORES=$NUMBER_OF_PROCESSORS
+BUILD=`realpath build`
 
 if [ "$MODE" == "debug" ]; then
-  BUILD=`realpath build_debug`
   MSBUILD_CONFIG=Debug
 elif [ "$MODE" == "release" ]; then
-  BUILD=`realpath build_release`
   MSBUILD_CONFIG=Release
 elif [ "$MODE" == "clean" ]; then
-  rm -rf src build_debug build_release
+  rm -rf src build
   exit
 else
   echo "Please supply build mode [debug|release|clean]!"
@@ -23,7 +22,7 @@ fi
 function compile_x264 {
   cd $SRC/x264
   make clean
-  CC=cl ./configure --prefix=$BUILD --extra-cflags='-DNO_PREFIX' --disable-cli --enable-static --libdir=$BUILD/lib
+  CC=cl.exe ./configure --prefix=$BUILD --extra-cflags='-DNO_PREFIX' --disable-cli --enable-static --libdir=$BUILD/lib
   make -j $CPU_CORES
   make install-lib-static
 }
@@ -70,17 +69,6 @@ function compile_ffnvcodec {
 # Install amf
 function compile_amf { 
   cp -a $SRC/amf/amf/public/include $BUILD/include/AMF
-}
-
-# Install mfx_dispatch
-function compile_mfx { 
-  cd $SRC/mfx_dispatch
-  cmake -G "Visual Studio 15 Win64" -DCMAKE_INSTALL_PREFIX=$BUILD
-  MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" mfx.vcxproj
-  cp $MSBUILD_CONFIG/mfx.lib $BUILD/lib/libmfx.lib
-  cp libmfx.pc $BUILD/lib/pkgconfig/libmfx.pc
-  sed -i 's/-lsupc++ .*/-llibmfx -ladvapi32/' "$BUILD/lib/pkgconfig/libmfx.pc"
-  cp -a $SRC/mfx_dispatch/mfx $BUILD/include/mfx
 }
 
 # Install zimg
@@ -141,12 +129,11 @@ function clean {
 
 apply_patches
 compile_fdk-aac
-#compile_zimg
-#compile_x264
+compile_zimg
+compile_x264
 #compile_x265
 #compile_ffnvcodec
 #compile_amf
-#compile_mfx
 #compile lame "--enable-nasm --disable-frontend --disable-shared --enable-static"
 #compile_ffmpeg
 
