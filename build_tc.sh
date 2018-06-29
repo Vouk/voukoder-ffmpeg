@@ -128,9 +128,9 @@ function clean {
 }
 
 apply_patches
-#compile_fdk-aac
-compile_x264
+compile_fdk-aac
 
+#compile_x264
 #Compile_zimg
 #compile_x265
 #compile_ffnvcodec
