@@ -10,11 +10,8 @@ if [ "$MODE" == "debug" ]; then
   MSBUILD_CONFIG=Debug
 elif [ "$MODE" == "release" ]; then
   MSBUILD_CONFIG=Release
-elif [ "$MODE" == "clean" ]; then
-  rm -rf src build
-  exit
 else
-  echo "Please supply build mode [debug|release|clean]!"
+  echo "Please supply build mode [debug|release]!"
   exit 1
 fi
 
@@ -62,12 +59,14 @@ function compile_x265 {
 
 # Install nv-codec-headers
 function compile_ffnvcodec { 
+  echo "Copying NVENC headers ..."
   cd $SRC/ffnvcodec
   make PREFIX=$BUILD install
 }
 
 # Install amf
-function compile_amf { 
+function compile_amf {
+  echo "Copying AMF headers ..."
   cp -a $SRC/amf/amf/public/include $BUILD/include/AMF
 }
 
@@ -116,15 +115,6 @@ function apply_patches {
     patch -N -p1 -i ../../patches/0001-dynamic-loading-of-shared-fdk-aac-library.patch
   fi
   cd -
-}
-
-# Clean build
-function clean {
-  rm -rf $BUILD
-  mkdir $BUILD
-  mkdir $BUILD/include/
-  mkdir $BUILD/lib
-  mkdir $BUILD/lib/pkgconfig
 }
 
 apply_patches
