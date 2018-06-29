@@ -3,7 +3,7 @@
 SRC=`realpath src`
 DATE_ISO=`date +%Y%m%d`
 MODE=$1
-CPU_CORES=2
+CPU_CORES=$NUMBER_OF_PROCESSORS
 BUILD=`realpath build`
 
 if [ "$MODE" == "debug" ]; then
