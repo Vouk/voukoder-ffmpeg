@@ -122,11 +122,10 @@ compile_ffnvcodec
 compile_amf
 compile lame "--enable-nasm --disable-frontend --disable-shared --enable-static"
 compile_fdk-aac
-
-#compile_x264
-#Compile_zimg
-#compile_x265
-#compile_ffmpeg
+compile_zimg
+compile_x264
+compile_x265
+compile_ffmpeg
 
 exit
 # Finish
