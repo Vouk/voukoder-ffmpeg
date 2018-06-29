@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#teamcity version
 SRC=`realpath src`
 DATE_ISO=`date +%Y%m%d`
 MODE=$1
