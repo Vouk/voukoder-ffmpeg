@@ -17,7 +17,6 @@ else
 fi
 
 function compile {
-  echo "### Compiling '$1' ...";
   cd $SRC/$1
   make clean
   CC=cl ./configure --prefix=$BUILD $2
@@ -31,34 +30,23 @@ if [ "$STEP" == "libfdk-aac" ]; then
   compile fdk-aac "--disable-static --disable-shared"
 elif [ "$STEP" == "lame" ]; then
   compile lame "--enable-nasm --disable-frontend --disable-shared --enable-static"
-else
-  echo "Unknown build step!"
-  exit 1
-fi
-
-exit
-
-
-
-
-
-
-
-
-
-
-# Compile x264 as static lib
-function compile_x264 {
+elif [ "$STEP" == "zimg" ]; then
+  cd $SRC/zimg
+  ./autogen.sh
+  ./configure --prefix=$BUILD
+  cd _msvc/zimg
+  MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" /property:Platform=x64 /property:WholeProgramOptimization=false zimg.vcxproj
+  cp x64/$MSBUILD_CONFIG/z.lib $BUILD/lib/zimg.lib
+  cd ../..
+  cp src/zimg/api/zimg.h  $BUILD/include/zimg.h
+  cp zimg.pc $BUILD/lib/pkgconfig/zimg.pc
+elif [ "$STEP" == "x264" ]; then
   cd $SRC/x264
   make clean
-  CC=cl.exe ./configure --prefix=$BUILD --extra-cflags='-DNO_PREFIX' --disable-cli --enable-static --libdir=$BUILD/lib
+  CC=cl ./configure --prefix=$BUILD --extra-cflags='-DNO_PREFIX' --disable-cli --enable-static --libdir=$BUILD/lib
   make -j $CPU_CORES
   make install-lib-static
-}
-
-
-
-function compile_x265 {
+elif [ "$STEP" == "x265" ]; then
   cd $SRC/x265/build/vc15-x86_64
   rm -rf work*
   mkdir work work10 work12
@@ -83,38 +71,23 @@ function compile_x265 {
   cp x265.pc $BUILD/lib/pkgconfig/x265.pc
   cp x265_config.h $BUILD/include/
   cp ../../../source/x265.h $BUILD/include/
-}
-
-# Install nv-codec-headers
-function compile_ffnvcodec { 
+elif [ "$STEP" == "ffmpeg" ]; then
   echo "### Copying NVENC headers ..."
   cd $SRC/ffnvcodec
   make PREFIX=$BUILD install
-}
-
-# Install amf
-function compile_amf {
+  
   echo "### Copying AMF headers ..."
   cp -a $SRC/amf/amf/public/include $BUILD/include/AMF
-}
-
-# Install zimg
-function compile_zimg { 
-  cd $SRC/zimg
-  ./autogen.sh
-  ./configure --prefix=$BUILD
-  cd _msvc/zimg
-  MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" /property:Platform=x64 /property:WholeProgramOptimization=false zimg.vcxproj
-  cp x64/$MSBUILD_CONFIG/z.lib $BUILD/lib/zimg.lib
-  cd ../..
-  cp src/zimg/api/zimg.h  $BUILD/include/zimg.h
-  cp zimg.pc $BUILD/lib/pkgconfig/zimg.pc
-}
-
-
-
-# Compile ffmpeg as static lib
-function compile_ffmpeg { 
+  
+  echo "### Applying patches ..."
+  cd $SRC/ffmpeg
+  patch -N -p1 --dry-run --silent -i ../../patches/0001-dynamic-loading-of-shared-fdk-aac-library.patch
+  if [ $? -eq 0 ];
+  then
+    patch -N -p1 -i ../../patches/0001-dynamic-loading-of-shared-fdk-aac-library.patch
+  fi
+  
+  echo "### Compiling FFMpeg ..."
   cd $SRC/ffmpeg
   make clean
   if [ "$MODE" == "debug" ]; then
@@ -125,29 +98,12 @@ function compile_ffmpeg {
   PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CFLAGS -I$BUILD/include" --extra-ldflags="-LIBPATH:$BUILD/lib" --prefix=$BUILD --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-gpl --enable-runtime-cpudetect --disable-devices --disable-network --enable-w32threads --enable-libmp3lame --enable-libzimg --enable-avisynth --enable-libx264 --enable-libx265 --enable-cuda --enable-cuvid --enable-d3d11va --enable-nvenc --enable-amf --enable-libmfx --enable-libfdk-aac
   make -j $CPU_CORES
   make install
-}
+else
+  echo "Unknown build step!"
+  exit 1
+fi
 
-# apply various patches
-function apply_patches {
-  cd $SRC/ffmpeg
-  patch -N -p1 --dry-run --silent -i ../../patches/0001-dynamic-loading-of-shared-fdk-aac-library.patch
-  if [ $? -eq 0 ];
-  then
-    patch -N -p1 -i ../../patches/0001-dynamic-loading-of-shared-fdk-aac-library.patch
-  fi
-  cd -
-}
-
-
-
-compile_zimg
-compile_x264
-compile_x265
-
-apply_patches
-compile_ffnvcodec
-compile_amf
-compile_ffmpeg
+exit
 
 # Finish
 cd $BUILD/lib
