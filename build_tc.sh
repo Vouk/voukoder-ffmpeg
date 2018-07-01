@@ -50,7 +50,7 @@ elif [ "$STEP" == "x265" ]; then
   # checkout manually (cmake is getting values from git)
   cd $src/..
   if [ ! -d $SRC/x265/.git ]; then
-    git clone $1 $SRC/x265
+    git clone git@github.com:videolan/x265.git $SRC/x265
   fi
   git reset --hard
   git pull
