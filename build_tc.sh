@@ -20,7 +20,7 @@ function compile {
   echo "### Compiling '$1' ...";
   cd $SRC/$1
   make clean
-  ./configure --prefix=$BUILD $2
+  CC=cl ./configure --prefix=$BUILD $2
   make -j $CPU_CORES
   make install
 }
