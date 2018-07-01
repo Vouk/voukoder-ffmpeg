@@ -1,9 +1,10 @@
 #!/bin/bash
 
+STEP=$1
+MODE=$2
+CPU_CORES=$3
 SRC=`realpath src`
 DATE_ISO=`date +%Y%m%d`
-MODE=$1
-CPU_CORES=$NUMBER_OF_PROCESSORS
 BUILD=`realpath build`
 
 if [ "$MODE" == "debug" ]; then
@@ -15,6 +16,36 @@ else
   exit 1
 fi
 
+function compile {
+  echo "### Compiling '$1' ...";
+  cd $SRC/$1
+  make clean
+  CC=cl.exe LD=link.exe ./configure --prefix=$BUILD $2
+  make -j $CPU_CORES
+  make install
+}
+
+if [ "$STEP" == "libfdk-aac" ]; then
+  cd $SRC/fdk-aac
+  ./autogen.sh
+  compile fdk-aac "--disable-static --disable-shared"
+elif [ "$STEP" == "release" ]; then
+else
+  echo "Unknown build step!"
+  exit 1
+fi
+
+exit
+
+
+
+
+
+
+
+
+
+
 # Compile x264 as static lib
 function compile_x264 {
   cd $SRC/x264
@@ -24,11 +55,7 @@ function compile_x264 {
   make install-lib-static
 }
 
-function compile_fdk-aac {
-  cd $SRC/fdk-aac
-  ./autogen.sh
-  compile fdk-aac "--disable-static --disable-shared"
-}
+
 
 function compile_x265 {
   cd $SRC/x265/build/vc15-x86_64
@@ -83,14 +110,7 @@ function compile_zimg {
   cp zimg.pc $BUILD/lib/pkgconfig/zimg.pc
 }
 
-function compile {
-  echo "### Compiling '$1' ...";
-  cd $SRC/$1
-  make clean
-  CC=cl.exe LD=link.exe ./configure --prefix=$BUILD $2
-  make -j $CPU_CORES
-  make install
-}
+
 
 # Compile ffmpeg as static lib
 function compile_ffmpeg { 
@@ -117,6 +137,8 @@ function apply_patches {
   cd -
 }
 
+
+
 apply_patches
 compile_ffnvcodec
 compile_amf
@@ -127,7 +149,6 @@ compile_x264
 compile_x265
 compile_ffmpeg
 
-exit
 # Finish
 cd $BUILD/lib
 for file in *.a; do
