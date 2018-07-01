@@ -29,8 +29,8 @@ if [ "$STEP" == "libfdk-aac" ]; then
   cd $SRC/fdk-aac
   ./autogen.sh
   compile fdk-aac "--disable-static --disable-shared"
-elif [ "$STEP" == "release" ]; then
-  echo 2222
+elif [ "$STEP" == "lame" ]; then
+  compile lame "--enable-nasm --disable-frontend --disable-shared --enable-static"
 else
   echo "Unknown build step!"
   exit 1
@@ -140,14 +140,13 @@ function apply_patches {
 
 
 
-apply_patches
-compile_ffnvcodec
-compile_amf
-compile lame "--enable-nasm --disable-frontend --disable-shared --enable-static"
-compile_fdk-aac
 compile_zimg
 compile_x264
 compile_x265
+
+apply_patches
+compile_ffnvcodec
+compile_amf
 compile_ffmpeg
 
 # Finish
