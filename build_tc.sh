@@ -30,6 +30,7 @@ if [ "$STEP" == "libfdk-aac" ]; then
   ./autogen.sh
   compile fdk-aac "--disable-static --disable-shared"
 elif [ "$STEP" == "release" ]; then
+  echo 2222
 else
   echo "Unknown build step!"
   exit 1
