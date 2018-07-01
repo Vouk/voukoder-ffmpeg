@@ -47,9 +47,14 @@ elif [ "$STEP" == "x264" ]; then
   make -j $CPU_CORES
   make install-lib-static
 elif [ "$STEP" == "x265" ]; then
-  cd $SRC/x265
+  # checkout manually (cmake is getting values from git)
+  cd $src/..
+  if [ ! -d $SRC/x265/.git ]; then
+    git clone $1 $SRC/x265
+  fi
+  git reset --hard
   git pull
-  cd build/vc15-x86_64
+  cd $SRC/x265/build/vc15-x86_64
   rm -rf work*
   mkdir work work10 work12
   # 12bit
