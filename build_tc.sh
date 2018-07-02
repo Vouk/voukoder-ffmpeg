@@ -105,22 +105,24 @@ elif [ "$STEP" == "ffmpeg" ]; then
   PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CFLAGS -I$BUILD/include" --extra-ldflags="-LIBPATH:$BUILD/lib" --prefix=$BUILD --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-gpl --enable-runtime-cpudetect --disable-devices --disable-network --enable-w32threads --enable-libmp3lame --enable-libzimg --enable-avisynth --enable-libx264 --enable-libx265 --enable-cuda --enable-cuvid --enable-d3d11va --enable-nvenc --enable-amf --enable-libfdk-aac
   make -j $CPU_CORES
   make install
+  
+  # rename *.a to *.lib
+  cd $BUILD/lib
+  for file in *.a; do
+    mv "$file" "`basename "$file" .a`.lib"
+  done
+
+  # clean up
+  rm -rf $BUILD/lib/pkgconfig $BUILD/lib/fdk-aac.lib $BUILD/lib/*.la
+  
+  mkdir ../dist 2>/dev/null
+  
+  # Build a binary package
+  cd $BUILD
+  tar czf ../dist/ffmpeg-win64-static-$MODE-$DATE_ISO.tar.gz *
+  cd $SRC/ffmpeg
+  tar czf ../dist/ffmpeg-win64-static-src-$MODE-$DATE_ISO.tar.gz *
 else
   echo "Unknown build step!"
   exit 1
 fi
-
-exit
-
-# Finish
-cd $BUILD/lib
-for file in *.a; do
-  mv "$file" "`basename "$file" .a`.lib"
-done
-
-rm -rf $BUILD/lib/pkgconfig $BUILD/lib/fdk-aac.lib $BUILD/lib/libfdk-aac.la
-
-# Build a package
-cd $BUILD
-mkdir ../dist 2>/dev/null
-tar czf ../dist/ffmpeg-win64-static-$MODE-$DATE_ISO.tar.gz *
