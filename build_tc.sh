@@ -4,7 +4,6 @@ STEP=$1
 MODE=$2
 CPU_CORES=$3
 SRC=`realpath src`
-DATE_ISO=`date +%Y%m%d`
 BUILD=`realpath build`
 
 if [ "$MODE" == "debug" ]; then
