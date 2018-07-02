@@ -112,10 +112,11 @@ elif [ "$STEP" == "ffmpeg" ]; then
   rm -rf $BUILD/lib/pkgconfig $BUILD/lib/fdk-aac.lib $BUILD/lib/*.la
   
   # Create archives
-  cd $BUILD/..
-  mkdir dist 2>/dev/null
-  tar czf dist/ffmpeg-win64-static-$MODE.tar.gz build/*
-  tar czf dist/ffmpeg-win64-static-src-$MODE.tar.gz src/ffmpeg/*
+  cd $BUILD
+  mkdir ../dist 2>/dev/null
+  tar czf ../dist/ffmpeg-win64-static-$MODE.tar.gz *
+  cd $SRC/ffmpeg
+  tar czf ../../dist/ffmpeg-win64-static-src-$MODE.tar.gz *
 else
   echo "Unknown build step!"
   exit 1
