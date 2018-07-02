@@ -18,7 +18,6 @@ fi
 
 function compile {
   cd $SRC/$1
-  make clean
   CC=cl ./configure --prefix=$BUILD $2
   make -j $CPU_CORES
   make install
@@ -42,7 +41,6 @@ elif [ "$STEP" == "zimg" ]; then
   cp zimg.pc $BUILD/lib/pkgconfig/zimg.pc
 elif [ "$STEP" == "x264" ]; then
   cd $SRC/x264
-  make clean
   CC=cl ./configure --prefix=$BUILD --extra-cflags='-DNO_PREFIX' --disable-cli --enable-static --libdir=$BUILD/lib
   make -j $CPU_CORES
   make install-lib-static
@@ -96,7 +94,6 @@ elif [ "$STEP" == "ffmpeg" ]; then
   
   echo "### Compiling FFMpeg ..."
   cd $SRC/ffmpeg
-  make clean
   if [ "$MODE" == "debug" ]; then
     CFLAGS=-MDd
   elif [ "$MODE" == "release" ]; then
