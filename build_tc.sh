@@ -118,8 +118,8 @@ elif [ "$STEP" == "ffmpeg" ]; then
   # Create archives
   cd $BUILD/..
   mkdir dist 2>/dev/null
-  tar czf dist/ffmpeg-win64-static-$MODE-$DATE_ISO.tar.gz build/*
-  tar czf dist/ffmpeg-win64-static-src-$MODE-$DATE_ISO.tar.gz src/ffmpeg/*
+  tar czf dist/ffmpeg-win64-static-$MODE.tar.gz build/*
+  tar czf dist/ffmpeg-win64-static-src-$MODE.tar.gz src/ffmpeg/*
 else
   echo "Unknown build step!"
   exit 1
