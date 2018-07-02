@@ -117,7 +117,7 @@ elif [ "$STEP" == "ffmpeg" ]; then
   
   mkdir ../dist 2>/dev/null
   
-  # Build a binary package
+  # Create archives
   cd $BUILD
   tar czf ../dist/ffmpeg-win64-static-$MODE-$DATE_ISO.tar.gz *
   cd $SRC/ffmpeg
