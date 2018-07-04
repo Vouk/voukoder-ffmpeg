@@ -81,7 +81,7 @@ elif [ "$STEP" == "libogg" ]; then
 elif [ "$STEP" == "libvorbis" ]; then
   compile libvorbis "--disable-shared --target=x86_64-win64-vs15"
 elif [ "$STEP" == "libvpx" ]; then
-  compile libvpx "--disable-shared --target=x86_64-win64-vs15 --disable-examples --disable-tools --disable-docs"
+  compile libvpx "--disable-shared --target=x86_64-win64-vs15 --disable-examples --disable-tools --disable-docs --enable-webm-io --enable-libyuv"
 elif [ "$STEP" == "ffmpeg" ]; then
   echo "### Copying NVENC headers ..."
   cd $SRC/ffnvcodec
