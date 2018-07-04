@@ -83,7 +83,7 @@ elif [ "$STEP" == "libvorbis" ]; then
   compile libvorbis "--disable-shared"
 elif [ "$STEP" == "libvpx" ]; then
   cd $SRC/$1
-  ./configure --prefix=$BUILD --target=x86_64-win64-vs15 --enable-vp8 --enable-vp9 --disable-shared --disable-examples --disable-tools --disable-docs --enable-vp9-highbitdepth
+  ./configure --prefix=$BUILD --target=x86_64-win64-vs15 --enable-vp8 --enable-vp9 --disable-unit_tests --disable-shared --disable-examples --disable-tools --disable-docs --enable-vp9-highbitdepth
   make -j $CPU_CORES
   make install
 elif [ "$STEP" == "ffmpeg" ]; then
