@@ -2,8 +2,8 @@
 
 STEP=$1
 MODE=$2
-ENABLED_TOOLS=$3
-CPU_CORES=$4
+CPU_CORES=$3
+ENABLED_TOOLS=$4
 SRC=`realpath src`
 BUILD=`realpath build`
 
