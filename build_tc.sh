@@ -80,7 +80,7 @@ elif [ "$STEP" == "x265" ]; then
 elif [ "$STEP" == "libogg" ]; then
   compile libogg "--disable-shared --target=x86_64-win64-vs15"
 elif [ "$STEP" == "libvorbis" ]; then
-  compile libvorbis "--disable-shared --target=x86_64-win64-vs15"
+  compile libvorbis "--disable-shared"
 elif [ "$STEP" == "libvpx" ]; then
   compile libvpx "--target=x86_64-win64-vs15 --disable-shared --disable-examples --disable-tools --disable-docs"
 elif [ "$STEP" == "ffmpeg" ]; then
