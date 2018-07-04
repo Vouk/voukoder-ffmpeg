@@ -17,14 +17,15 @@ fi
 
 function compile {
   cd $SRC/$1
+  if [ -f autogen.sh ]; then
+    ./autogen.sh
+  fi
   CC=cl ./configure --prefix=$BUILD $2
   make -j $CPU_CORES
   make install
 }
 
 if [ "$STEP" == "libfdk-aac" ]; then
-  cd $SRC/fdk-aac
-  ./autogen.sh
   compile fdk-aac "--disable-static --disable-shared"
 elif [ "$STEP" == "lame" ]; then
   compile lame "--enable-nasm --disable-frontend --disable-shared --enable-static"
