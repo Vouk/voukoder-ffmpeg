@@ -2,7 +2,8 @@
 
 STEP=$1
 MODE=$2
-CPU_CORES=$3
+ENABLED_TOOLS=$3
+CPU_CORES=$4
 SRC=`realpath src`
 BUILD=`realpath build`
 
@@ -105,7 +106,7 @@ elif [ "$STEP" == "ffmpeg" ]; then
   elif [ "$MODE" == "release" ]; then
     CFLAGS=-MD
   fi
-  PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CFLAGS -I$BUILD/include" --extra-ldflags="-LIBPATH:$BUILD/lib" --prefix=$BUILD --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-gpl --enable-runtime-cpudetect --disable-devices --disable-network --enable-w32threads --enable-libmp3lame --enable-libzimg --enable-avisynth --enable-libx264 --enable-libx265 --enable-cuda --enable-cuvid --enable-d3d11va --enable-nvenc --enable-amf --enable-libfdk-aac --enable-libvpx --enable-libvorbis
+  PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CFLAGS -I$BUILD/include" --extra-ldflags="-LIBPATH:$BUILD/lib" --prefix=$BUILD --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-gpl --enable-runtime-cpudetect --disable-devices --disable-network --enable-w32threads $ENABLED_TOOLS
   make -j $CPU_CORES
   make install
   
