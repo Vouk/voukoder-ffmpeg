@@ -78,11 +78,11 @@ elif [ "$STEP" == "x265" ]; then
   cp x265_config.h $BUILD/include/
   cp ../../../source/x265.h $BUILD/include/
 elif [ "$STEP" == "libogg" ]; then
-  compile libogg "--disable-shared --target=x86_64-win64-vs15"
+  compile libogg "--disable-shared"
 elif [ "$STEP" == "libvorbis" ]; then
   compile libvorbis "--disable-shared"
 elif [ "$STEP" == "libvpx" ]; then
-  compile libvpx "--target=x86_64-win64-vs15 --disable-shared --disable-examples --disable-tools --disable-docs"
+  compile libvpx "--target=x86_64-win64-gcc --disable-shared --disable-examples --disable-tools --disable-docs --enable-vp9-highbitdepth"
 elif [ "$STEP" == "ffmpeg" ]; then
   echo "### Copying NVENC headers ..."
   cd $SRC/ffnvcodec
