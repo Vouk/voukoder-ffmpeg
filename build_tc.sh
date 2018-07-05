@@ -87,7 +87,8 @@ elif [ "$STEP" == "libvpx" ]; then
   ./configure --prefix=$BUILD --target=x86_64-win64-vs15 --enable-vp9-highbitdepth --disable-shared --disable-examples --disable-tools --disable-docs --disable-libyuv --disable-unit_tests --disable-postproc
   make -j $CPU_CORES
   make install
-  cp $BUILD/lib/x64/vpxmd.lib $BUILD/lib/vpx.lib
+  mv $BUILD/lib/x64/vpxmd.lib $BUILD/lib/vpx.lib
+  rm -rf $BUILD/lib/x64
 elif [ "$STEP" == "ffmpeg" ]; then
   echo "### Copying NVENC headers ..."
   cd $SRC/ffnvcodec
