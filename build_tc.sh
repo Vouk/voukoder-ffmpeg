@@ -80,13 +80,14 @@ elif [ "$STEP" == "x265" ]; then
 elif [ "$STEP" == "libogg" ]; then
   compile libogg "--disable-shared"
 elif [ "$STEP" == "libvorbis" ]; then
-  compile libvorbis "--disable-shared"
+  compile libvorbis "--disable-shared"  
+  sed -i '/^Libs\.private.*/d' $BUILD/lib/pkgconfig/vorbis.pc  # don't need m.lib on windows
 elif [ "$STEP" == "libvpx" ]; then
   cd $SRC/libvpx
   ./configure --prefix=$BUILD --target=x86_64-win64-vs15 --enable-vp9-highbitdepth --disable-shared --disable-examples --disable-tools --disable-docs --disable-libyuv --disable-unit_tests --disable-postproc
   make -j $CPU_CORES
   make install
-  cp $BUILD/lib/x64/* $BUILD/lib/
+  cp $BUILD/lib/x64/vpxmd.lib $BUILD/lib/vpx.lib
 elif [ "$STEP" == "ffmpeg" ]; then
   echo "### Copying NVENC headers ..."
   cd $SRC/ffnvcodec
