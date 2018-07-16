@@ -31,8 +31,9 @@ if [ "$STEP" == "opus" ]; then
   ./autogen.sh
   ./configure --prefix=$BUILD
   cd win32/VS2015
+  devenv.exe /Upgrade opus.sln
   MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" /property:Platform=x64 opus.vcxproj
-  
+
   
 elif [ "$STEP" == "libfdk-aac" ]; then
   compile fdk-aac "--disable-static --disable-shared"
