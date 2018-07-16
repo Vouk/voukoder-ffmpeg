@@ -31,8 +31,8 @@ if [ "$STEP" == "opus" ]; then
   ./autogen.sh
   ./configure --prefix=$BUILD
   cd win32/VS2015
-  echo Converting project file ...
-  devenv.exe /Upgrade opus.vcxproj
+  echo \nConverting project file ...
+  sed -i 's/v140/v141/g' opus.vcxproj
   echo Building project 'opus' ...
   MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" /property:Platform=x64 opus.vcxproj
   echo Done.
