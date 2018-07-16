@@ -26,7 +26,15 @@ function compile {
   make install
 }
 
-if [ "$STEP" == "libfdk-aac" ]; then
+if [ "$STEP" == "opus" ]; then
+  cd $SRC/opus
+  ./autogen.sh
+  ./configure --prefix=$BUILD
+  cd win32/VS2015
+  MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" /property:Platform=x64 opus.vcxproj
+  
+  
+elif [ "$STEP" == "libfdk-aac" ]; then
   compile fdk-aac "--disable-static --disable-shared"
 elif [ "$STEP" == "lame" ]; then
   compile lame "--enable-nasm --disable-frontend --disable-shared --enable-static"
