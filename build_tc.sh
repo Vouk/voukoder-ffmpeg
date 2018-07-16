@@ -36,7 +36,8 @@ if [ "$STEP" == "opus" ]; then
   echo Building project 'opus' ...
   MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" /property:Platform=x64 opus.vcxproj
   echo Done.
-  
+  cp x64/$MSBUILD_CONFIG/opus.lib $BUILD/lib/opus.lib
+  cp -r $SRC/opus/include $BUILD/include/opus
 elif [ "$STEP" == "libfdk-aac" ]; then
   compile fdk-aac "--disable-static --disable-shared"
 elif [ "$STEP" == "lame" ]; then
