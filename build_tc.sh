@@ -38,6 +38,13 @@ if [ "$STEP" == "opus" ]; then
   echo Done.
   cp x64/$MSBUILD_CONFIG/opus.lib $BUILD/lib/opus.lib
   cp -r $SRC/opus/include $BUILD/include/opus
+  cp $SRC/opus/opus.pc.in $BUILD/lib/pkgconfig/opus.pc
+  sed -i "s/@prefix@/$BUILD/g" $BUILD/lib/pkgconfig/opus.pc
+  sed -i "s/@exec_prefix@/\$\{prefix\}/g" $BUILD/lib/pkgconfig/opus.pc
+  sed -i "s/@libdir@/\$\{prefix\}\/lib/g" $BUILD/lib/pkgconfig/opus.pc
+  sed -i "s/@includedir@/\$\{prefix\}\/include/g" $BUILD/lib/pkgconfig/opus.pc
+  sed -i "s/@LIBM@//g" $BUILD/lib/pkgconfig/opus.pc
+  sed -i "s/@VERSION@/2.0.0/g" $BUILD/lib/pkgconfig/opus.pc
 elif [ "$STEP" == "libfdk-aac" ]; then
   compile fdk-aac "--disable-static --disable-shared"
 elif [ "$STEP" == "lame" ]; then
