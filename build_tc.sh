@@ -27,10 +27,7 @@ function compile {
 }
 
 if [ "$STEP" == "opus" ]; then
-  cd $SRC/opus
-  ./autogen.sh
-  ./configure --prefix=$BUILD
-  cd win32/VS2015
+  cd $SRC/opus/win32/VS2015
   echo \nConverting project file ...
   sed -i 's/v140/v141/g' opus.vcxproj
   echo Building project 'opus' ...
