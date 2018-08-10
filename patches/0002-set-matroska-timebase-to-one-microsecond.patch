@@ -6,7 +6,7 @@
      for (i = 0; i < s->nb_streams; i++) {
 -        // ms precision is the de-facto standard timescale for mkv files
 -        avpriv_set_pts_info(s->streams[i], 64, 1, 1000);
-+        // ms precision is the de-facto standard timescale for mkv files (Patched: We're using nanoseconds!!)
++        // ms precision is the de-facto standard timescale for mkv files (Patched: We're using microseconds!!)
 +        avpriv_set_pts_info(s->streams[i], 64, 1, 1000000);
      }
  
