@@ -1,13 +1,13 @@
---- matroskaenc.c       2018-08-10 04:00:37.385538200 +0200
-+++ matroskaenc2.c      2018-08-10 22:07:20.208420400 +0200
+--- libavformat/matroskaenc.c	2018-08-10 22:18:59.051659000 +0200
++++ libavformat/matroskaenc2.c	2018-08-10 22:18:31.932030400 +0200
 @@ -2671,8 +2671,8 @@
      }
-
+ 
      for (i = 0; i < s->nb_streams; i++) {
 -        // ms precision is the de-facto standard timescale for mkv files
 -        avpriv_set_pts_info(s->streams[i], 64, 1, 1000);
-+        // ms precision is the de-facto standard timescale for mkv files (Patched - We're using microseconds!!)
++        // ms precision is the de-facto standard timescale for mkv files (Patched: We're using nanoseconds!!)
 +        avpriv_set_pts_info(s->streams[i], 64, 1, 1000000);
      }
-
+ 
      return 0;
