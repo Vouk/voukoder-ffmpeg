@@ -120,11 +120,6 @@ elif [ "$STEP" == "ffmpeg" ]; then
   then
     patch -N -p1 -i ../../patches/0001-dynamic-loading-of-shared-fdk-aac-library.patch
   fi
-  patch -N -p0 --dry-run --silent -i ../../patches/0002-set-matroska-timebase-to-one-microsecond.patch
-  if [ $? -eq 0 ];
-  then
-    patch -N -p0 -i ../../patches/0002-set-matroska-timebase-to-one-microsecond.patch
-  fi
     
   echo "### Compiling FFMpeg ..."
   cd $SRC/ffmpeg
