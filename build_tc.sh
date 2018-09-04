@@ -115,17 +115,17 @@ elif [ "$STEP" == "ffmpeg" ]; then
   
   echo "### Applying patches ..."
   cd $SRC/ffmpeg
-  
-  patch -N -p1 --dry-run --silent -i ../../patches/0002-patch-ffmpeg-to-new-fdk-api.patch
-  if [ $? -eq 0 ];
-  then
-    patch -N -p1 -i ../../0002-patch-ffmpeg-to-new-fdk-api.patch
-  fi
     
   patch -N -p1 --dry-run --silent -i ../../patches/0001-dynamic-loading-of-shared-fdk-aac-library.patch
   if [ $? -eq 0 ];
   then
     patch -N -p1 -i ../../patches/0001-dynamic-loading-of-shared-fdk-aac-library.patch
+  fi
+  
+  patch -N -p1 --dry-run --silent -i ../../patches/0002-patch-ffmpeg-to-new-fdk-api.patch
+  if [ $? -eq 0 ];
+  then
+    patch -N -p1 -i ../../0002-patch-ffmpeg-to-new-fdk-api.patch
   fi
     
   echo "### Compiling FFMpeg ..."
