@@ -1,51 +1,21 @@
-From: Martin Storsjö <martin@martin.st>
-Date: Fri, 31 Aug 2018 11:25:30 +0000 (+0300)
-Subject: libfdk-aacenc: Fix building with libfdk-aac v2
-X-Git-Url: https://git.libav.org/?p=libav.git;a=commitdiff_plain;h=141c960e21d2860e354f9b90df136184dd00a9a8;hp=c8bca9fe466f810fd484e2c6db7ef7bc83b5a943
-
-libfdk-aacenc: Fix building with libfdk-aac v2
-
-When flushing the encoder, we now need to provide non-null buffer
-parameters for everything, even if they are unused.
-
-The encoderDelay parameter has been replaced by two, nDelay and
-nDelayCore.
-
-Signed-off-by: Martin Storsjö <martin@martin.st>
----
-
-diff --git a/libavcodec/libfdk-aacenc.c b/libavcodec/libfdk-aacenc.c
-index c340a1e..2ad768e 100644
---- a/libavcodec/libfdk-aacenc.c
-+++ b/libavcodec/libfdk-aacenc.c
-@@ -26,6 +26,11 @@
- #include "audio_frame_queue.h"
- #include "internal.h"
- 
-+#define FDKENC_VER_AT_LEAST(vl0, vl1) \
-+    (defined(AACENCODER_LIB_VL0) && \
-+        ((AACENCODER_LIB_VL0 > vl0) || \
-+         (AACENCODER_LIB_VL0 == vl0 && AACENCODER_LIB_VL1 >= vl1)))
-+
- typedef struct AACContext {
-     const AVClass *class;
-     HANDLE_AACENCODER handle;
-@@ -290,7 +295,11 @@ static av_cold int aac_encode_init(AVCodecContext *avctx)
+--- libavcodec/libfdk-aacenc.c.orig     2018-09-04 17:31:43.145385000 +0200
++++ libavcodec/libfdk-aacenc.c  2018-09-04 17:39:10.786071200 +0200
+@@ -289,7 +289,7 @@
      }
- 
+
      avctx->frame_size = info.frameLength;
-+    avctx->initial_padding = info.nDelay;
 -    avctx->initial_padding = info.encoderDelay;
++    avctx->initial_padding = info.nDelay;
      ff_af_queue_init(avctx, &s->afq);
- 
+
      if (avctx->flags & AV_CODEC_FLAG_GLOBAL_HEADER) {
-@@ -323,28 +332,35 @@ static int aac_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
+@@ -322,28 +322,35 @@
      int out_buffer_size, out_buffer_element_size;
      void *in_ptr, *out_ptr;
      int ret;
 +    uint8_t dummy_buf[1];
      AACENC_ERROR err;
- 
+
      /* handle end-of-stream small frame and flushing */
      if (!frame) {
 +        /* Must be a non-null pointer, even if it's a dummy. We could use
@@ -58,22 +28,23 @@ index c340a1e..2ad768e 100644
 -        in_ptr                   = frame->data[0];
 -        in_buffer_size           = 2 * avctx->channels * frame->nb_samples;
 -        in_buffer_element_size   = 2;
-+        in_ptr               = frame->data[0];
-+        in_buffer_size       = 2 * avctx->channels * frame->nb_samples;
- 
+-
 -        in_args.numInSamples     = avctx->channels * frame->nb_samples;
 -        in_buf.numBufs           = 1;
 -        in_buf.bufs              = &in_ptr;
 -        in_buf.bufferIdentifiers = &in_buffer_identifier;
 -        in_buf.bufSizes          = &in_buffer_size;
 -        in_buf.bufElSizes        = &in_buffer_element_size;
++        in_ptr               = frame->data[0];
++        in_buffer_size       = 2 * avctx->channels * frame->nb_samples;
++
 +        in_args.numInSamples = avctx->channels * frame->nb_samples;
- 
+
          /* add current frame to the queue */
          if ((ret = ff_af_queue_add(&s->afq, frame)) < 0)
              return ret;
      }
- 
+
 +    in_buffer_element_size   = 2;
 +    in_buf.numBufs           = 1;
 +    in_buf.bufs              = &in_ptr;
@@ -82,5 +53,5 @@ index c340a1e..2ad768e 100644
 +    in_buf.bufElSizes        = &in_buffer_element_size;
 +
      /* The maximum packet size is 6144 bits aka 768 bytes per channel. */
-     if ((ret = ff_alloc_packet(avpkt, FFMAX(8192, 768 * avctx->channels)))) {
-         av_log(avctx, AV_LOG_ERROR, "Error getting output packet\n");
+     if ((ret = ff_alloc_packet2(avctx, avpkt, FFMAX(8192, 768 * avctx->channels), 0)) < 0)
+         return ret;
