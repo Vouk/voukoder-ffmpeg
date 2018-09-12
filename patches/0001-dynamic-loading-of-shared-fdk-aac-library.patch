@@ -212,6 +212,9 @@ index 25d33fec18..eae29fa362 100644
  #include "audio_frame_queue.h"
  #include "internal.h"
 +#include "libfdk-aac_internal.h"
++#pragma message("AACENCODER_LIB_VL0=" AACENCODER_LIB_VL0)
++#pragma message("AACENCODER_LIB_VL1=" AACENCODER_LIB_VL1)
++#pragma message("AACENCODER_LIB_VL2=" AACENCODER_LIB_VL2)
  
  typedef struct AACContext {
      const AVClass *class;
@@ -259,14 +262,5 @@ index 25d33fec18..eae29fa362 100644
      if ((err = aacEncOpen(&s->handle, 0, avctx->channels)) != AACENC_OK) {
          av_log(avctx, AV_LOG_ERROR, "Unable to open the encoder: %s\n",
                 aac_get_error(err));
-@@ -290,7 +310,7 @@ static av_cold int aac_encode_init(AVCodecContext *avctx)
-     }
- 
-     avctx->frame_size = info.frameLength;
--    avctx->initial_padding = info.encoderDelay;
-+    avctx->initial_padding = info.nDelay;
-     ff_af_queue_init(avctx, &s->afq);
- 
-     if (avctx->flags & AV_CODEC_FLAG_GLOBAL_HEADER) {
 -- 
 2.19.0.rc1
