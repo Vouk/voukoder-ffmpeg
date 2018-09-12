@@ -117,7 +117,7 @@ elif [ "$STEP" == "ffmpeg" ]; then
   cd $SRC/ffmpeg
     
   patch -N -p1 -i ../../patches/0001-dynamic-loading-of-shared-fdk-aac-library.patch
-  patch -N -p0 -i ../../patches/0002-patch-ffmpeg-to-new-fdk-api.patch
+  #patch -N -p0 -i ../../patches/0002-patch-ffmpeg-to-new-fdk-api.patch
     
   echo "### Compiling FFMpeg ..."
   cd $SRC/ffmpeg
