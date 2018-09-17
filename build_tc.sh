@@ -111,7 +111,7 @@ elif [ "$STEP" == "libaom" ]; then
   mkdir work
   cd work
   cmake -G "Visual Studio 15 Win64" .. -DENABLE_{DOCS,TOOLS,TESTS}=off -DAOM_TARGET_CPU=x86_64 -DCMAKE_INSTALL_PREFIX=$BUILD
-  MSBuild.exe /property:Configuration=Release AOM.sln
+  MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" AOM.sln
   
 elif [ "$STEP" == "ffmpeg" ]; then
   echo "### Copying NVENC headers ..."
