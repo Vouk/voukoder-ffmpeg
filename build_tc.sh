@@ -110,7 +110,7 @@ elif [ "$STEP" == "libaom" ]; then
   rm -rf work
   mkdir work
   cd work
-  cmake -G "Visual Studio 15 Win64" .. -DENABLE_{DOCS,TOOLS,TESTS}=off -DAOM_TARGET_CPU=x86_64
+  cmake -G "Visual Studio 15 Win64" .. -DENABLE_{DOCS,TOOLS,TESTS}=off -DAOM_TARGET_CPU=x86_64 -DCMAKE_INSTALL_PREFIX=$BUILD
   MSBuild.exe /property:Configuration=Release AOM.sln
   
 elif [ "$STEP" == "ffmpeg" ]; then
