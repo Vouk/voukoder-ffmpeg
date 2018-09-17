@@ -105,6 +105,14 @@ elif [ "$STEP" == "libvpx" ]; then
   make install
   mv $BUILD/lib/x64/vpxmd.lib $BUILD/lib/vpx.lib
   rm -rf $BUILD/lib/x64
+elif [ "$STEP" == "libaom" ]; then
+  cd $SRC/libaom
+  rm -rf work
+  mkdir work
+  cd work
+  cmake -G "Visual Studio 15 Win64" .. -DENABLE_{DOCS,TOOLS,TESTS}=off -DAOM_TARGET_CPU=x86_64
+  MSBuild.exe /property:Configuration=Release AOM.sln
+  
 elif [ "$STEP" == "ffmpeg" ]; then
   echo "### Copying NVENC headers ..."
   cd $SRC/ffnvcodec
