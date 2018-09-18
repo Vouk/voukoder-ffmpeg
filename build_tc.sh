@@ -114,6 +114,8 @@ elif [ "$STEP" == "libaom" ]; then
   MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" AOM.sln
   cp $MSBUILD_CONFIG/aom.lib $BUILD/lib/aom.lib
   cp -r ../aom $BUILD/include/aom
+  cmake -DAOM_CONFIG_DIR=. -DAOM_ROOT=.. -DCMAKE_INSTALL_PREFIX=$BUILD -DCMAKE_PROJECT_NAME=libaom -DCONFIG_MULTITHREAD=true -DHAVE_PTHREAD_H=false -P "../build/cmake/pkg_config.cmake"
+  cp aom.pc $BUILD/lib/pkgconfig/aom.pc
   
 elif [ "$STEP" == "ffmpeg" ]; then
   echo "### Copying NVENC headers ..."
