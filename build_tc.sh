@@ -105,6 +105,15 @@ elif [ "$STEP" == "libvpx" ]; then
   make install
   mv $BUILD/lib/x64/vpxmd.lib $BUILD/lib/vpx.lib
   rm -rf $BUILD/lib/x64
+elif [ "$STEP" == "snappy" ]; then
+  cd $SRC/snappy
+  rm -rf work
+  mkdir work
+  cd work
+  cmake -G "Visual Studio 15 Win64" .. -DCMAKE_INSTALL_PREFIX=$BUILD -DBUILD_SHARED_LIBS=OFF -DSNAPPY_BUILD_TESTS=OFF
+  MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" Snappy.sln
+  cp $MSBUILD_CONFIG/snappy.lib $BUILD/lib/snappy.lib
+  cp ../snappy.h ../snappy-c.h $BUILD/include/
 elif [ "$STEP" == "libaom" ]; then
   cd $SRC/libaom
   rm -rf work
