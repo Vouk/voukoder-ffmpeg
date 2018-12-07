@@ -16,6 +16,10 @@ else
   exit 1
 fi
 
+if [ ! -d "$BUILD" ]; then
+  mkdir $BUILD
+fi
+
 function compile {
   cd $SRC/$1
   if [ -f autogen.sh ]; then
