@@ -17,7 +17,7 @@ else
 fi
 
 if [ ! -d "$BUILD" ]; then
-  mkdir $BUILD
+  mkdir $BUILD $BUILD/include $BUILD/lib
 fi
 
 function compile {
