@@ -4,6 +4,7 @@ STEP=$1
 MODE=$2
 CPU_CORES=$3
 ENABLED_TOOLS=$4
+FFBRANCH=$5
 SRC=`realpath src`
 BUILD=`realpath build`
 
@@ -145,8 +146,10 @@ elif [ "$STEP" == "ffmpeg" ]; then
   cd $SRC/ffmpeg
     
   patch -N -p1 -i ../../patches/0001-dynamic-loading-of-shared-fdk-aac-library.patch
-  patch -N -p0 -i ../../patches/0002-patch-ffmpeg-to-new-fdk-api.patch
-    
+  if [ "$FFBRANCH" == "release/4.0" ]; then
+    patch -N -p0 -i ../../patches/0002-patch-ffmpeg-to-new-fdk-api.patch
+  fi
+  
   echo "### Compiling FFMpeg ..."
   cd $SRC/ffmpeg
   if [ "$MODE" == "debug" ]; then
