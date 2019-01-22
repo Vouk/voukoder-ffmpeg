@@ -145,11 +145,11 @@ elif [ "$STEP" == "ffmpeg" ]; then
   cd $SRC/ffmpeg
   
   ffbranch=$(git rev-parse --abbrev-ref HEAD)
-  echo "Patching FFMpeg (Branch: $ffbranch) ..."
+  echo "FFMpeg branch: $ffbranch ..."
   if [ "$ffbranch" == "release/4.0" ]; then
     patch -N -p1 -i ../../patches/0001-dynamic-loading-of-shared-fdk-aac-library-4.0.patch
     patch -N -p0 -i ../../patches/0002-patch-ffmpeg-to-new-fdk-api.patch
-  elif  
+  else  
     patch -N -p1 -i ../../patches/0001-dynamic-loading-of-shared-fdk-aac-library.patch
   fi
   
