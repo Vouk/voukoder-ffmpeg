@@ -15,10 +15,9 @@ diff --git a/configure b/configure
 index 25120337de..36e8d99f00 100755
 --- a/configure
 +++ b/configure
-@@ -1675,7 +1675,6 @@ EXTERNAL_LIBRARY_GPL_LIST="
+@@ -1675,6 +1675,5 @@ EXTERNAL_LIBRARY_GPL_LIST="
  EXTERNAL_LIBRARY_NONFREE_LIST="
      decklink
-     libndi_newtek
 -    libfdk_aac
      openssl
      libtls
