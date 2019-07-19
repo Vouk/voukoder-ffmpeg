@@ -30,7 +30,13 @@ function compile {
   make install
 }
 
-if [ "$STEP" == "opus" ]; then
+if [ "$STEP" == "libmfx" ]; then
+  cd $SRC/libmfx
+  if [[ ! -f "configure" ]]; then
+      autoreconf -fiv || exit 1
+  fi
+  compile libmfx ""
+elif [ "$STEP" == "opus" ]; then
   cd $SRC/opus/win32/VS2015
   echo \nConverting project file ...
   sed -i 's/v140/v141/g' opus.vcxproj
