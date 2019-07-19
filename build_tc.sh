@@ -35,7 +35,11 @@ if [ "$STEP" == "libmfx" ]; then
   if [[ ! -f "configure" ]]; then
       autoreconf -fiv || exit 1
   fi
-  compile libmfx ""
+  if [ "$MODE" == "debug" ]; then
+    compile libmfx "--enable-debug"
+  else
+    compile libmfx ""
+  fi
   sed -i 's/-lstdc++/-ladvapi32/g' $BUILD/lib/pkgconfig/libmfx.pc
 elif [ "$STEP" == "opus" ]; then
   cd $SRC/opus/win32/VS2015
