@@ -36,6 +36,7 @@ if [ "$STEP" == "libmfx" ]; then
       autoreconf -fiv || exit 1
   fi
   compile libmfx ""
+  sed -i 's/-lstdc++/-ladvapi32/g' $BUILD/lib/pkgconfig/libmfx.pc
 elif [ "$STEP" == "opus" ]; then
   cd $SRC/opus/win32/VS2015
   echo \nConverting project file ...
