@@ -27,7 +27,7 @@ function compile {
   if [ -f autogen.sh ]; then
     ./autogen.sh
   fi
-  CC=cl CFLAGS=$CFLAGS ./configure --prefix=$BUILD $2
+  CC=cl CXXFLAGS=$CFLAGS ./configure --prefix=$BUILD $2
   make -j $CPU_CORES
   make install
 }
@@ -37,11 +37,7 @@ if [ "$STEP" == "libmfx" ]; then
   if [[ ! -f "configure" ]]; then
       autoreconf -fiv || exit 1
   fi
-  if [ "$MODE" == "debug" ]; then
-    compile libmfx "--enable-debug"
-  else
-    compile libmfx
-  fi
+  compile libmfx
   sed -i 's/-lstdc++/-ladvapi32/g' $BUILD/lib/pkgconfig/libmfx.pc
 elif [ "$STEP" == "opus" ]; then
   cd $SRC/opus/win32/VS2015
