@@ -66,7 +66,7 @@ elif [ "$STEP" == "zimg" ]; then
   ./autogen.sh
   ./configure --prefix=$BUILD
   cd _msvc/zimg
-  MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" /property:WindowsTargetPlatformVersion=10.0.17134.0 /property:PlatformToolset=v141 /property:Platform=x64 /property:WholeProgramOptimization=false zimg.vcxproj
+  MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" /property:ConfigurationType=StaticLibrary /property:WindowsTargetPlatformVersion=10.0.17134.0 /property:PlatformToolset=v141 /property:Platform=x64 /property:WholeProgramOptimization=false zimg.vcxproj
   cp x64/$MSBUILD_CONFIG/z.lib $BUILD/lib/zimg.lib
   cd ../..
   cp src/zimg/api/zimg.h  $BUILD/include/zimg.h
