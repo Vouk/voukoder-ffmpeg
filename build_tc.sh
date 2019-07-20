@@ -9,8 +9,10 @@ BUILD=`realpath build`
 
 if [ "$MODE" == "debug" ]; then
   MSBUILD_CONFIG=Debug
+  CFLAGS=-MDd
 elif [ "$MODE" == "release" ]; then
   MSBUILD_CONFIG=Release
+  CFLAGS=-MD
 else
   echo "Please supply build mode [debug|release]!"
   exit 1
@@ -36,9 +38,9 @@ if [ "$STEP" == "libmfx" ]; then
       autoreconf -fiv || exit 1
   fi
   if [ "$MODE" == "debug" ]; then
-    compile libmfx "--enable-debug"
+    compile libmfx "--enable-debug --extra-cflags=$CFLAGS"
   else
-    compile libmfx ""
+    compile libmfx "--extra-cflags=$CFLAGS"
   fi
   sed -i 's/-lstdc++/-ladvapi32/g' $BUILD/lib/pkgconfig/libmfx.pc
 elif [ "$STEP" == "opus" ]; then
@@ -143,7 +145,6 @@ elif [ "$STEP" == "libaom" ]; then
   sed -i '/^Libs\.private.*/d' aom.pc
   sed -i 's/-lm//' aom.pc
   cp aom.pc $BUILD/lib/pkgconfig/aom.pc
-  
 elif [ "$STEP" == "ffmpeg" ]; then
   echo "### Copying NVENC headers ..."
   cd $SRC/ffnvcodec
@@ -166,11 +167,7 @@ elif [ "$STEP" == "ffmpeg" ]; then
   
   echo "### Compiling FFMpeg ..."
   cd $SRC/ffmpeg
-  if [ "$MODE" == "debug" ]; then
-    CFLAGS=-MDd
-  elif [ "$MODE" == "release" ]; then
-    CFLAGS=-MD
-  fi
+
   PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CFLAGS -I$BUILD/include" --extra-ldflags="-LIBPATH:$BUILD/lib" --prefix=$BUILD --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-network --enable-w32threads $ENABLED_TOOLS
   make -j $CPU_CORES
   make install
