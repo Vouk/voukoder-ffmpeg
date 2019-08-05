@@ -32,7 +32,10 @@ function compile {
   make install
 }
 
-if [ "$STEP" == "libmfx" ]; then
+if [ "$STEP" == "svt-av1" ]; then
+  cd $SRC/svt-av1/Build
+  PKG_CONFIG_PATH+=":$BUILD" cmake ..  
+elif [ "$STEP" == "libmfx" ]; then
   cd $SRC/libmfx
   if [[ ! -f "configure" ]]; then
       autoreconf -fiv || exit 1
