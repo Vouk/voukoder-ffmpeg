@@ -36,6 +36,7 @@ if [ "$STEP" == "svt-av1" ]; then
   cd $SRC/svt-av1/Build
   cmake .. -G"Visual Studio 15 2017" -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD -DCMAKE_CONFIGURATION_TYPES="Debug;Release"
   MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" Source/Lib/Encoder/SvtAv1Enc.vcxproj
+  cd $SRC/ffmpeg
   patch -N -p1 -i ../../patches/0001-libsvt-av1.patch
 elif [ "$STEP" == "libmfx" ]; then
   cd $SRC/libmfx
