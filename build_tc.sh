@@ -38,6 +38,7 @@ if [ "$STEP" == "svt-av1" ]; then
   cd $SRC/svt-av1/Build
   cmake .. -G"Visual Studio 15 2017" -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD -DCMAKE_CONFIGURATION_TYPES="Debug;Release"
   MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" /property:ConfigurationType="StaticLibrary" /property:TargetExt=".lib" Source/Lib/Encoder/SvtAv1Enc.vcxproj
+  cp -r ../Source/API $BUILD/include/svt-av1
   cp ../Bin/Release/$MSBUILD_CONFIG/SvtAv1Enc.lib $BUILD/lib/
   cp SvtAv1Enc.pc $BUILD/lib/pkgconfig/
   cd $SRC/ffmpeg
