@@ -39,7 +39,7 @@ if [ "$STEP" == "svt-av1" ]; then
   cp ../Bin/Release/$MSBUILD_CONFIG/SvtAv1Enc.lib $BUILD/lib/
   cp SvtAv1Enc.pc $BUILD/lib/pkgconfig/
   cd $SRC/ffmpeg
-  # patch -N -p1 -i ../../patches/0001-libsvt-av1.patch
+  git apply ../svt-av1/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-av1.patch
 elif [ "$STEP" == "libmfx" ]; then
   cd $SRC/libmfx
   if [[ ! -f "configure" ]]; then
