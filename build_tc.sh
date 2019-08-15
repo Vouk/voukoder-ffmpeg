@@ -34,7 +34,17 @@ function compile {
   make install
 }
 
-if [ "$STEP" == "svt-av1" ]; then
+if [ "$STEP" == "svt" ]; then 
+  # HEVC
+  cd $SRC/svt-hevc/Build
+  cmake .. -G"Visual Studio 15 2017" -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD -DCMAKE_CONFIGURATION_TYPES="Debug;Release"
+  MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" /property:ConfigurationType="StaticLibrary" /property:TargetExt=".lib"  Source/Lib/C_DEFAULT/HEVC_C_DEFAULT.vcxproj
+  cp -r ../Source/API $BUILD/include/svt-hevc
+  cp Source/Lib/C_DEFAULT/HEVC_C_DEFAULT.dir/$MSBUILD_CONFIG/HEVC_C_DEFAULT.lib $BUILD/lib/SvtHevcEnc.lib
+  cp SvtHevcEnc.pc $BUILD/lib/pkgconfig/
+  cd $SRC/ffmpeg
+  git apply ../svt-hevc/ffmpeg_plugin/*.patch
+  # AV1
   cd $SRC/svt-av1/Build
   cmake .. -G"Visual Studio 15 2017" -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD -DCMAKE_CONFIGURATION_TYPES="Debug;Release"
   MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" /property:ConfigurationType="StaticLibrary" /property:TargetExt=".lib" Source/Lib/Encoder/SvtAv1Enc.vcxproj
@@ -42,16 +52,7 @@ if [ "$STEP" == "svt-av1" ]; then
   cp ../Bin/Release/$MSBUILD_CONFIG/SvtAv1Enc.lib $BUILD/lib/
   cp SvtAv1Enc.pc $BUILD/lib/pkgconfig/
   cd $SRC/ffmpeg
-  git apply ../svt-av1/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-av1.patch
-elif [ "$STEP" == "svt-hevc" ]; then 
-  cd $SRC/svt-hevc/Build
-  cmake .. -G"Visual Studio 15 2017" -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD -DCMAKE_CONFIGURATION_TYPES="Debug;Release"
-  MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" /property:ConfigurationType="StaticLibrary" /property:TargetExt=".lib" Source/Lib/Encoder/SvtHevcEnc.vcxproj
-  cp -r ../Source/API $BUILD/include/svt-hevc
-  cp ../Bin/Release/$MSBUILD_CONFIG/SvtHevcEnc.lib $BUILD/lib/
-  cp SvtHevcEnc.pc $BUILD/lib/pkgconfig/
-  #cd $SRC/ffmpeg
-  #git apply ../svt-av1/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-av1.patch
+  git apply ../svt-av1/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-av1-with-svt-hevc.patch
 elif [ "$STEP" == "libmfx" ]; then
   cd $SRC/libmfx
   if [[ ! -f "configure" ]]; then
