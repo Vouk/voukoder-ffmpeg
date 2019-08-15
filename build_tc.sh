@@ -53,6 +53,15 @@ if [ "$STEP" == "svt" ]; then
   cp SvtAv1Enc.pc $BUILD/lib/pkgconfig/
   cd $SRC/ffmpeg
   git apply ../svt-av1/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-av1-with-svt-hevc.patch
+  # VP9
+  cd $SRC/svt-vp9/Build
+  cmake .. -G"Visual Studio 15 2017" -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD -DCMAKE_CONFIGURATION_TYPES="Debug;Release"
+  MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" /property:ConfigurationType="StaticLibrary" /property:TargetExt=".lib" Source/Lib/C_DEFAULT/C_DEFAULT.vcxproj
+  cp -r ../Source/API $BUILD/include/svt-vp9
+  cp lib/$MSBUILD_CONFIG/C_DEFAULT.lib $BUILD/lib/SvtVp9Enc.lib
+  cp SvtVp9Enc.pc $BUILD/lib/pkgconfig/
+  cd $SRC/ffmpeg
+  git apply ../svt-vp9/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-vp9-with-svt-hevc-av1.patch
 elif [ "$STEP" == "libmfx" ]; then
   cd $SRC/libmfx
   if [[ ! -f "configure" ]]; then
