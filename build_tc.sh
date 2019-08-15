@@ -58,6 +58,7 @@ if [ "$STEP" == "svt" ]; then
   cp -r ../Source/API $BUILD/include/svt-vp9 ; cp ../Bin/$MSBUILD_CONFIG/SvtVp9Enc.lib $BUILD/lib/ ; cp SvtVp9Enc.pc $BUILD/lib/pkgconfig/
   #
   # PATCHES
+  sed -i 's/-lpthread //g' $BUILD/lib/pkgconfig/SvtVp9Enc.pc
   cd $SRC/ffmpeg
   git apply ../svt-hevc/ffmpeg_plugin/0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch
   git apply ../svt-av1/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-av1-with-svt-hevc.patch
