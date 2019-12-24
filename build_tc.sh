@@ -95,14 +95,14 @@ elif [ "$STEP" == "zimg" ]; then
   ./autogen.sh
   ./configure --prefix=$BUILD
   cd _msvc/zimg
-  MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" /property:ConfigurationType=StaticLibrary /property:WindowsTargetPlatformVersion=10.0.17134.0 /property:PlatformToolset=v141 /property:Platform=x64 /property:WholeProgramOptimization=false zimg.vcxproj
+  MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration="$MSBUILD_CONFIG" /property:ConfigurationType=StaticLibrary /property:WindowsTargetPlatformVersion=10.0.17134.0 /property:PlatformToolset=v141 /property:Platform=x64 /property:WholeProgramOptimization=true zimg.vcxproj
   cp x64/$MSBUILD_CONFIG/z.lib $BUILD/lib/zimg.lib
   cd ../..
   cp src/zimg/api/zimg.h  $BUILD/include/zimg.h
   cp zimg.pc $BUILD/lib/pkgconfig/zimg.pc
 elif [ "$STEP" == "x264" ]; then
   cd $SRC/x264
-  CC=cl ./configure --prefix=$BUILD --extra-cflags='-DNO_PREFIX' --disable-cli --enable-static --libdir=$BUILD/lib
+  CC=cl ./configure --prefix=$BUILD --extra-cflags='-DNO_PREFIX' --disable-cli --enable-static --enable-shared --libdir=$BUILD/lib
   make -j $CPU_CORES
   make install-lib-static
 elif [ "$STEP" == "x265" ]; then
