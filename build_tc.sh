@@ -102,7 +102,8 @@ elif [ "$STEP" == "zimg" ]; then
   cp zimg.pc $BUILD/lib/pkgconfig/zimg.pc
 elif [ "$STEP" == "x264" ]; then
   cd $SRC/x264
-  CC=cl ./configure --prefix=$BUILD --extra-cflags='-DNO_PREFIX' --disable-cli --enable-static --enable-shared --libdir=$BUILD/lib
+  git checkout 0e227c47ce99ab26fc30e3326ce6d923d191e922
+  CC=cl ./configure --prefix=$BUILD --extra-cflags='-DNO_PREFIX' --disable-cli --enable-static --libdir=$BUILD/lib
   make -j $CPU_CORES
   make install-lib-static
 elif [ "$STEP" == "x265" ]; then
