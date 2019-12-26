@@ -197,6 +197,7 @@ elif [ "$STEP" == "ffmpeg" ]; then
   cd $SRC/ffmpeg
 
   PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CFLAGS -I$BUILD/include" --extra-ldflags="-LIBPATH:$BUILD/lib -FORCE:MULTIPLE" --prefix=$BUILD --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-network --enable-w32threads $ENABLED_TOOLS
+  sed -i 's/\x81/ue/g' config.h
   make -j $CPU_CORES
   make install
   
