@@ -1,6 +1,5 @@
 #!/bin/bash
 
-MODE=$1
 COMPONENTS=""
 
 if [ "$MODE" == "debug" ]; then
