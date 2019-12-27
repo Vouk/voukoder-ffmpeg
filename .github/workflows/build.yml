@@ -1,0 +1,16 @@
+name: CI
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - name: Build it!
+      run: |
+        choco install msys2
+        dir
