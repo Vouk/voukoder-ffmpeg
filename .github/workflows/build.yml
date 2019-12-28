@@ -11,6 +11,6 @@ jobs:
 
     steps:
     - name: Build it!
-      run: |
+      run:
         choco install msys2
         dir
