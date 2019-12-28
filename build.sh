@@ -67,20 +67,21 @@ function build_aom {
 }
 
 function build_svt {
-  git clone https://github.com/OpenVisualCloud/SVT-AV1.git $SRC/svt-av1
-  #
   # HEVC
-  #cd $SRC/svt-hevc/Build
-  #cmake .. -G"Visual Studio 15 2017" -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD -DCMAKE_CONFIGURATION_TYPES=$MSBUILD_CONFIG
-  #MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration=$MSBUILD_CONFIG /property:ConfigurationType=StaticLibrary /property:TargetExt=.lib  svt-hevc.sln  
-  #cp -r ../Source/API $BUILD/include/svt-hevc ; cp ../Bin/$MSBUILD_CONFIG/SvtHevcEnc.lib $BUILD/lib/ ; cp SvtHevcEnc.pc $BUILD/lib/pkgconfig/
+  git clone https://github.com/OpenVisualCloud/SVT-HEVC.git $SRC/svt-hevc
+  cd $SRC/svt-hevc/Build
+  cmake .. -G"Visual Studio 15 2017" -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD -DCMAKE_CONFIGURATION_TYPES=$MSBUILD_CONFIG
+  MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration=$MSBUILD_CONFIG /property:ConfigurationType=StaticLibrary /property:TargetExt=.lib svt-hevc.sln  
+  cp -r ../Source/API $BUILD/include/svt-hevc ; cp ../Bin/$MSBUILD_CONFIG/SvtHevcEnc.lib $BUILD/lib/ ; cp SvtHevcEnc.pc $BUILD/lib/pkgconfig/
+  add_comp libsvthevc
   #
   # AV1
-  cd $SRC/svt-av1/Build
-  cmake .. -G"Visual Studio 15 2017" -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD -DCMAKE_CONFIGURATION_TYPES=$MSBUILD_CONFIG
-  MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration=$MSBUILD_CONFIG /property:ConfigurationType=StaticLibrary /property:TargetExt=.lib svt-av1.sln
-  cp -r ../Source/API $BUILD/include/svt-av1 ; cp ../Bin/Release/$MSBUILD_CONFIG/SvtAv1Enc.lib $BUILD/lib/ ; cp SvtAv1Enc.pc $BUILD/lib/pkgconfig/
-  add_comp libsvtav1
+  #git clone https://github.com/OpenVisualCloud/SVT-AV1.git $SRC/svt-av1
+  #cd $SRC/svt-av1/Build
+  #cmake .. -G"Visual Studio 15 2017" -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD -DCMAKE_CONFIGURATION_TYPES=$MSBUILD_CONFIG
+  #MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration=$MSBUILD_CONFIG /property:ConfigurationType=StaticLibrary /property:TargetExt=.lib svt-av1.sln
+  #cp -r ../Source/API $BUILD/include/svt-av1 ; cp ../Bin/Release/$MSBUILD_CONFIG/SvtAv1Enc.lib $BUILD/lib/ ; cp SvtAv1Enc.pc $BUILD/lib/pkgconfig/
+  #add_comp libsvtav1
   #
   # VP9
   #cd $SRC/svt-vp9/Build
@@ -90,7 +91,8 @@ function build_svt {
   #sed -i 's/ -lpthread//g' $BUILD/lib/pkgconfig/SvtVp9Enc.pc
   #sed -i 's/ -lm//g' $BUILD/lib/pkgconfig/SvtVp9Enc.pc
   cd $SRC/ffmpeg
-  git apply $SRC/svt-av1/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-av1.patch
+  git am $SRC/svt-hevc/ffmpeg_plugin/0001*.patch
+  #git apply $SRC/svt-av1/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-av1.patch
 }
 
 function build_ogg {
