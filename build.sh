@@ -239,7 +239,7 @@ git clone git://source.ffmpeg.org/ffmpeg.git $SRC/ffmpeg
 build_nvenc
 build_amf
 build_mfx
-#build_svt
+build_svt
 build_ogg
 build_vorbis
 build_snappy
