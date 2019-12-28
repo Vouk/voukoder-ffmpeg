@@ -227,7 +227,7 @@ build_vorbis
 build_libfdkaac
 build_lame
 build_zimg
-#build_x264
+build_x264
 build_opus
 #build_x265
 
