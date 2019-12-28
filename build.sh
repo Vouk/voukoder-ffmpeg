@@ -48,6 +48,24 @@ function build_mfx {
   add_comp libmfx
 }
 
+function build_aom {
+  git clone https://aomedia.googlesource.com/aom $SRC/libaom
+  cd $SRC/libaom
+  rm -rf work
+  mkdir work
+  cd work
+  cmake -G "Visual Studio 15 2017" .. -A x64 -DENABLE_{DOCS,TOOLS,TESTS}=off -DAOM_TARGET_CPU=x86_64 -DCMAKE_INSTALL_PREFIX=$BUILD
+  MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration="$MSBUILD_CONFIG" AOM.sln
+  cp $MSBUILD_CONFIG/aom.lib $BUILD/lib/aom.lib
+  cp -r ../aom $BUILD/include/aom
+  cmake -DAOM_CONFIG_DIR=. -DAOM_ROOT=.. -DCMAKE_INSTALL_PREFIX=@prefix@ -DCMAKE_PROJECT_NAME=aom -DCONFIG_MULTITHREAD=true -DHAVE_PTHREAD_H=false -P "../build/cmake/pkg_config.cmake"
+  sed -i "s#@prefix@#$BUILD#g" aom.pc
+  sed -i '/^Libs\.private.*/d' aom.pc
+  sed -i 's/-lm//' aom.pc
+  cp aom.pc $BUILD/lib/pkgconfig/aom.pc
+  add_comp libaom
+}
+
 function build_svt {
   git clone https://github.com/OpenVisualCloud/SVT-AV1.git $SRC/svt-av1
   #
@@ -229,7 +247,8 @@ build_lame
 build_zimg
 build_x264
 build_opus
-#build_x265
+build_x265
+#build_aom
 
 cd $SRC/ffmpeg
 PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CFLAGS -I$BUILD/include" --extra-ldflags="-LIBPATH:$BUILD/lib" --prefix=$BUILD --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl $COMPONENTS
@@ -246,7 +265,7 @@ done
 # clean up
 rm -rf $BUILD/lib/pkgconfig $BUILD/lib/fdk-aac.lib $BUILD/lib/*.la
   
-  # Create archives
+# Create archives
 cd $BUILD
 mkdir ../dist 2>/dev/null
 tar czf ../dist/ffmpeg-win64-static-$MODE.tar.gz *
