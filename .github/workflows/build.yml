@@ -6,11 +6,13 @@ on:
 
 jobs:
   build:
-
     runs-on: windows-latest
-
     steps:
     - name: Build it!
       run:
         choco install msys2
-        dir
+        echo "::set-env name=CHERE_INVOKING::enabled_from_arguments"
+        echo "::set-env name=MODE::release"
+        echo "::set-env name=MSYS2_PATH_TYPE::inherit"
+        echo "::set-env name=MSYSTEM::MINGW64"
+        c:\tools\msys64\usr\bin\bash.exe -l -c "pacman -S base-devel binutils git make pkg-config"
