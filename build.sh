@@ -54,7 +54,7 @@ function build_aom {
   rm -rf work
   mkdir work
   cd work
-  cmake -G "Visual Studio 15 2017" .. -A x64 -DENABLE_{DOCS,TOOLS,TESTS}=off -DAOM_TARGET_CPU=x86_64 -DCMAKE_INSTALL_PREFIX=$BUILD
+  cmake -G "Visual Studio 16 2019" .. -A x64 -DENABLE_{DOCS,TOOLS,TESTS}=off -DAOM_TARGET_CPU=x86_64 -DCMAKE_INSTALL_PREFIX=$BUILD
   MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration="$MSBUILD_CONFIG" AOM.sln
   cp $MSBUILD_CONFIG/aom.lib $BUILD/lib/aom.lib
   cp -r ../aom $BUILD/include/aom
@@ -70,7 +70,7 @@ function build_svt {
   # HEVC
   #git clone https://github.com/OpenVisualCloud/SVT-HEVC.git $SRC/svt-hevc
   #cd $SRC/svt-hevc/Build
-  #cmake .. -G"Visual Studio 15 2017" -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD -DCMAKE_CONFIGURATION_TYPES=$MSBUILD_CONFIG
+  #cmake .. -G"Visual Studio 16 2019" -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD -DCMAKE_CONFIGURATION_TYPES=$MSBUILD_CONFIG
   #MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration=$MSBUILD_CONFIG /property:ConfigurationType=StaticLibrary /property:TargetExt=.lib svt-hevc.sln  
   #cp -r ../Source/API $BUILD/include/svt-hevc ; cp ../Bin/$MSBUILD_CONFIG/SvtHevcEnc.lib $BUILD/lib/ ; cp SvtHevcEnc.pc $BUILD/lib/pkgconfig/
   #add_comp libsvthevc
@@ -78,14 +78,14 @@ function build_svt {
   # AV1
   git clone https://github.com/OpenVisualCloud/SVT-AV1.git $SRC/svt-av1
   cd $SRC/svt-av1/Build
-  cmake .. -G"Visual Studio 15 2017" -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD -DCMAKE_CONFIGURATION_TYPES=$MSBUILD_CONFIG
+  cmake .. -G"Visual Studio 16 2019" -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD -DCMAKE_CONFIGURATION_TYPES=$MSBUILD_CONFIG
   MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration=$MSBUILD_CONFIG /property:ConfigurationType=StaticLibrary /property:TargetExt=.lib Source/Lib/Encoder/SvtAv1Enc.vcxproj
   cp -r ../Source/API $BUILD/include/svt-av1 ; cp ../Bin/$MSBUILD_CONFIG/SvtAv1Enc.lib $BUILD/lib/ ; cp SvtAv1Enc.pc $BUILD/lib/pkgconfig/
   add_comp libsvtav1
   #
   # VP9
   #cd $SRC/svt-vp9/Build
-  #cmake .. -G"Visual Studio 15 2017" -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD -DCMAKE_CONFIGURATION_TYPES=$MSBUILD_CONFIG
+  #cmake .. -G"Visual Studio 16 2019" -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD -DCMAKE_CONFIGURATION_TYPES=$MSBUILD_CONFIG
   #MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration=$MSBUILD_CONFIG /property:ConfigurationType=StaticLibrary /property:TargetExt=".lib" svt-vp9.sln
   #cp -r ../Source/API $BUILD/include/svt-vp9 ; cp ../Bin/$MSBUILD_CONFIG/SvtVp9Enc.lib $BUILD/lib/ ; cp SvtVp9Enc.pc $BUILD/lib/pkgconfig/
   #sed -i 's/ -lpthread//g' $BUILD/lib/pkgconfig/SvtVp9Enc.pc
@@ -115,7 +115,7 @@ function build_snappy {
   rm -rf work
   mkdir work
   cd work
-  cmake -G "Visual Studio 15 Win64" .. -DCMAKE_INSTALL_PREFIX=$BUILD -DBUILD_SHARED_LIBS=OFF -DSNAPPY_BUILD_TESTS=OFF
+  cmake .. -G "Visual Studio 16 2019" -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD -DBUILD_SHARED_LIBS=OFF -DSNAPPY_BUILD_TESTS=OFF
   MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration="$MSBUILD_CONFIG" Snappy.sln
   cp $MSBUILD_CONFIG/snappy.lib $BUILD/lib/snappy.lib
   cp ../snappy.h ../snappy-c.h $BUILD/include/
@@ -125,7 +125,7 @@ function build_snappy {
 function build_libvpx {
   git clone https://github.com/webmproject/libvpx.git $SRC/libvpx
   cd $SRC/libvpx
-  ./configure --prefix=$BUILD --target=x86_64-win64-vs15 --enable-vp9-highbitdepth --disable-shared --disable-examples --disable-tools --disable-docs --disable-libyuv --disable-unit_tests --disable-postproc
+  ./configure --prefix=$BUILD --target=x86_64-win64-vs16 --enable-vp9-highbitdepth --disable-shared --disable-examples --disable-tools --disable-docs --disable-libyuv --disable-unit_tests --disable-postproc
   make -j $NUMBER_OF_PROCESSORS
   make install
   mv $BUILD/lib/x64/vpxmd.lib $BUILD/lib/vpx.lib
@@ -156,7 +156,7 @@ function build_zimg {
   ./autogen.sh
   ./configure --prefix=$BUILD
   cd _msvc/zimg
-  MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration="$MSBUILD_CONFIG" /property:ConfigurationType=StaticLibrary /property:WindowsTargetPlatformVersion=10.0.17134.0 /property:PlatformToolset=v141 /property:Platform=x64 /property:WholeProgramOptimization=false zimg.vcxproj
+  MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration="$MSBUILD_CONFIG" /property:ConfigurationType=StaticLibrary /property:WindowsTargetPlatformVersion=10.0.17134.0 /property:PlatformToolset=v142 /property:Platform=x64 /property:WholeProgramOptimization=false zimg.vcxproj
   cp x64/$MSBUILD_CONFIG/z.lib $BUILD/lib/zimg.lib
   cd ../..
   cp $SRC/zimg/src/zimg/api/zimg.h  $BUILD/include/zimg.h
@@ -179,7 +179,7 @@ function build_opus {
   git clone https://github.com/xiph/opus.git $SRC/opus
   cd $SRC/opus/win32/VS2015
   echo \nConverting project file ...
-  sed -i 's/v140/v141/g' opus.vcxproj
+  sed -i 's/v140/v142/g' opus.vcxproj
   echo Building project 'opus' ...
   MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration="$MSBUILD_CONFIG" /property:Platform=x64 opus.vcxproj
   echo Done.
@@ -197,22 +197,22 @@ function build_opus {
 
 function build_x265 {
   git clone https://github.com/videolan/x265.git --branch stable $SRC/x265
-  cd $SRC/x265/build/vc15-x86_64
+  cd $SRC/x265/build/vc16-x86_64
   rm -rf work*
   mkdir work work10 work12
   # 12bit
   cd work12
-  cmake -G "Visual Studio 15 Win64" ../../../source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON
+  cmake -G "Visual Studio 16 2019" -A x64 ../../../source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON
   MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration="$MSBUILD_CONFIG" x265-static.vcxproj
   cp $MSBUILD_CONFIG/x265-static.lib ../work/x265_12bit.lib
   # 10bit
   cd ../work10
-  cmake -G "Visual Studio 15 Win64" ../../../source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF
+  cmake -G "Visual Studio 16 2019" -A x64 ../../../source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF
   MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration="$MSBUILD_CONFIG" x265-static.vcxproj
   cp $MSBUILD_CONFIG/x265-static.lib ../work/x265_10bit.lib
   # 8bit - main
   cd ../work
-  cmake -G "Visual Studio 15 Win64" ../../../source -DCMAKE_INSTALL_PREFIX=$BUILD -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DEXTRA_LIB="x265_10bit.lib;x265_12bit.lib" -DLINKED_10BIT=ON -DLINKED_12BIT=ON
+  cmake -G "Visual Studio 16 2019" -A x64 ../../../source -DCMAKE_INSTALL_PREFIX=$BUILD -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DEXTRA_LIB="x265_10bit.lib;x265_12bit.lib" -DLINKED_10BIT=ON -DLINKED_12BIT=ON
   #-DSTATIC_LINK_CRT=ON
   MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration="$MSBUILD_CONFIG" x265-static.vcxproj
   cp $MSBUILD_CONFIG/x265-static.lib ./x265_main.lib
