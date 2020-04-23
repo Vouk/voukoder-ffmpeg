@@ -87,7 +87,7 @@ function build_svt {
   git clone https://github.com/OpenVisualCloud/SVT-VP9.git $SRC/svt-vp9
   cd $SRC/svt-vp9/Build
   cmake .. -G"Visual Studio 15 2017" -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD -DCMAKE_CONFIGURATION_TYPES=$MSBUILD_CONFIG
-  MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration=$MSBUILD_CONFIG /property:ConfigurationType=StaticLibrary /property:TargetExt=".lib" svt-vp9.sln
+  MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration=$MSBUILD_CONFIG /property:ConfigurationType=StaticLibrary /property:TargetExt=".lib" svt-vp9.sln
   cp -r ../Source/API $BUILD/include/svt-vp9 ; cp ../Bin/$MSBUILD_CONFIG/SvtVp9Enc.lib $BUILD/lib/ ; cp SvtVp9Enc.pc $BUILD/lib/pkgconfig/
   sed -i 's/ -lpthread//g' $BUILD/lib/pkgconfig/SvtVp9Enc.pc
   sed -i 's/ -lm//g' $BUILD/lib/pkgconfig/SvtVp9Enc.pc
