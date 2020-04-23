@@ -93,9 +93,9 @@ function build_svt {
   sed -i 's/ -lm//g' $BUILD/lib/pkgconfig/SvtVp9Enc.pc
   add_comp libsvtvp9
   cd $SRC/ffmpeg
-  git apply $SRC/svt-hevc/0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch
-  git apply $SRC/svt-hevc/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-av1-with-svt-hevc.patch
-  git apply $SRC/svt-hevc/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-vp9-with-svt-hevc-av1.patch
+  git apply $SRC/svt-hevc/ffmpeg_plugin/0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch
+  git apply $SRC/svt-av1/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-av1-with-svt-hevc.patch
+  git apply $SRC/svt-vp9/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-vp9-with-svt-hevc-av1.patch
   #git am $SRC/svt-hevc/ffmpeg_plugin/0001*.patch
   #git apply $SRC/svt-av1/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-av1.patch
 }
