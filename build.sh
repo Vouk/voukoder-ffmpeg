@@ -84,6 +84,7 @@ function build_svt {
   add_comp libsvtav1
   #
   # VP9
+  git clone https://github.com/OpenVisualCloud/SVT-VP9.git $SRC/svt-vp9
   cd $SRC/svt-vp9/Build
   cmake .. -G"Visual Studio 15 2017" -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD -DCMAKE_CONFIGURATION_TYPES=$MSBUILD_CONFIG
   MSBuild.exe /maxcpucount:$CPU_CORES /property:Configuration=$MSBUILD_CONFIG /property:ConfigurationType=StaticLibrary /property:TargetExt=".lib" svt-vp9.sln
