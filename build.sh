@@ -241,7 +241,7 @@ BUILD=`realpath build`
 SRC=`realpath src`
 
 git clone git://source.ffmpeg.org/ffmpeg.git $SRC/ffmpeg
-git checkout n4.2.4
+git checkout release/4.3
 
 build_nvenc
 build_amf
