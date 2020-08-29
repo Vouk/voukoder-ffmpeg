@@ -242,7 +242,7 @@ SRC=`realpath src`
 
 git clone git://source.ffmpeg.org/ffmpeg.git $SRC/ffmpeg
 cd $SRC/ffmpeg
-git checkout release/4.2
+git checkout release/4.3
 cd ../..
 
 build_nvenc
