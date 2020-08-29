@@ -40,7 +40,7 @@ function build_amf {
 function build_mfx {
   git clone https://github.com/lu-zero/mfx_dispatch.git $SRC/libmfx
   cd $SRC/libmfx
-  git checkout c200d833e25a91e3e49d69890dac1ffa3486cbe9
+  #git checkout c200d833e25a91e3e49d69890dac1ffa3486cbe9
   if [[ ! -f "configure" ]]; then
       autoreconf -fiv || exit 1
   fi
