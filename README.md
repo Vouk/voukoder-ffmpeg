@@ -13,7 +13,7 @@ Builds static libraries of ffmeg and external libraries (x264 8bit, x265 8,10 an
 
 ## Install development tools
 - Install CMakeGui in Windows to have the VisualStudio templates ready
-- Install "pacman -S base-devel binutils git make pkg-config cmake" in msys2
+- Install "pacman -S base-devel binutils git make pkg-config subversion zip" in msys2
 - Install nasm to /usr/bin/nasm.exe
 - Install cmake gui
 - Add cmake path to path variable
