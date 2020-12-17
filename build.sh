@@ -115,7 +115,7 @@ function build_vorbis {
 }
 
 function build_snappy {
-  git clone https://github.com/google/snappy.git $SRC/snappy
+  git clone -b 1.1.8 https://github.com/google/snappy.git $SRC/snappy
   cd $SRC/snappy
   rm -rf work
   mkdir work
