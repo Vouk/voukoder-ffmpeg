@@ -24,7 +24,7 @@ function build {
 }
 
 function build_nvenc {
-  git clone -b sdk/9.0 git://github.com/FFmpeg/nv-codec-headers.git $SRC/ffnvcodec
+  git clone -b sdk/9.1 git://github.com/FFmpeg/nv-codec-headers.git $SRC/ffnvcodec
   cd $SRC/ffnvcodec
   make PREFIX=$BUILD install
   add_comp nvenc
