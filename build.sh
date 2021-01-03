@@ -106,6 +106,13 @@ function build_ogg {
   build libogg "--disable-shared"
 }
 
+function build_libass {
+  git clone https://github.com/libass/libass.git $SRC/libass
+  cd $SRC/libass
+  build libass "--disable-shared"  
+  add_comp libass
+}
+
 function build_vorbis {
   git clone https://github.com/xiph/vorbis.git $SRC/libvorbis
   cd $SRC/libvorbis
@@ -257,6 +264,7 @@ build_x264
 build_opus
 build_x265
 #build_aom
+build_libass
 
 cd $SRC/ffmpeg
 PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CFLAGS -I$BUILD/include" --extra-ldflags="-LIBPATH:$BUILD/lib" --prefix=$BUILD --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl $COMPONENTS
