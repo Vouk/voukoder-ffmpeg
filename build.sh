@@ -81,7 +81,7 @@ function build_svt {
   cmake .. -G"Visual Studio 15 2017" -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD -DCMAKE_CONFIGURATION_TYPES=$MSBUILD_CONFIG
   MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration=$MSBUILD_CONFIG /property:ConfigurationType=StaticLibrary /property:TargetExt=.lib Source/Lib/Encoder/SvtAv1Enc.vcxproj
   cp -r ../Source/API $BUILD/include/svt-av1 ; cp ../Bin/$MSBUILD_CONFIG/SvtAv1Enc.lib $BUILD/lib/ ; cp SvtAv1Enc.pc $BUILD/lib/pkgconfig/
-  add_comp libsvtav1
+  #add_comp libsvtav1
   #
   # VP9
   #git clone https://github.com/OpenVisualCloud/SVT-VP9.git $SRC/svt-vp9
