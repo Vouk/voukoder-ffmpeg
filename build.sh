@@ -280,7 +280,7 @@ for file in *.a; do
 done
 
 # clean up
-rm -rf $BUILD/lib/pkgconfig $BUILD/lib/fdk-aac.lib $BUILD/lib/*.la
+#rm -rf $BUILD/lib/pkgconfig $BUILD/lib/fdk-aac.lib $BUILD/lib/*.la
   
 # Create archives
 cd $BUILD
