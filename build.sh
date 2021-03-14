@@ -156,7 +156,7 @@ function build_libfdkaac {
 }
 
 function build_lame {
-  svn co svn://svn.code.sf.net/p/lame/svn/trunk/lame $SRC/lame
+  svn co svn://svn.code.sf.net/p/lame/svn/trunk/lame@6474 $SRC/lame
   cd $SRC/lame
   build lame "--enable-nasm --disable-frontend --disable-shared --enable-static"
   add_comp libmp3lame
