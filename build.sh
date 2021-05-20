@@ -258,7 +258,7 @@ build_ogg
 build_vorbis
 build_snappy
 build_libvpx
-#build_libfdkaac
+build_libfdkaac
 build_lame
 build_zimg
 build_x264
