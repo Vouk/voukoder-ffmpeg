@@ -152,7 +152,7 @@ function build_libfdkaac {
   build fdk-aac "--disable-static --disable-shared"
   add_comp libfdk-aac
   cd $SRC/ffmpeg
-  patch -N -p1 -i ../../patches/0001-dynamic-loading-of-shared-fdk-aac-library.patch
+  patch -N -p1 -i ../../patches/0003-dynamic-loading-of-shared-fdk-aac-library.patch
 }
 
 function build_lame {
