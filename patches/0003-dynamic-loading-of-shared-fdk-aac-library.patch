@@ -1,21 +1,8 @@
-From de345e50f1b2d8b79c72db747c66a6bdcc646914 Mon Sep 17 00:00:00 2001
-From: Gianluigi Tiesi <sherpya@netfarm.it>
-Date: Sun, 4 Dec 2016 01:28:51 +0100
-Subject: [PATCH 3/8] dynamic loading of shared fdk-aac library
-
----
- configure                        |  6 +--
- libavcodec/libfdk-aac_internal.h | 84 ++++++++++++++++++++++++++++++++
- libavcodec/libfdk-aacdec.c       | 32 ++++++++++--
- libavcodec/libfdk-aacenc.c       | 25 +++++++++-
- 4 files changed, 138 insertions(+), 9 deletions(-)
- create mode 100644 libavcodec/libfdk-aac_internal.h
-
 diff --git a/configure b/configure
-index 69fc11fcba..d381419123 100755
+index 82367fd30d..a67cb46861 100755
 --- a/configure
 +++ b/configure
-@@ -1726,7 +1726,6 @@ EXTERNAL_LIBRARY_GPL_LIST="
+@@ -1762,7 +1762,6 @@ EXTERNAL_LIBRARY_GPL_LIST="
  
  EXTERNAL_LIBRARY_NONFREE_LIST="
      decklink
@@ -23,7 +10,7 @@ index 69fc11fcba..d381419123 100755
      openssl
      libtls
  "
-@@ -1816,6 +1815,7 @@ EXTERNAL_LIBRARY_LIST="
+@@ -1857,6 +1856,7 @@ EXTERNAL_LIBRARY_LIST="
      opengl
      pocketsphinx
      vapoursynth
@@ -31,7 +18,7 @@ index 69fc11fcba..d381419123 100755
  "
  
  HWACCEL_AUTODETECT_LIBRARY_LIST="
-@@ -6246,9 +6246,7 @@ enabled libdav1d          && require_pkg_config libdav1d "dav1d >= 0.4.0" "dav1d
+@@ -6386,9 +6386,7 @@ enabled libdav1d          && require_pkg_config libdav1d "dav1d >= 0.5.0" "dav1d
  enabled libdavs2          && require_pkg_config libdavs2 "davs2 >= 1.6.0" davs2.h davs2_decoder_open
  enabled libdc1394         && require_pkg_config libdc1394 libdc1394-2 dc1394/dc1394.h dc1394_new
  enabled libdrm            && require_pkg_config libdrm libdrm xf86drm.h drmGetVersion
@@ -133,7 +120,7 @@ index 0000000000..cd1e6e3340
 +
 +#endif /* AVCODEC_LIBFDK_AAC_INTERNAL_H */
 diff --git a/libavcodec/libfdk-aacdec.c b/libavcodec/libfdk-aacdec.c
-index 1abe1d8438..ef7728c368 100644
+index ffa1fdcce3..b3ee1248ed 100644
 --- a/libavcodec/libfdk-aacdec.c
 +++ b/libavcodec/libfdk-aacdec.c
 @@ -24,6 +24,7 @@
@@ -153,7 +140,7 @@ index 1abe1d8438..ef7728c368 100644
      uint8_t *decoder_buffer;
      int decoder_buffer_size;
      uint8_t *anc_buffer;
-@@ -99,7 +102,7 @@ static const AVClass fdk_aac_dec_class = {
+@@ -101,7 +104,7 @@ static const AVClass fdk_aac_dec_class = {
  static int get_stream_info(AVCodecContext *avctx)
  {
      FDKAACDecContext *s   = avctx->priv_data;
@@ -162,7 +149,7 @@ index 1abe1d8438..ef7728c368 100644
      int channel_counts[0x24] = { 0 };
      int i, ch_error       = 0;
      uint64_t ch_layout    = 0;
-@@ -211,8 +214,10 @@ static av_cold int fdk_aac_decode_close(AVCodecContext *avctx)
+@@ -216,8 +219,10 @@ static av_cold int fdk_aac_decode_close(AVCodecContext *avctx)
  {
      FDKAACDecContext *s = avctx->priv_data;
  
@@ -175,7 +162,7 @@ index 1abe1d8438..ef7728c368 100644
      av_freep(&s->decoder_buffer);
      av_freep(&s->anc_buffer);
  
-@@ -224,6 +229,27 @@ static av_cold int fdk_aac_decode_init(AVCodecContext *avctx)
+@@ -229,6 +234,27 @@ static av_cold int fdk_aac_decode_init(AVCodecContext *avctx)
      FDKAACDecContext *s = avctx->priv_data;
      AAC_DECODER_ERROR err;
  
@@ -204,19 +191,19 @@ index 1abe1d8438..ef7728c368 100644
      if (!s->handle) {
          av_log(avctx, AV_LOG_ERROR, "Error opening decoder\n");
 diff --git a/libavcodec/libfdk-aacenc.c b/libavcodec/libfdk-aacenc.c
-index 5620bb5951..c4519b6b74 100644
+index a7144e95dd..cfbfdea417 100644
 --- a/libavcodec/libfdk-aacenc.c
 +++ b/libavcodec/libfdk-aacenc.c
-@@ -26,6 +26,8 @@
- #include "audio_frame_queue.h"
+@@ -27,6 +27,8 @@
  #include "internal.h"
+ #include "profiles.h"
  
 +#include "libfdk-aac_internal.h"
 +
  #ifdef AACENCODER_LIB_VL0
  #define FDKENC_VER_AT_LEAST(vl0, vl1) \
      ((AACENCODER_LIB_VL0 > vl0) || \
-@@ -45,6 +47,8 @@ typedef struct AACContext {
+@@ -46,6 +48,8 @@ typedef struct AACContext {
      int header_period;
      int vbr;
  
@@ -225,7 +212,7 @@ index 5620bb5951..c4519b6b74 100644
      AudioFrameQueue afq;
  } AACContext;
  
-@@ -108,8 +112,10 @@ static int aac_encode_close(AVCodecContext *avctx)
+@@ -110,8 +114,10 @@ static int aac_encode_close(AVCodecContext *avctx)
  {
      AACContext *s = avctx->priv_data;
  
@@ -233,12 +220,12 @@ index 5620bb5951..c4519b6b74 100644
 -        aacEncClose(&s->handle);
 +    if (s->hLib && s->handle) {
 +        s->pfn.aacEncClose(&s->handle);
-+        dlclose(s->hLib);
++	dlclose(s->hLib);
 +    }
-     av_freep(&avctx->extradata);
      ff_af_queue_close(&s->afq);
  
-@@ -126,6 +132,21 @@ static av_cold int aac_encode_init(AVCodecContext *avctx)
+     return 0;
+@@ -127,6 +133,21 @@ static av_cold int aac_encode_init(AVCodecContext *avctx)
      int aot = FF_PROFILE_AAC_LOW + 1;
      int sce = 0, cpe = 0;
  
@@ -260,5 +247,3 @@ index 5620bb5951..c4519b6b74 100644
      if ((err = aacEncOpen(&s->handle, 0, avctx->channels)) != AACENC_OK) {
          av_log(avctx, AV_LOG_ERROR, "Unable to open the encoder: %s\n",
                 aac_get_error(err));
--- 
-2.24.0
