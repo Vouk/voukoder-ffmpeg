@@ -82,7 +82,7 @@ function build_svt {
   MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration=$MSBUILD_CONFIG /property:ConfigurationType=StaticLibrary /property:TargetExt=.lib Source/Lib/Encoder/SvtAv1Enc.vcxproj
   #sed -i 's/C:/\/c/g' SvtAv1Enc.pc
   cp -r ../Source/API $BUILD/include/svt-av1 ; cp ../Bin/$MSBUILD_CONFIG/SvtAv1Enc.lib $BUILD/lib/ ; cp SvtAv1Enc.pc $BUILD/lib/pkgconfig/
-  #add_comp libsvtav1
+  add_comp libsvtav1
   #
   # VP9
   #git clone https://github.com/OpenVisualCloud/SVT-VP9.git $SRC/svt-vp9
@@ -263,7 +263,7 @@ build_lame
 build_zimg
 build_x264
 build_opus
-build_x265
+#build_x265
 #build_aom
 #build_libass
 
