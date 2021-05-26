@@ -172,6 +172,7 @@ function build_zimg {
 function build_x264 {
   git clone https://code.videolan.org/videolan/x264.git $SRC/x264
   cd $SRC/x264
+  sed -i 's/#define X264_API_IMPORTS 1/\/\/#define X264_API_IMPORTS 1/g' ../ffmpeg/libavcodec/libx264.c
   #git checkout b5bc5d69c580429ff716bafcd43655e855c31b02
   #f9af2a0f71d0fca7c1cafa7657f03a302da0ca1c
   CC=cl ./configure --prefix=$BUILD --disable-cli --enable-static --enable-pic --libdir=$BUILD/lib
