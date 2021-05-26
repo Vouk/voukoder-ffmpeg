@@ -115,7 +115,7 @@ function build_vorbis {
 }
 
 function build_snappy {
-  git clone -b 1.1.8 https://github.com/google/snappy.git $SRC/snappy
+  git clone https://github.com/google/snappy.git $SRC/snappy
   cd $SRC/snappy
   rm -rf work
   mkdir work
@@ -248,12 +248,12 @@ git clone git://source.ffmpeg.org/ffmpeg.git $SRC/ffmpeg
 #build_svt
 #build_ogg
 #build_vorbis
-#build_snappy
+build_snappy
 #build_libvpx
 #build_libfdkaac
 #build_lame
 #build_zimg
-build_x264
+#build_x264
 #build_opus
 #build_x265
 #build_aom
