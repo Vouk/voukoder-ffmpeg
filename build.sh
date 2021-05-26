@@ -69,37 +69,28 @@ function build_aom {
 function build_svt {
   # HEVC
   #git clone https://github.com/OpenVisualCloud/SVT-HEVC.git $SRC/svt-hevc
-  #cd $SRC/svt-hevc/Build
+  #cd $SRC/svt-hevc/Build/windows
   #cmake .. -G"Visual Studio 15 2017" -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD -DCMAKE_CONFIGURATION_TYPES=$MSBUILD_CONFIG
   #MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration=$MSBUILD_CONFIG /property:ConfigurationType=StaticLibrary /property:TargetExt=.lib svt-hevc.sln  
   #cp -r ../Source/API $BUILD/include/svt-hevc ; cp ../Bin/$MSBUILD_CONFIG/SvtHevcEnc.lib $BUILD/lib/ ; cp SvtHevcEnc.pc $BUILD/lib/pkgconfig/
   #add_comp libsvthevc
   #
-  # AV1 (patch needed for FFmpeg 4.3)
+  # AV1
   git clone --depth 1  https://github.com/AOMediaCodec/SVT-AV1 $SRC/svt-av1
   cd $SRC/svt-av1/Build/windows
   ./build.bat 2017 $MODE static
-  # cmake .. -G"Visual Studio 15 2017" -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD -DCMAKE_CONFIGURATION_TYPES=$MSBUILD_CONFIG
-  # MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration=$MSBUILD_CONFIG /property:ConfigurationType=StaticLibrary /p:EB_DLL /property:TargetExt=.lib Source/Lib/Encoder/SvtAv1Enc.vcxproj
-  # sed -i 's/C:/\/c/g' SvtAv1Enc.pc
   cp -r ../../Source/API $BUILD/include/svt-av1 ; cp ../../Bin/$MSBUILD_CONFIG/SvtAv1Enc.lib $BUILD/lib/ ; cp SvtAv1Enc.pc $BUILD/lib/pkgconfig/
   add_comp libsvtav1
   #
   # VP9
   #git clone https://github.com/OpenVisualCloud/SVT-VP9.git $SRC/svt-vp9
-  #cd $SRC/svt-vp9/Build
+  #cd $SRC/svt-vp9/Build/windows
   #cmake .. -G"Visual Studio 15 2017" -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD -DCMAKE_CONFIGURATION_TYPES=$MSBUILD_CONFIG
   #MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration=$MSBUILD_CONFIG /property:ConfigurationType=StaticLibrary /property:TargetExt=".lib" svt-vp9.sln
   #cp -r ../Source/API $BUILD/include/svt-vp9 ; cp ../Bin/$MSBUILD_CONFIG/SvtVp9Enc.lib $BUILD/lib/ ; cp SvtVp9Enc.pc $BUILD/lib/pkgconfig/
   #sed -i 's/ -lpthread//g' $BUILD/lib/pkgconfig/SvtVp9Enc.pc
   #sed -i 's/ -lm//g' $BUILD/lib/pkgconfig/SvtVp9Enc.pc
   #add_comp libsvtvp9
-  cd $SRC/ffmpeg
-  #git apply $SRC/svt-hevc/ffmpeg_plugin/0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch
-  #git apply $SRC/svt-av1/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-av1-with-svt-hevc.patch
-  #git apply $SRC/svt-vp9/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-vp9-with-hevc-av1.patch
-  #git am $SRC/svt-hevc/ffmpeg_plugin/0001*.patch
-  #git apply $SRC/svt-av1/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-av1.patch
 }
 
 function build_ogg {
@@ -248,23 +239,22 @@ mkdir src build build/include build/lib build/lib/pkgconfig
 BUILD=`realpath build`
 SRC=`realpath src`
 
-#git clone -b release/4.3 git://source.ffmpeg.org/ffmpeg.git $SRC/ffmpeg
 git clone git://source.ffmpeg.org/ffmpeg.git $SRC/ffmpeg
 
-#build_nvenc
-#build_amf
-#build_mfx
+build_nvenc
+build_amf
+build_mfx
 build_svt
-#build_ogg
-#build_vorbis
-#build_snappy
-#build_libvpx
-#build_libfdkaac
-#build_lame
-#build_zimg
-#build_x264
-#build_opus
-#build_x265
+build_ogg
+build_vorbis
+build_snappy
+build_libvpx
+build_libfdkaac
+build_lame
+build_zimg
+build_x264
+build_opus
+build_x265
 #build_aom
 #build_libass
 
