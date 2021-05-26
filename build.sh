@@ -250,19 +250,19 @@ SRC=`realpath src`
 #git clone -b release/4.3 git://source.ffmpeg.org/ffmpeg.git $SRC/ffmpeg
 git clone git://source.ffmpeg.org/ffmpeg.git $SRC/ffmpeg
 
-build_nvenc
-build_amf
-build_mfx
+#build_nvenc
+#build_amf
+#build_mfx
 build_svt
-build_ogg
-build_vorbis
-build_snappy
-build_libvpx
-build_libfdkaac
-build_lame
-build_zimg
-build_x264
-build_opus
+#build_ogg
+#build_vorbis
+#build_snappy
+#build_libvpx
+#build_libfdkaac
+#build_lame
+#build_zimg
+#build_x264
+#build_opus
 #build_x265
 #build_aom
 #build_libass
