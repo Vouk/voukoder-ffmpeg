@@ -172,7 +172,7 @@ function build_zimg {
 function build_x264 {
   git clone https://code.videolan.org/videolan/x264.git $SRC/x264
   cd $SRC/x264
-  git checkout b5bc5d69c580429ff716bafcd43655e855c31b02
+  #git checkout b5bc5d69c580429ff716bafcd43655e855c31b02
   #f9af2a0f71d0fca7c1cafa7657f03a302da0ca1c
   CC=cl ./configure --prefix=$BUILD --disable-cli --enable-static --enable-pic --libdir=$BUILD/lib
   make -j $NUMBER_OF_PROCESSORS
@@ -241,20 +241,20 @@ SRC=`realpath src`
 
 git clone git://source.ffmpeg.org/ffmpeg.git $SRC/ffmpeg
 
-build_nvenc
-build_amf
-build_mfx
-build_svt
-build_ogg
-build_vorbis
-build_snappy
-build_libvpx
-build_libfdkaac
-build_lame
-build_zimg
+#build_nvenc
+#build_amf
+#build_mfx
+#build_svt
+#build_ogg
+#build_vorbis
+#build_snappy
+#build_libvpx
+#build_libfdkaac
+#build_lame
+#build_zimg
 build_x264
-build_opus
-build_x265
+#build_opus
+#build_x265
 #build_aom
 #build_libass
 
