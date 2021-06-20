@@ -240,7 +240,7 @@ mkdir src build build/include build/lib build/lib/pkgconfig
 BUILD=`realpath build`
 SRC=`realpath src`
 
-git clone git://source.ffmpeg.org/ffmpeg.git $SRC/ffmpeg
+git clone -b release/4.4 git://source.ffmpeg.org/ffmpeg.git $SRC/ffmpeg
 
 build_nvenc
 build_amf
