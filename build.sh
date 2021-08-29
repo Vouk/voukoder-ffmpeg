@@ -54,16 +54,16 @@ function build_aom {
   rm -rf work
   mkdir work
   cd work
-  cmake -G "Visual Studio 15 2017" .. -A x64 -DENABLE_{DOCS,TOOLS,TESTS}=off -DAOM_TARGET_CPU=x86_64 -DCMAKE_INSTALL_PREFIX=$BUILD
+  cmake -G "Visual Studio 15 2017" .. -DCMAKE_INSTALL_PREFIX=$BUILD
   MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration="$MSBUILD_CONFIG" AOM.sln
-  cp $MSBUILD_CONFIG/aom.lib $BUILD/lib/aom.lib
-  cp -r ../aom $BUILD/include/aom
-  cmake -DAOM_CONFIG_DIR=. -DAOM_ROOT=.. -DCMAKE_INSTALL_PREFIX=@prefix@ -DCMAKE_PROJECT_NAME=aom -DCONFIG_MULTITHREAD=true -DHAVE_PTHREAD_H=false -P "../build/cmake/pkg_config.cmake"
-  sed -i "s#@prefix@#$BUILD#g" aom.pc
-  sed -i '/^Libs\.private.*/d' aom.pc
-  sed -i 's/-lm//' aom.pc
-  cp aom.pc $BUILD/lib/pkgconfig/aom.pc
-  add_comp libaom
+  #cp $MSBUILD_CONFIG/aom.lib $BUILD/lib/aom.lib
+  #cp -r ../aom $BUILD/include/aom
+  #cmake -DAOM_CONFIG_DIR=. -DAOM_ROOT=.. -DCMAKE_INSTALL_PREFIX=@prefix@ -DCMAKE_PROJECT_NAME=aom -DCONFIG_MULTITHREAD=true -DHAVE_PTHREAD_H=false -P "../build/cmake/pkg_config.cmake"
+  #sed -i "s#@prefix@#$BUILD#g" aom.pc
+  #sed -i '/^Libs\.private.*/d' aom.pc
+  #sed -i 's/-lm//' aom.pc
+  #cp aom.pc $BUILD/lib/pkgconfig/aom.pc
+  #add_comp libaom
 }
 
 function build_svt {
