@@ -55,7 +55,7 @@ function build_aom {
   mkdir work
   cd work
   cmake -G "Visual Studio 15 2017" .. -T host=x64 -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD
-  MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration="$MSBUILD_CONFIG" aom_av1_encoder.vcxproj
+  MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration="$MSBUILD_CONFIG" AOM.sln
   #cp $MSBUILD_CONFIG/aom.lib $BUILD/lib/aom.lib
   #cp -r ../aom $BUILD/include/aom
   #cmake -DAOM_CONFIG_DIR=. -DAOM_ROOT=.. -DCMAKE_INSTALL_PREFIX=@prefix@ -DCMAKE_PROJECT_NAME=aom -DCONFIG_MULTITHREAD=true -DHAVE_PTHREAD_H=false -P "../build/cmake/pkg_config.cmake"
