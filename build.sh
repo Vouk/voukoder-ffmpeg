@@ -49,7 +49,7 @@ function build_mfx {
 }
 
 function build_aom {
-  git clone -q https://aomedia.googlesource.com/aom $SRC/libaom
+  git clone -q -b v3.1.2 https://aomedia.googlesource.com/aom $SRC/libaom
   cd $SRC/libaom
   rm -rf work
   mkdir work
