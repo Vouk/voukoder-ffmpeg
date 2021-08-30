@@ -24,20 +24,20 @@ function build {
 }
 
 function build_nvenc {
-  git clone -b sdk/9.1 git://github.com/FFmpeg/nv-codec-headers.git $SRC/ffnvcodec
+  git clone -q -b sdk/9.1 git://github.com/FFmpeg/nv-codec-headers.git $SRC/ffnvcodec
   cd $SRC/ffnvcodec
   make PREFIX=$BUILD install
   add_comp nvenc
 }
 
 function build_amf {
-  git clone git://github.com/GPUOpen-LibrariesAndSDKs/AMF.git $SRC/amf
+  git clone -q git://github.com/GPUOpen-LibrariesAndSDKs/AMF.git $SRC/amf
   cp -a $SRC/amf/amf/public/include $BUILD/include/AMF
   add_comp amf
 }
 
 function build_mfx {
-  git clone https://github.com/lu-zero/mfx_dispatch.git $SRC/libmfx
+  git clone -q https://github.com/lu-zero/mfx_dispatch.git $SRC/libmfx
   cd $SRC/libmfx
   #git checkout c200d833e25a91e3e49d69890dac1ffa3486cbe9
   if [[ ! -f "configure" ]]; then
@@ -49,7 +49,7 @@ function build_mfx {
 }
 
 function build_aom {
-  git clone https://aomedia.googlesource.com/aom $SRC/libaom
+  git clone -q https://aomedia.googlesource.com/aom $SRC/libaom
   cd $SRC/libaom
   rm -rf work
   mkdir work
@@ -68,7 +68,7 @@ function build_aom {
 
 function build_svt {
   # HEVC
-  #git clone https://github.com/OpenVisualCloud/SVT-HEVC.git $SRC/svt-hevc
+  #git clone -q https://github.com/OpenVisualCloud/SVT-HEVC.git $SRC/svt-hevc
   #cd $SRC/svt-hevc/Build/windows
   #cmake .. -G"Visual Studio 15 2017" -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD -DCMAKE_CONFIGURATION_TYPES=$MSBUILD_CONFIG
   #MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration=$MSBUILD_CONFIG /property:ConfigurationType=StaticLibrary /property:TargetExt=.lib svt-hevc.sln  
@@ -76,14 +76,14 @@ function build_svt {
   #add_comp libsvthevc
   #
   # AV1
-  git clone --depth 1  https://github.com/AOMediaCodec/SVT-AV1 $SRC/svt-av1
+  git clone -q --depth 1  https://github.com/AOMediaCodec/SVT-AV1 $SRC/svt-av1
   cd $SRC/svt-av1/Build/windows
   ./build.bat 2017 $MODE static
   cp -r ../../Source/API $BUILD/include/svt-av1 ; cp ../../Bin/$MSBUILD_CONFIG/SvtAv1Enc.lib $BUILD/lib/ ; cp SvtAv1Enc.pc $BUILD/lib/pkgconfig/
   add_comp libsvtav1
   #
   # VP9
-  #git clone https://github.com/OpenVisualCloud/SVT-VP9.git $SRC/svt-vp9
+  #git clone -q https://github.com/OpenVisualCloud/SVT-VP9.git $SRC/svt-vp9
   #cd $SRC/svt-vp9/Build/windows
   #cmake .. -G"Visual Studio 15 2017" -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD -DCMAKE_CONFIGURATION_TYPES=$MSBUILD_CONFIG
   #MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration=$MSBUILD_CONFIG /property:ConfigurationType=StaticLibrary /property:TargetExt=".lib" svt-vp9.sln
@@ -94,20 +94,20 @@ function build_svt {
 }
 
 function build_ogg {
-  git clone https://github.com/xiph/ogg.git $SRC/libogg
+  git clone -q https://github.com/xiph/ogg.git $SRC/libogg
   cd $SRC/libogg
   build libogg "--disable-shared"
 }
 
 function build_libass {
-  git clone https://github.com/libass/libass.git $SRC/libass
+  git clone -q https://github.com/libass/libass.git $SRC/libass
   cd $SRC/libass
   build libass "--disable-shared"  
   add_comp libass
 }
 
 function build_vorbis {
-  git clone https://github.com/xiph/vorbis.git $SRC/libvorbis
+  git clone -q https://github.com/xiph/vorbis.git $SRC/libvorbis
   cd $SRC/libvorbis
   build libvorbis "--disable-shared"  
   sed -i '/^Libs\.private.*/d' $BUILD/lib/pkgconfig/vorbis.pc  # don't need m.lib on windows
@@ -115,7 +115,7 @@ function build_vorbis {
 }
 
 function build_snappy {
-  git clone -b 1.1.8 https://github.com/google/snappy.git $SRC/snappy
+  git clone -q -b 1.1.8 https://github.com/google/snappy.git $SRC/snappy
   cd $SRC/snappy
   rm -rf work
   mkdir work
@@ -128,7 +128,7 @@ function build_snappy {
 }
 
 function build_libvpx {
-  git clone https://github.com/webmproject/libvpx.git $SRC/libvpx
+  git clone -q https://github.com/webmproject/libvpx.git $SRC/libvpx
   cd $SRC/libvpx
   ./configure --prefix=$BUILD --target=x86_64-win64-vs15 --enable-vp9-highbitdepth --disable-shared --disable-examples --disable-tools --disable-docs --disable-libyuv --disable-unit_tests --disable-postproc
   make -j $NUMBER_OF_PROCESSORS
@@ -155,7 +155,7 @@ function build_lame {
 }
 
 function build_zimg {
-  git clone https://github.com/sekrit-twc/zimg.git $SRC/zimg
+  git clone -q https://github.com/sekrit-twc/zimg.git $SRC/zimg
   cd $SRC/zimg
   git checkout release-2.9.2
   ./autogen.sh
@@ -170,7 +170,7 @@ function build_zimg {
 }
 
 function build_x264 {
-  git clone https://code.videolan.org/videolan/x264.git $SRC/x264
+  git clone -q https://code.videolan.org/videolan/x264.git $SRC/x264
   cd $SRC/x264
   sed -i 's/#define X264_API_IMPORTS 1/\/\/#define X264_API_IMPORTS 1/g' ../ffmpeg/libavcodec/libx264.c
   #git checkout b5bc5d69c580429ff716bafcd43655e855c31b02
@@ -182,7 +182,7 @@ function build_x264 {
 }
 
 function build_opus {
-  git clone https://github.com/xiph/opus.git $SRC/opus
+  git clone -q https://github.com/xiph/opus.git $SRC/opus
   cd $SRC/opus/win32/VS2015
   echo \nConverting project file ...
   sed -i 's/v140/v141/g' opus.vcxproj
@@ -202,7 +202,7 @@ function build_opus {
 }
 
 function build_x265 {
-  git clone https://github.com/videolan/x265.git --branch stable $SRC/x265
+  git clone -q https://github.com/videolan/x265.git --branch stable $SRC/x265
   cd $SRC/x265/build/vc15-x86_64
   rm -rf work*
   mkdir work work10 work12
@@ -240,7 +240,7 @@ mkdir src build build/include build/lib build/lib/pkgconfig
 BUILD=`realpath build`
 SRC=`realpath src`
 
-git clone -b release/4.4 git://source.ffmpeg.org/ffmpeg.git $SRC/ffmpeg
+git clone -q -b release/4.4 git://source.ffmpeg.org/ffmpeg.git $SRC/ffmpeg
 
 #build_nvenc
 #build_amf
