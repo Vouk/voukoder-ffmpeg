@@ -54,7 +54,7 @@ function build_aom {
   rm -rf work
   mkdir work
   cd work
-  cmake -G "Visual Studio 15 2017" .. -T host=x64 -A x64 -DCMAKE_INSTALL_PREFIX=$BUILD
+  cmake -G "Visual Studio 15 2017" .. -T host=x64 -A x64 -DENABLE_{DOCS,TOOLS,TESTS,EXAMPLES}=OFF -DCMAKE_INSTALL_PREFIX=$BUILD
   MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration="$MSBUILD_CONFIG" AOM.sln
   cp $MSBUILD_CONFIG/aom.lib $BUILD/lib/aom.lib
   cp -r ../aom $BUILD/include/aom
