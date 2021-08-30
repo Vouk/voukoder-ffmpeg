@@ -58,8 +58,8 @@ function build_aom {
   MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration="$MSBUILD_CONFIG" AOM.sln
   cp $MSBUILD_CONFIG/aom.lib $BUILD/lib/aom.lib
   cp -r ../aom $BUILD/include/aom
-  #cmake -DAOM_CONFIG_DIR=. -DAOM_ROOT=.. -DCMAKE_INSTALL_PREFIX=@prefix@ -DCMAKE_PROJECT_NAME=aom -DCONFIG_MULTITHREAD=true -DHAVE_PTHREAD_H=false -P "../build/cmake/pkg_config.cmake"
-  #sed -i "s#@prefix@#$BUILD#g" aom.pc
+  cmake -DAOM_CONFIG_DIR=. -DAOM_ROOT=.. -DCMAKE_INSTALL_PREFIX=@prefix@ -DCMAKE_PROJECT_NAME=aom -DCONFIG_MULTITHREAD=true -DHAVE_PTHREAD_H=false -P "../build/cmake/pkg_config.cmake"
+  sed -i "s#@prefix@#$BUILD#g" aom.pc
   sed -i '/^Libs\.private.*/d' aom.pc
   #sed -i 's/-lm//' aom.pc
   cp aom.pc $BUILD/lib/pkgconfig/aom.pc
@@ -258,7 +258,7 @@ git clone -q -b release/4.4 git://source.ffmpeg.org/ffmpeg.git $SRC/ffmpeg
 #build_x265
 build_aom
 #build_libass
-
+exit
 cd $SRC/ffmpeg
 PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CFLAGS -I$BUILD/include" --extra-ldflags="-LIBPATH:$BUILD/lib" --prefix=$BUILD --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl $COMPONENTS
 sed -i 's/\x81/ue/g' config.h
