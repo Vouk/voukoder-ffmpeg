@@ -58,7 +58,7 @@ function build_aom {
   MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration="$MSBUILD_CONFIG" AOM.sln
   cp $MSBUILD_CONFIG/aom.lib $BUILD/lib/aom.lib
   cp -r ../aom $BUILD/include/aom
-  printf "prefix=$BUILD\nexec_prefix=\${prefix}\nincludedir=\${prefix}/include\nlibdir=\${exec_prefix}/lib\nName: aom\nVersion: 3.1.2\nLibs: -L\${libdir} -laom\nCflags: -I\${includedir}\n" > $BUILD/lib/pkgconfig/aom.pc
+  printf "prefix=$BUILD\nexec_prefix=\${prefix}\nincludedir=\${prefix}/include\nlibdir=\${exec_prefix}/lib\nName: aom\nDescription: Alliance for Open Media AV1 codec library v3.1.2\nVersion: 3.1.2\nRequires:\nConflicts:\nLibs: -L\${libdir} -laom\nCflags: -I\${includedir}\n" > $BUILD/lib/pkgconfig/aom.pc
   #cmake -DAOM_CONFIG_DIR=. -DAOM_ROOT=.. -DCMAKE_INSTALL_PREFIX=@prefix@ -DCMAKE_PROJECT_NAME=aom -DCONFIG_MULTITHREAD=true -DHAVE_PTHREAD_H=false -P "../build/cmake/pkg_config.cmake"
   #sed -i "s#@prefix@#$BUILD#g" aom.pc
   #sed -i '/^Libs\.private.*/d' aom.pc
