@@ -60,7 +60,7 @@ function build_aom {
   cp -r ../aom $BUILD/include/aom
   #cmake -DAOM_CONFIG_DIR=. -DAOM_ROOT=.. -DCMAKE_INSTALL_PREFIX=@prefix@ -DCMAKE_PROJECT_NAME=aom -DCONFIG_MULTITHREAD=true -DHAVE_PTHREAD_H=false -P "../build/cmake/pkg_config.cmake"
   #sed -i "s#@prefix@#$BUILD#g" aom.pc
-  #sed -i '/^Libs\.private.*/d' aom.pc
+  sed -i '/^Libs\.private.*/d' aom.pc
   #sed -i 's/-lm//' aom.pc
   cp aom.pc $BUILD/lib/pkgconfig/aom.pc
   add_comp libaom
