@@ -49,7 +49,7 @@ function build_mfx {
 }
 
 function build_aom {
-  git clone -q -b v3.1.2 https://aomedia.googlesource.com/aom $SRC/libaom
+  git clone -q https://aomedia.googlesource.com/aom $SRC/libaom
   cd $SRC/libaom
   rm -rf work
   mkdir work
@@ -58,7 +58,7 @@ function build_aom {
   MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration="$MSBUILD_CONFIG" AOM.sln
   cp $MSBUILD_CONFIG/aom.lib $BUILD/lib/aom.lib
   cp -r ../aom $BUILD/include/aom
-  cmake -DAOM_CONFIG_DIR=. -DAOM_ROOT=.. -DCMAKE_INSTALL_PREFIX=@prefix@ -DCMAKE_PROJECT_NAME=aom -DCONFIG_MULTITHREAD=true -DHAVE_PTHREAD_H=false -P "../build/cmake/pkg_config.cmake"
+  #cmake -DAOM_CONFIG_DIR=. -DAOM_ROOT=.. -DCMAKE_INSTALL_PREFIX=@prefix@ -DCMAKE_PROJECT_NAME=aom -DCONFIG_MULTITHREAD=true -DHAVE_PTHREAD_H=false -P "../build/cmake/pkg_config.cmake"
   sed -i "s#@prefix@#$BUILD#g" aom.pc
   sed -i '/^Libs\.private.*/d' aom.pc
   #sed -i 's/-lm//' aom.pc
