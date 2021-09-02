@@ -243,6 +243,7 @@ SRC=`realpath src`
 
 git clone -q -b release/4.4 git://source.ffmpeg.org/ffmpeg.git $SRC/ffmpeg
 
+#build_aom
 build_nvenc
 build_amf
 build_mfx
@@ -257,7 +258,6 @@ build_zimg
 build_x264
 build_opus
 build_x265
-build_aom
 #build_libass
 
 cd $SRC/ffmpeg
