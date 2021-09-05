@@ -37,14 +37,18 @@ function build_amf {
 }
 
 function build_mfx {
-  git clone -q https://github.com/lu-zero/mfx_dispatch.git $SRC/libmfx
-  cd $SRC/libmfx
-  #git checkout c200d833e25a91e3e49d69890dac1ffa3486cbe9
-  if [[ ! -f "configure" ]]; then
-      autoreconf -fiv || exit 1
-  fi
-  build libmfx
-  sed -i 's/-lstdc++/-ladvapi32/g' $BUILD/lib/pkgconfig/libmfx.pc
+  cp -r "C:\Program Files (x86)\IntelSWTools\Intel(R) Media SDK 2021 R1\Software Development Kit\include" $BUILD/include/mfx
+  cp "C:\Program Files (x86)\IntelSWTools\Intel(R) Media SDK 2021 R1\Software Development Kit\lib\x64\libmfx_vs2015.lib" $BUILD/lib/libmfx.lib
+  printf "prefix=$BUILD\nexec_prefix=\${prefix}\nincludedir=\${prefix}/include\nlibdir=\${exec_prefix}/lib\nName: libmfx\nDescription: Intel Media SDK Dispatched static library\nVersion: 1.34\nLibs: -L\${libdir} -llibmfx -ladvapi32 -lole32 -luuid\nCflags: -I\${includedir}\n" > $BUILD/lib/pkgconfig/libmfx.pc
+  
+  #git clone -q https://github.com/lu-zero/mfx_dispatch.git $SRC/libmfx
+  #cd $SRC/libmfx
+  #if [[ ! -f "configure" ]]; then
+  #    autoreconf -fiv || exit 1
+  #fi
+  #build libmfx
+  #sed -i 's/-lstdc++/-ladvapi32/g' $BUILD/lib/pkgconfig/libmfx.pc
+  
   add_comp libmfx
 }
 
