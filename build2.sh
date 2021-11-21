@@ -209,12 +209,6 @@ sed -i 's/\x81/ue/g' config.h
 make -j$(nproc)
 make install
 
-# rename *.a to *.lib
-cd $BUILD/lib
-for file in *.a; do
-  mv "$file" "`basename "$file" .a`.lib"
-done
-
 # clean up
 rm -rf $BUILD/lib/fdk-aac.lib $BUILD/lib/*.la
   
