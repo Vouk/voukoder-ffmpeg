@@ -204,7 +204,7 @@ build_mfx
 #build_opus
 
 cd $SRC/ffmpeg
-PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CFLAGS -I$BUILD/include" --extra-ldflags="-LIBPATH:$BUILD/lib" --prefix=$BUILD --build-suffix=-voukoderpro --enable-shared --disable-static --arch=x86_64 --disable-doc --enable-runtime-cpudetect --enable-w32threads $COMPONENTS
+PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CFLAGS -I$BUILD/include" --extra-ldflags="-LIBPATH:$BUILD/lib" --prefix=$BUILD --enable-shared --disable-static --arch=x86_64 --disable-doc --enable-runtime-cpudetect --enable-w32threads $COMPONENTS
 sed -i 's/\x81/ue/g' config.h
 make -j$(nproc)
 make install
