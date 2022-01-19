@@ -15,9 +15,10 @@ fi
 
 function build {
   cd $SRC/$1
-  if [ -f autogen.sh ]; then
-    ./autogen.sh
-  fi
+  #if [ -f autogen.sh ]; then
+  #  ./autogen.sh
+  #fi
+  autoreconf -i
   CC=cl CXXFLAGS=$CFLAGS ./configure --prefix=$BUILD $2
   make -j $NUMBER_OF_PROCESSORS
   make install
