@@ -19,7 +19,7 @@ function build {
   #  ./autogen.sh
   #fi
   autoreconf -i
-  CC=cl CXXFLAGS=$CFLAGS ./configure --prefix=$BUILD $2
+  CC=cl CXX=cl CXXFLAGS=$CFLAGS ./configure --prefix=$BUILD $2
   make -j $NUMBER_OF_PROCESSORS
   make install
 }
