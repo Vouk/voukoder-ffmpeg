@@ -264,7 +264,7 @@ build_libfdkaac
 #build_opus
 #build_x265
 #build_libass
-exit 0
+
 cd $SRC/ffmpeg
 PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CFLAGS -I$BUILD/include" --extra-ldflags="-LIBPATH:$BUILD/lib" --prefix=$BUILD --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl $COMPONENTS
 sed -i 's/\x81/ue/g' config.h
