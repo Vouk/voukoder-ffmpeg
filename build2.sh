@@ -24,14 +24,14 @@ function build {
 }
 
 function build_nvenc {
-  git clone -q -b sdk/11.0 git://github.com/FFmpeg/nv-codec-headers.git $SRC/ffnvcodec
+  git clone -q -b sdk/11.0 https://github.com/FFmpeg/nv-codec-headers.git $SRC/ffnvcodec
   cd $SRC/ffnvcodec
   make PREFIX=$BUILD install
   add_comp nvenc
 }
 
 function build_amf {
-  git clone -q git://github.com/GPUOpen-LibrariesAndSDKs/AMF.git $SRC/amf
+  git clone -q https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git $SRC/amf
   cp -a $SRC/amf/amf/public/include $BUILD/include/AMF
   add_comp amf
 }
@@ -188,7 +188,7 @@ mkdir src build build/include build/lib build/lib/pkgconfig
 BUILD=`realpath build`
 SRC=`realpath src`
 
-git clone -q -b release/5.0 git://source.ffmpeg.org/ffmpeg.git $SRC/ffmpeg
+git clone -q -b release/5.0 https://source.ffmpeg.org/ffmpeg.git $SRC/ffmpeg
 
 #build_aom
 build_nvenc
