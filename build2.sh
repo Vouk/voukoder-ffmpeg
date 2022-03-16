@@ -188,7 +188,7 @@ mkdir src build build/include build/lib build/lib/pkgconfig
 BUILD=`realpath build`
 SRC=`realpath src`
 
-git clone -q -b release/5.0 https://source.ffmpeg.org/ffmpeg.git $SRC/ffmpeg
+git clone -q -b release/5.0 https://github.com/FFmpeg/FFmpeg.git $SRC/ffmpeg
 
 #build_aom
 build_nvenc
