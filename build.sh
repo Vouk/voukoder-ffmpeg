@@ -137,7 +137,7 @@ function build_lame {
 
 function build_zimg {
   cd repos/zimg
-  git checkout release-2.9.2
+  #git checkout release-2.9.2
   ./autogen.sh
   ./configure --prefix=$BUILD
   cd _msvc/zimg
@@ -151,8 +151,7 @@ function build_zimg {
 }
 
 function build_x264 {
-  git clone -q https://code.videolan.org/videolan/x264.git $SRC/x264
-  cd $SRC/x264
+  cd repos/x264
   sed -i 's/#define X264_API_IMPORTS 1/\/\/#define X264_API_IMPORTS 1/g' ../ffmpeg/libavcodec/libx264.c
   #git checkout b5bc5d69c580429ff716bafcd43655e855c31b02
   #f9af2a0f71d0fca7c1cafa7657f03a302da0ca1c
@@ -160,6 +159,7 @@ function build_x264 {
   make -j $NUMBER_OF_PROCESSORS
   make install-lib-static
   add_comp libx264
+  cd -
 }
 
 function build_opus {
@@ -225,16 +225,15 @@ build_amf
 #build_mfx
 build_svt
 build_ogg
+build_opus
 build_vorbis
 build_snappy
 build_libvpx
 build_libfdkaac
-#build_lame
-#build_zimg
+build_lame
+build_zimg
 #build_x264
-#build_opus
 #build_x265
-#build_libass
 
 cd repos/ffmpeg
 PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CFLAGS -I$BUILD/include" --extra-ldflags="-LIBPATH:$BUILD/lib" --prefix=$BUILD --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl $COMPONENTS
