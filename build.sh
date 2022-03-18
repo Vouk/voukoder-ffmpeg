@@ -253,7 +253,7 @@ mkdir src build build/include build/lib build/lib/pkgconfig
 
 BUILD=`realpath build`
 SRC=`realpath src`
-repos=$(realpath repo)
+repos=$(realpath repos)
 
 build_nvenc
 build_amf
