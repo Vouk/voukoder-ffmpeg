@@ -222,7 +222,7 @@ SRC=`realpath src`
 
 build_nvenc
 build_amf
-build_mfx
+#build_mfx
 build_svt
 build_ogg
 build_vorbis
