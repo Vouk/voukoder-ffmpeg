@@ -244,6 +244,8 @@ function build_x265 {
   add_comp libx265
 }
 
+export -f build_nvenc && export -f build_amf && export -f build_mfx && export -f build_svt && export -f build_ogg && export -f build_vorbis && export -f build_snappy && export -f build_libvpx && export -f build_libfdkaac && export -f build_lame && export -f build_zimg && export -f build_x264 && export -f build_x265
+
 function add_comp {
   COMPONENTS="$COMPONENTS --enable-$1"
 }
@@ -255,18 +257,20 @@ BUILD=`realpath build`
 SRC=`realpath src`
 repos=$(realpath repos)
 
-build_nvenc
-build_amf
+parallel -j3 ::: build_nvenc build_amf build_svt build_ogg
+
+#build_nvenc
+#build_amf
 #build_mfx
-build_svt
-build_ogg
-build_opus
-build_vorbis
-build_snappy
-build_libvpx
-build_libfdkaac
+#build_svt
+#build_ogg
+#build_opus
+#build_vorbis
+#build_snappy
+#build_libvpx
+#build_libfdkaac
 #build_lame
-build_zimg
+#build_zimg
 #build_x264
 #build_x265
 
