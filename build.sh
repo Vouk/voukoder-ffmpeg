@@ -52,25 +52,6 @@ function build_mfx {
   add_comp libmfx
 }
 
-function build_aom {
-  git clone -q -b v3.1.2 https://aomedia.googlesource.com/aom $SRC/libaom
-  cd $SRC/libaom
-  rm -rf work
-  mkdir work
-  cd work
-  cmake -G "Visual Studio 15 2017" .. -T host=x64 -A x64 -DCONFIG_AV1_DECODER=0 -DENABLE_{DOCS,TOOLS,TESTS,EXAMPLES}=OFF -DCMAKE_INSTALL_PREFIX=$BUILD
-  MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration="$MSBUILD_CONFIG" AOM.sln
-  cp $MSBUILD_CONFIG/aom.lib $BUILD/lib/aom.lib
-  cp -r ../aom $BUILD/include/aom
-  printf "prefix=$BUILD\nexec_prefix=\${prefix}\nincludedir=\${prefix}/include\nlibdir=\${exec_prefix}/lib\nName: aom\nDescription: Alliance for Open Media AV1 codec library v3.1.2\nVersion: 3.1.2\nRequires:\nConflicts:\nLibs: -L\${libdir} -laom\nCflags: -I\${includedir}\n" > $BUILD/lib/pkgconfig/aom.pc
-  #cmake -DAOM_CONFIG_DIR=. -DAOM_ROOT=.. -DCMAKE_INSTALL_PREFIX=@prefix@ -DCMAKE_PROJECT_NAME=aom -DCONFIG_MULTITHREAD=true -DHAVE_PTHREAD_H=false -P "../build/cmake/pkg_config.cmake"
-  #sed -i "s#@prefix@#$BUILD#g" aom.pc
-  #sed -i '/^Libs\.private.*/d' aom.pc
-  #sed -i 's/-lm//' aom.pc
-  #cp aom.pc $BUILD/lib/pkgconfig/aom.pc
-  add_comp libaom
-}
-
 function build_svt {
   # HEVC
   #git clone -q https://github.com/OpenVisualCloud/SVT-HEVC.git $SRC/svt-hevc
@@ -100,29 +81,22 @@ function build_svt {
 }
 
 function build_ogg {
-  git clone -q https://github.com/xiph/ogg.git $SRC/libogg
-  cd $SRC/libogg
+  cd repos/libogg
   build libogg "--disable-shared"
-}
-
-function build_libass {
-  git clone -q https://github.com/libass/libass.git $SRC/libass
-  cd $SRC/libass
-  build libass "--disable-shared"  
-  add_comp libass
+  cd -
 }
 
 function build_vorbis {
-  git clone -q https://github.com/xiph/vorbis.git $SRC/libvorbis
-  cd $SRC/libvorbis
+  cd repos/libvorbis
   build libvorbis "--disable-shared"  
   sed -i '/^Libs\.private.*/d' $BUILD/lib/pkgconfig/vorbis.pc  # don't need m.lib on windows
   add_comp libvorbis
+  cd -
 }
 
 function build_snappy {
-  git clone -q -b 1.1.8 https://github.com/google/snappy.git $SRC/snappy
-  cd $SRC/snappy
+  #git clone -q -b 1.1.8 https://github.com/google/snappy.git $SRC/snappy
+  cd repos/snappy
   rm -rf work
   mkdir work
   cd work
@@ -131,26 +105,27 @@ function build_snappy {
   cp $MSBUILD_CONFIG/snappy.lib $BUILD/lib/snappy.lib
   cp ../snappy.h ../snappy-c.h $BUILD/include/
   add_comp libsnappy
+  cd ../../..
 }
 
 function build_libvpx {
-  git clone -q https://github.com/webmproject/libvpx.git $SRC/libvpx
-  cd $SRC/libvpx
+  cd repos/libvpx
   ./configure --prefix=$BUILD --target=x86_64-win64-vs15 --enable-vp9-highbitdepth --disable-shared --disable-examples --disable-tools --disable-docs --disable-libyuv --disable-unit_tests --disable-postproc
   make -j $NUMBER_OF_PROCESSORS
   make install
   mv $BUILD/lib/x64/vpxmd.lib $BUILD/lib/vpx.lib
   rm -rf $BUILD/lib/x64
   add_comp libvpx
+  cd -
 }
 
 function build_libfdkaac {
-  git clone https://github.com/mstorsjo/fdk-aac.git $SRC/fdk-aac
-  cd $SRC/fdk-aac
+  cd repos/fdk-aac
   build fdk-aac "--disable-static --disable-shared"
   add_comp libfdk-aac
-  cd $SRC/ffmpeg
+  cd - ; cd repos/ffmpeg
   patch -N -p1 -i ../../patches/0003-dynamic-loading-of-shared-fdk-aac-library-5.0.patch
+  cd -
 }
 
 function build_lame {
@@ -161,8 +136,7 @@ function build_lame {
 }
 
 function build_zimg {
-  git clone -q https://github.com/sekrit-twc/zimg.git $SRC/zimg
-  cd $SRC/zimg
+  cd repos/zimg
   git checkout release-2.9.2
   ./autogen.sh
   ./configure --prefix=$BUILD
@@ -173,6 +147,7 @@ function build_zimg {
   cp $SRC/zimg/src/zimg/api/zimg.h  $BUILD/include/zimg.h
   cp zimg.pc $BUILD/lib/pkgconfig/zimg.pc
   add_comp libzimg
+  cd ../..
 }
 
 function build_x264 {
@@ -188,8 +163,7 @@ function build_x264 {
 }
 
 function build_opus {
-  git clone -q https://github.com/xiph/opus.git $SRC/opus
-  cd $SRC/opus/win32/VS2015
+  cd repos/opus/win32/VS2015
   echo \nConverting project file ...
   sed -i 's/v140/v141/g' opus.vcxproj
   echo Building project 'opus' ...
@@ -205,11 +179,11 @@ function build_opus {
   sed -i "s/@LIBM@//g" $BUILD/lib/pkgconfig/opus.pc
   sed -i "s/@VERSION@/2.0.0/g" $BUILD/lib/pkgconfig/opus.pc
   add_comp libopus
+  cd -
 }
 
 function build_x265 {
-  git clone -q https://github.com/videolan/x265.git --branch stable $SRC/x265
-  cd $SRC/x265/build/vc15-x86_64
+  cd repos/x265/build/vc15-x86_64
   rm -rf work*
   mkdir work work10 work12
   # 12bit
@@ -246,18 +220,15 @@ mkdir src build build/include build/lib build/lib/pkgconfig
 BUILD=`realpath build`
 SRC=`realpath src`
 
-git clone -q -b release/5.0 https://github.com/FFmpeg/FFmpeg.git $SRC/ffmpeg
-
-#build_aom
 build_nvenc
 build_amf
-#build_mfx
+build_mfx
 build_svt
-#build_ogg
-#build_vorbis
-#build_snappy
-#build_libvpx
-#build_libfdkaac
+build_ogg
+build_vorbis
+build_snappy
+build_libvpx
+build_libfdkaac
 #build_lame
 #build_zimg
 #build_x264
@@ -265,11 +236,12 @@ build_svt
 #build_x265
 #build_libass
 
-cd $SRC/ffmpeg
+cd repos/ffmpeg
 PKG_CONFIG_PATH=$BUILD/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="$CFLAGS -I$BUILD/include" --extra-ldflags="-LIBPATH:$BUILD/lib" --prefix=$BUILD --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl $COMPONENTS
 sed -i 's/\x81/ue/g' config.h
 make -j $NUMBER_OF_PROCESSORS
 make install
+cd -
 
 # rename *.a to *.lib
 cd $BUILD/lib
@@ -284,6 +256,6 @@ rm -rf $BUILD/lib/fdk-aac.lib $BUILD/lib/*.la
 cd $BUILD
 mkdir ../dist 2>/dev/null
 tar czf ../dist/ffmpeg-win64-static-$MODE.tar.gz *
-cd $SRC/ffmpeg
+cd - ; cd repos/ffmpeg
 tar czf ../../dist/ffmpeg-win64-static-src-$MODE.tar.gz *
 
