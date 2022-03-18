@@ -28,6 +28,7 @@ function build_nvenc {
   cd repos/ffnvcodec
   make PREFIX=$BUILD install
   add_comp nvenc
+  cd -
 }
 
 function build_amf {
@@ -85,6 +86,7 @@ function build_svt {
   ./build.bat 2017 $MODE static
   cp -r ../../Source/API $BUILD/include/svt-av1 ; cp ../../Bin/$MSBUILD_CONFIG/SvtAv1Enc.lib $BUILD/lib/ ; cp SvtAv1Enc.pc $BUILD/lib/pkgconfig/
   add_comp libsvtav1
+  cd -
   #
   # VP9
   #git clone -q https://github.com/OpenVisualCloud/SVT-VP9.git $SRC/svt-vp9
