@@ -14,7 +14,7 @@ else
 fi
 
 function build {
-  cd $SRC/$1
+  cd repos/$1
   #if [ -f autogen.sh ]; then
   #  ./autogen.sh
   #fi
@@ -144,7 +144,7 @@ function build_zimg {
   MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration="$MSBUILD_CONFIG" /property:ConfigurationType=StaticLibrary /property:WindowsTargetPlatformVersion=10.0.17134.0 /property:PlatformToolset=v141 /property:Platform=x64 /property:WholeProgramOptimization=false zimg.vcxproj
   cp x64/$MSBUILD_CONFIG/z.lib $BUILD/lib/zimg.lib
   cd ../..
-  cp $SRC/zimg/src/zimg/api/zimg.h  $BUILD/include/zimg.h
+  cp repos/zimg/src/zimg/api/zimg.h  $BUILD/include/zimg.h
   cp zimg.pc $BUILD/lib/pkgconfig/zimg.pc
   add_comp libzimg
   cd ../..
