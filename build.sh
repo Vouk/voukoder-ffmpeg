@@ -253,7 +253,7 @@ done
 rm -rf $BUILD/lib/fdk-aac.lib $BUILD/lib/*.la
   
 # Create archives
-cd $BUILD
+cd - ; cd $BUILD
 mkdir ../dist 2>/dev/null
 tar czf ../dist/ffmpeg-win64-static-$MODE.tar.gz *
 cd - ; cd repos/ffmpeg
