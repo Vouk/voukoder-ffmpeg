@@ -25,15 +25,13 @@ function build {
 }
 
 function build_nvenc {
-  git clone -q -b sdk/9.1 https://github.com/FFmpeg/nv-codec-headers.git $SRC/ffnvcodec
-  cd $SRC/ffnvcodec
+  cd repos/ffnvcodec
   make PREFIX=$BUILD install
   add_comp nvenc
 }
 
 function build_amf {
-  git clone -q https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git $SRC/amf
-  cp -a $SRC/amf/amf/public/include $BUILD/include/AMF
+  cp -a repos/amf/amf/public/include $BUILD/include/AMF
   add_comp amf
 }
 
@@ -82,8 +80,8 @@ function build_svt {
   #add_comp libsvthevc
   #
   # AV1
-  git clone -q --depth 1  https://github.com/AOMediaCodec/SVT-AV1 $SRC/svt-av1
-  cd $SRC/svt-av1/Build/windows
+  #git clone -q --depth 1  https://github.com/AOMediaCodec/SVT-AV1 $SRC/svt-av1
+  cd repos/svt-av1/Build/windows
   ./build.bat 2017 $MODE static
   cp -r ../../Source/API $BUILD/include/svt-av1 ; cp ../../Bin/$MSBUILD_CONFIG/SvtAv1Enc.lib $BUILD/lib/ ; cp SvtAv1Enc.pc $BUILD/lib/pkgconfig/
   add_comp libsvtav1
@@ -251,18 +249,18 @@ git clone -q -b release/5.0 https://github.com/FFmpeg/FFmpeg.git $SRC/ffmpeg
 #build_aom
 build_nvenc
 build_amf
-build_mfx
+#build_mfx
 build_svt
-build_ogg
-build_vorbis
-build_snappy
-build_libvpx
-build_libfdkaac
-build_lame
-build_zimg
-build_x264
-build_opus
-build_x265
+#build_ogg
+#build_vorbis
+#build_snappy
+#build_libvpx
+#build_libfdkaac
+#build_lame
+#build_zimg
+#build_x264
+#build_opus
+#build_x265
 #build_libass
 
 cd $SRC/ffmpeg
