@@ -25,6 +25,9 @@ function build {
 }
 
 function build_nvenc {
+  echo "################################################################################"
+  echo "## NVENC                                                                      ##"
+  echo "################################################################################"
   cd repos/ffnvcodec
   make PREFIX=$BUILD install
   add_comp nvenc
@@ -32,11 +35,17 @@ function build_nvenc {
 }
 
 function build_amf {
+  echo "################################################################################"
+  echo "## AMF                                                                        ##"
+  echo "################################################################################"
   cp -a repos/amf/amf/public/include $BUILD/include/AMF
   add_comp amf
 }
 
 function build_mfx {
+  echo "################################################################################"
+  echo "## LIBMFX                                                                     ##"
+  echo "################################################################################"
   cp -r "C:\Program Files (x86)\IntelSWTools\Intel(R) Media SDK 2021 R1\Software Development Kit\include" $BUILD/include/mfx
   cp "C:\Program Files (x86)\IntelSWTools\Intel(R) Media SDK 2021 R1\Software Development Kit\lib\x64\libmfx_vs2015.lib" $BUILD/lib/libmfx.lib
   printf "prefix=$BUILD\nexec_prefix=\${prefix}\nincludedir=\${prefix}/include\nlibdir=\${exec_prefix}/lib\nName: libmfx\nDescription: Intel Media SDK Dispatched static library\nVersion: 1.34\nLibs: -L\${libdir} -llibmfx -ladvapi32 -lole32 -luuid\nCflags: -I\${includedir}\n" > $BUILD/lib/pkgconfig/libmfx.pc
@@ -53,6 +62,9 @@ function build_mfx {
 }
 
 function build_svt {
+  echo "################################################################################"
+  echo "## LIBSVTAV1                                                                  ##"
+  echo "################################################################################"
   # HEVC
   #git clone -q https://github.com/OpenVisualCloud/SVT-HEVC.git $SRC/svt-hevc
   #cd $SRC/svt-hevc/Build/windows
@@ -81,12 +93,18 @@ function build_svt {
 }
 
 function build_ogg {
+  echo "################################################################################"
+  echo "## LIBOGG                                                                     ##"
+  echo "################################################################################"
   cd repos/libogg
   build libogg "--disable-shared"
   cd -
 }
 
 function build_vorbis {
+  echo "################################################################################"
+  echo "## LIBVORBIS                                                                  ##"
+  echo "################################################################################"
   cd repos/libvorbis
   build libvorbis "--disable-shared"  
   sed -i '/^Libs\.private.*/d' $BUILD/lib/pkgconfig/vorbis.pc  # don't need m.lib on windows
@@ -95,6 +113,9 @@ function build_vorbis {
 }
 
 function build_snappy {
+  echo "################################################################################"
+  echo "## LIBSNAPPY                                                                  ##"
+  echo "################################################################################"
   #git clone -q -b 1.1.8 https://github.com/google/snappy.git $SRC/snappy
   cd repos/snappy
   rm -rf work
@@ -109,6 +130,9 @@ function build_snappy {
 }
 
 function build_libvpx {
+  echo "################################################################################"
+  echo "## LIBVPX                                                                     ##"
+  echo "################################################################################"
   cd repos/libvpx
   ./configure --prefix=$BUILD --target=x86_64-win64-vs15 --enable-vp9-highbitdepth --disable-shared --disable-examples --disable-tools --disable-docs --disable-libyuv --disable-unit_tests --disable-postproc
   make -j $NUMBER_OF_PROCESSORS
@@ -120,6 +144,9 @@ function build_libvpx {
 }
 
 function build_libfdkaac {
+  echo "################################################################################"
+  echo "## LIBFDK_AAC                                                                 ##"
+  echo "################################################################################"
   cd repos/fdk-aac
   build fdk-aac "--disable-static --disable-shared"
   add_comp libfdk-aac
@@ -129,6 +156,9 @@ function build_libfdkaac {
 }
 
 function build_lame {
+  echo "################################################################################"
+  echo "## LIBLAME                                                                    ##"
+  echo "################################################################################"
   svn co svn://svn.code.sf.net/p/lame/svn/trunk/lame@6474 repos/lame
   cd repos/lame
   build lame "--enable-nasm --disable-frontend --disable-shared --enable-static"
@@ -137,8 +167,10 @@ function build_lame {
 }
 
 function build_zimg {
+  echo "################################################################################"
+  echo "## ZIMG                                                                       ##"
+  echo "################################################################################"
   cd repos/zimg
-  #git checkout release-2.9.2
   ./autogen.sh
   ./configure --prefix=$BUILD
   cd _msvc/zimg
@@ -152,6 +184,9 @@ function build_zimg {
 }
 
 function build_x264 {
+  echo "################################################################################"
+  echo "## LIBX264                                                                    ##"
+  echo "################################################################################"
   cd repos/x264
   sed -i 's/#define X264_API_IMPORTS 1/\/\/#define X264_API_IMPORTS 1/g' ../ffmpeg/libavcodec/libx264.c
   #git checkout b5bc5d69c580429ff716bafcd43655e855c31b02
@@ -164,6 +199,9 @@ function build_x264 {
 }
 
 function build_opus {
+  echo "################################################################################"
+  echo "## LIBOPUS                                                                    ##"
+  echo "################################################################################"
   cd repos/opus/win32/VS2015
   echo \nConverting project file ...
   sed -i 's/v140/v141/g' opus.vcxproj
@@ -184,20 +222,26 @@ function build_opus {
 }
 
 function build_x265 {
+  echo "################################################################################"
+  echo "## LIBX265                                                                    ##"
+  echo "################################################################################"
   cd repos/x265/build/vc15-x86_64
   rm -rf work*
   mkdir work work10 work12
   # 12bit
   cd work12
+  echo "## 12 BIT"
   cmake -G "Visual Studio 15 Win64" ../../../source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON
   MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration="$MSBUILD_CONFIG" x265-static.vcxproj
   cp $MSBUILD_CONFIG/x265-static.lib ../work/x265_12bit.lib
   # 10bit
+  echo "## 10 BIT"
   cd ../work10
   cmake -G "Visual Studio 15 Win64" ../../../source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF
   MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration="$MSBUILD_CONFIG" x265-static.vcxproj
   cp $MSBUILD_CONFIG/x265-static.lib ../work/x265_10bit.lib
   # 8bit - main
+  echo "## 8 BIT"
   cd ../work
   cmake -G "Visual Studio 15 Win64" ../../../source -DCMAKE_INSTALL_PREFIX=$BUILD -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DEXTRA_LIB="x265_10bit.lib;x265_12bit.lib" -DLINKED_10BIT=ON -DLINKED_12BIT=ON
   #-DSTATIC_LINK_CRT=ON
