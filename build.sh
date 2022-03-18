@@ -171,8 +171,8 @@ function build_opus {
   MSBuild.exe /maxcpucount:$NUMBER_OF_PROCESSORS /property:Configuration="$MSBUILD_CONFIG" /property:Platform=x64 opus.vcxproj
   echo Done.
   cp x64/$MSBUILD_CONFIG/opus.lib $BUILD/lib/opus.lib
-  cp -r $SRC/opus/include $BUILD/include/opus
-  cp $SRC/opus/opus.pc.in $BUILD/lib/pkgconfig/opus.pc
+  cp -r repos/opus/include $BUILD/include/opus
+  cp repos/opus/opus.pc.in $BUILD/lib/pkgconfig/opus.pc
   sed -i "s#@prefix@#$BUILD#g" $BUILD/lib/pkgconfig/opus.pc
   sed -i "s/@exec_prefix@/\$\{prefix\}/g" $BUILD/lib/pkgconfig/opus.pc
   sed -i "s/@libdir@/\$\{prefix\}\/lib/g" $BUILD/lib/pkgconfig/opus.pc
