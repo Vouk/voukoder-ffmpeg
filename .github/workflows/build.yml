@@ -1,18 +1,84 @@
-name: CI
+name: Build FFmpeg
 
 on:
-  schedule:
-    - cron: "0 2 * * *"
+  workflow_dispatch:
+    inputs:
+      config:
+        description: 'Configuration'     
+        required: true
+        default: 'Debug'
 
 jobs:
-  build:
-    runs-on: windows-latest
+  oneVPL:
+    runs-on: windows-2019
     steps:
-    - name: Build it!
-      run:
-        choco install msys2
-        echo "::set-env name=CHERE_INVOKING::enabled_from_arguments"
-        echo "::set-env name=MODE::release"
-        echo "::set-env name=MSYS2_PATH_TYPE::inherit"
-        echo "::set-env name=MSYSTEM::MINGW64"
-        c:\tools\msys64\usr\bin\bash.exe -l -c "pacman -S base-devel binutils git make pkg-config"
+      - name: Set up WSL
+        uses: Vampire/setup-wsl@v1.2.0
+        with:
+          distribution: Debian
+      - name: Set up MSBuild
+        uses: microsoft/setup-msbuild@v1.1
+        with:
+          msbuild-architecture: x64
+      - name: Set up cache
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-ffmpeg
+        with:
+          path: ~/build
+          key: ${{ env.cache-name }}
+      - name: Cloning GIT repository
+        uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+      - name: Build oneVPL
+        shell: wsl-bash {0}
+        run: |
+          PATH=/mnt/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64:/mnt/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin:$PATH
+          mkdir build dist
+          cd build
+          cmake.exe -G "Visual Studio 16 2019" ../repos/oneVPL -T host=x64 -A x64 -DBUILD_TOOLS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=../dist -DCMAKE_VS_INCLUDE_INSTALL_TO_DEFAULT_BUILD=ON
+          MSBuild.exe -t:VPL,INSTALL -p:Configuration=${{github.event.inputs.config}} -m oneVPL.sln
+          cd ../dist
+          tar czvf ../oneVPL.tgz include lib
+      - name: Publish artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: oneVPL
+          path: oneVPL.tgz
+          
+  FFmpeg:
+    runs-on: windows-2019
+    needs: [oneVPL]
+    steps:
+      - name: Set up WSL
+        uses: Vampire/setup-wsl@v1.2.0
+        with:
+          distribution: Debian
+      - name: Set up MSBuild
+        uses: microsoft/setup-msbuild@v1.1
+        with:
+          msbuild-architecture: x64
+      - name: Set up cache
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-ffmpeg
+        with:
+          path: ~/build
+          key: ${{ env.cache-name }}
+      - name: Cloning GIT repository
+        uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+      - name: Get artifacts
+        uses: actions/download-artifact@master
+        with:
+          name: oneVPL
+      - name: Build FFmpeg
+        shell: wsl-bash {0}
+        run: |
+          mkdir build
+          tar zxf *.tgz -C build
+          cd repos/ffmpeg
+          PKG_CONFIG_PATH=../../build/lib/pkgconfig:$PKG_CONFIG_PATH ./configure --toolchain=msvc --extra-cflags="-MDd -I../../build/include" --extra-ldflags="-LIBPATH:../../build/lib" --prefix=../../build --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl --enable-libvpl
+          ls -laR ../../build
