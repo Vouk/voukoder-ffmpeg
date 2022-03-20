@@ -9,7 +9,7 @@ rem    cmd.exe /c c:/tools/SetupWSLcross.bat $1 | dos2unix > /tmp/WSLcross.sh &&
 rem }
 rem 
 
-call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" %~1
+rem call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" %~1
 
 rem FOR /F "delims==" %%G IN ('SET') DO @Echo %%G
 
