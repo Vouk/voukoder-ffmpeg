@@ -22,9 +22,9 @@ jobs:
           echo CL_EXEC="%_cl_path%" >> vars.sh
           echo WSL_CL_EXEC=$(wslpath -u "$CL_EXEC") >> vars.sh
           echo WSL_CL_PATH=$(dirname "$WSL_CL_EXEC") >> vars.sh
-          rem echo export PATH=$PATH:$WSL_CL_PATH >> vars.sh
-          rem echo export DevEnvDir="%DevEnvDir% " >> vars.sh
-          rem echo export INCLUDE="%INCLUDE% " >> vars.sh
+          echo export PATH=$PATH:$WSL_CL_PATH >> vars.sh
+          echo export DevEnvDir="%DevEnvDir% " >> vars.sh
+          echo export INCLUDE="%INCLUDE% " >> vars.sh
           rem echo export LIB="%LIB% " >> vars.sh
           rem echo export LIBPATH="%LIBPATH% " >> vars.sh
           rem echo export VCINSTALLDIR="%VCINSTALLDIR% " >> vars.sh
@@ -43,6 +43,7 @@ jobs:
           dos2unix vars.sh
           cat vars.sh
           ./vars.sh
+          set
           #echo $ABC
           #echo $PATH
           #cl.exe
