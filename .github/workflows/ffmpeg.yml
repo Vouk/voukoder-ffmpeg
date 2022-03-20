@@ -17,7 +17,7 @@ jobs:
       - name: Set up development tools
         shell: cmd {0}
         run: C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat
-      - name: Set up Msys2
+      - name: Set up MSYS2
         uses: msys2/setup-msys2@v2
         with:
           install: base-devel binutils mingw-w64-x86_64-cmake pkg-config git
@@ -47,7 +47,7 @@ jobs:
           ls -la "/c/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64"
           echo $PATH
           #export VS=/mnt/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise
-          #PATH=$VS/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64:$VS/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin:$PATH
+          PATH=/c/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64:$VS/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin:$PATH
           #sudo apt -y install yasm
           mkdir build
           #BUILD=$(realpath build)
