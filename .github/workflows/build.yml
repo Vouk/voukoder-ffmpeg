@@ -42,7 +42,7 @@ jobs:
         run: |
           dos2unix vars.sh
           cat vars.sh
-          ./vars.sh
+          bash -c vars.sh
           set
           #echo $ABC
           #echo $PATH
