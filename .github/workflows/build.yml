@@ -20,7 +20,7 @@ jobs:
       - name: Set up development tools
         shell: cmd {0}
         run: |
-          C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat
+          C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat
           set
       - name: Set up WSL
         uses: Vampire/setup-wsl@v1.2.0
