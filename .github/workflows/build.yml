@@ -37,7 +37,8 @@ jobs:
       - name: Build FFmpeg
         shell: wsl-bash {0}
         run: |
-          ./vars.sh | dos2unix
+          dos2unix vars.sh
+          ./vars.sh
           echo $PATH
           cl.exe
           MSBuild.exe
