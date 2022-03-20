@@ -14,12 +14,24 @@ jobs:
     runs-on: windows-2019
     needs: []
     steps:
+      - name: Set up GIT
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - name: Checkout FFmpeg
+        uses: actions/checkout@v3.0.0
+        with:
+          repository: FFmpeg/FFmpeg.git
+          ref: release/5.0
+          path: repo
       - name: Set up WSL
         uses: Vampire/setup-wsl@v1.2.0
       - name: Set up development tools
         shell: cmd
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          bash.exe -c ^
-            PKG_CONFIG_PATH=../build/lib/pkgconfig ^
-            ./configure --toolchain=msvc --extra-cflags='-MDd -I../build/include' --extra-ldflags='-LIBPATH:$VS/VC/Tools/MSVC/14.29.30133/lib/x64:../build/lib' --prefix=../build --pkg-config-flags='--static' --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl || true
+          md build
+          bash.exe -c "cd repo ; PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags='-MDd -I../build/include' --extra-ldflags='-LIBPATH:$VS/VC/Tools/MSVC/14.29.30133/lib/x64:../build/lib' --prefix=../build --pkg-config-flags='--static' --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl"
+          pwd
+          dir
+      
