@@ -47,7 +47,7 @@ jobs:
           ls -la "/c/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64"
           echo $PATH
           #export VS=/mnt/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise
-          PATH="/c/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64":$PATH
+          PATH=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64:$PATH
           #sudo apt -y install yasm
           mkdir build
           #BUILD=$(realpath build)
