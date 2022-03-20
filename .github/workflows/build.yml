@@ -10,7 +10,7 @@ on:
         
 jobs:
 
-  FFmpeg:
+  ffmpeg:
     runs-on: windows-2019
     needs: []
     steps:
@@ -26,6 +26,9 @@ jobs:
           path: repo
       - name: Set up WSL
         uses: Vampire/setup-wsl@v1.2.0
+        with:
+          additional-packages:
+            yasm
       - name: Set up development tools
         shell: cmd
         run: |
