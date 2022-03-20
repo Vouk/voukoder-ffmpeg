@@ -45,8 +45,7 @@ jobs:
         shell: msys2 {0}
         run: |
           mkdir /c
-          ln -s /mnt/c /c
-          ls -la /c
+          ls -la /c/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/MSBuild/Current/Bin/amd64
           #export VS=/mnt/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise
           #PATH=$VS/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64:$VS/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin:$PATH
           #sudo apt -y install yasm
