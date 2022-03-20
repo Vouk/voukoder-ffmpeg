@@ -29,26 +29,17 @@ jobs:
         with:
           path: ~/build
           key: ${{ env.cache-name }}
-      - name: Set up GIT
-        shell: cmd {0}
-        run: |
-          git config --global core.eol lf
-          git config --global core.autocrlf input
-      - name: Cloning GIT repository
-        uses: actions/checkout@v3
-        with:
-          submodules: 'true'
-      - name: Get artifacts
-        uses: actions/download-artifact@master
-        with:
-          name: oneVPL
+#      - name: Get artifacts
+#        uses: actions/download-artifact@master
+#        with:
+#          name: oneVPL
       - name: Build FFmpeg
         shell: wsl-bash {0}
         run: |
-          sudo ap-get install dos2unix
+          git clone -q -b release/5.0 https://github.com/FFmpeg/FFmpeg.git ffmpeg
           mkdir build
           BUILD=$(realpath build)
           tar zxf *.tgz -C build
-          cd repos/ffmpeg
-          PKG_CONFIG_PATH=$BUILD/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags='-MDd -I$BUILD/include' --extra-ldflags='-LIBPATH:$BUILD/lib' --prefix=$BUILD --pkg-config-flags='--static' --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl --enable-libvpl
+          cd ffmpeg
+          PKG_CONFIG_PATH=$BUILD/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags='-MDd -I$BUILD/include' --extra-ldflags='-LIBPATH:$BUILD/lib' --prefix=$BUILD --pkg-config-flags='--static' --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl
           ls -laR $BUILD
