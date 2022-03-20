@@ -18,12 +18,17 @@ jobs:
         shell: cmd
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          .github\workflows\SetupWSLcross.bat > vars.sh
-      - name: Set up WSL
-        uses: Vampire/setup-wsl@v1.2.0
-        with:
-          additional-packages:
-            dos2unix
+         
+      - name: Set up development tools2
+        shell: cmd
+        run: |
+          set
+          
+     # - name: Set up WSL
+     #   uses: Vampire/setup-wsl@v1.2.0
+     #   with:
+     #     additional-packages:
+     #       dos2unix
       - name: Build FFmpeg
         shell: wsl-bash {0}
         run: |
