@@ -20,18 +20,18 @@ jobs:
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           FOR /F "delims==" %%G IN ('where cl.exe') DO SET _cl_path=%%G > vars.sh
           echo CL_EXEC="%_cl_path%" >> vars.sh
-          echo "WSL_CL_EXEC=$(wslpath -u "$CL_EXEC")" >> vars.sh
-          echo "WSL_CL_PATH=$(dirname "$WSL_CL_EXEC")" >> vars.sh
-          echo export PATH=$PATH:$WSL_CL_PATH >> vars.sh
-          echo export DevEnvDir="%DevEnvDir% " >> vars.sh
-          echo export INCLUDE="%INCLUDE% " >> vars.sh
-          echo export LIB="%LIB% " >> vars.sh
-          echo export LIBPATH="%LIBPATH% " >> vars.sh
-          echo export VCINSTALLDIR="%VCINSTALLDIR% " >> vars.sh
-          echo export VSINSTALLDIR="%VSINSTALLDIR% " >> vars.sh
-          echo export VisualStudioVersion="%VisualStudioVersion% " >> vars.sh
-          echo export WSLcross=true >> vars.sh
-          echo export WSLENV=$WSLENV:INCLUDE/w:LIB/w:LIBPATH/w >> vars.sh
+          echo WSL_CL_EXEC=$(wslpath -u "$CL_EXEC") >> vars.sh
+          echo WSL_CL_PATH=$(dirname "$WSL_CL_EXEC") >> vars.sh
+          rem echo export PATH=$PATH:$WSL_CL_PATH >> vars.sh
+          rem echo export DevEnvDir="%DevEnvDir% " >> vars.sh
+          rem echo export INCLUDE="%INCLUDE% " >> vars.sh
+          rem echo export LIB="%LIB% " >> vars.sh
+          rem echo export LIBPATH="%LIBPATH% " >> vars.sh
+          rem echo export VCINSTALLDIR="%VCINSTALLDIR% " >> vars.sh
+          rem echo export VSINSTALLDIR="%VSINSTALLDIR% " >> vars.sh
+          rem echo export VisualStudioVersion="%VisualStudioVersion% " >> vars.sh
+          rem echo export WSLcross=true >> vars.sh
+          rem echo export WSLENV=$WSLENV:INCLUDE/w:LIB/w:LIBPATH/w >> vars.sh
       - name: Set up WSL
         uses: Vampire/setup-wsl@v1.2.0
         with:
@@ -42,6 +42,7 @@ jobs:
         run: |
           dos2unix vars.sh
           cat vars.sh
+          ./vars.sh
           #echo $ABC
           #echo $PATH
           #cl.exe
