@@ -29,6 +29,16 @@ jobs:
         with:
           path: ~/build
           key: ${{ env.cache-name }}
+      - name: Set git to use LF
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - name: Checkout
+        uses: actions/checkout@v3.0.0
+        with:
+          repository: https://github.com/FFmpeg/FFmpeg.git
+          ref: release/5.0
+          path: repo
 #      - name: Get artifacts
 #        uses: actions/download-artifact@master
 #        with:
@@ -36,11 +46,9 @@ jobs:
       - name: Build FFmpeg
         shell: wsl-bash {0}
         run: |
-          sudo apt-get install git
-          git clone -q -b release/5.0 https://github.com/FFmpeg/FFmpeg.git ffmpeg
           mkdir build
           BUILD=$(realpath build)
           tar zxf *.tgz -C build
-          cd ffmpeg
-          PKG_CONFIG_PATH=$BUILD/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags='-MDd -I$BUILD/include' --extra-ldflags='-LIBPATH:$BUILD/lib' --prefix=$BUILD --pkg-config-flags='--static' --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl
+          cd repo
+          PKG_CONFIG_PATH=../repo/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags='-MDd -I../repo/include' --extra-ldflags='-LIBPATH:../repo/lib' --prefix=../repo --pkg-config-flags='--static' --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl
           ls -laR $BUILD
