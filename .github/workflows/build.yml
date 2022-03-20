@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Set up development tools
         shell: cmd {0}
-        run: echo ${{ env.VS2019INSTALLDIR }}\VC\Auxiliary\Build\vcvars64.bat
+        run: $VS2019INSTALLDIR\VC\Auxiliary\Build\vcvars64.bat
       - name: Set up WSL
         uses: Vampire/setup-wsl@v1.2.0
         with:
