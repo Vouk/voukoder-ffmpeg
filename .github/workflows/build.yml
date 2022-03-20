@@ -26,13 +26,15 @@ jobs:
           path: repo
       - name: Set up WSL
         uses: Vampire/setup-wsl@v1.2.0
+      - uses: suisei-cn/actions-download-file@v1
+        name: Set up NASM
         with:
-          additional-packages:
-            wget
+          url: "https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/win64/nasm-2.15.05-win64.zip"
+          target: .
       - name: Build
         shell: cmd
         run: |
-          bash.exe -c "wget https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/win64/nasm-2.15.05-win64.zip ; unzip nasm-2.15.05-win64.zip"
+          bash.exe -c "unzip nasm-2.15.05-win64.zip"
           dir
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           md build
