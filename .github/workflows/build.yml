@@ -34,7 +34,7 @@ jobs:
       - name: Build
         shell: cmd
         run: |
-          bash.exe -c "unzip nasm-2.15.05-win64.zip"
+          bash.exe -c "unzip -j nasm-2.15.05-win64.zip -d /usr/bin"
           dir
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           md build
