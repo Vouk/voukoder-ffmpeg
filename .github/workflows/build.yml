@@ -40,5 +40,5 @@ jobs:
           bash.exe -c "unzip -j nasm-2.15.05-win64.zip -d /usr/bin > /dev/null"
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           md build
-          bash.exe -c "cd repo ; PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags='-MDd -I../build/include' --extra-ldflags='-LIBPATH:$VS/VC/Tools/MSVC/14.29.30133/lib/x64:../build/lib' --prefix=../build --pkg-config-flags='--static' --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl ; make ; make install"
+          bash.exe -c "export BUILD=$(realpath build) ; cd repo ; PKG_CONFIG_PATH=$BUILD/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags='-MDd -I$BUILD/include' --extra-ldflags='-LIBPATH:$BUILD/lib' --prefix=$BUILD --pkg-config-flags='--static' --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl ; make ; make install"
           dir ../build
