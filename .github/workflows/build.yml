@@ -23,7 +23,7 @@ jobs:
         shell: wsl-bash {0}
         run: |
           VCVARS_BAT="/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
-          echo VCVARS_BAT
+          echo ${VCVARS_BAT}
           cmd.exe /V /C @ "${VCVARS_BAT}" "&&" "$@"
           echo $PATH
           cl.exe
