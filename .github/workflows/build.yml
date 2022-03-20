@@ -18,25 +18,26 @@ jobs:
         shell: cmd
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          FOR /F "delims==" %%G IN ('where cl.exe') DO SET _cl_path=%%G
-          echo CL_EXEC="%_cl_path%"
-          echo WSL_CL_EXEC=`wslpath -u "$CL_EXEC"`
-          echo WSL_CL_PATH=`dirname "$WSL_CL_EXEC"`
-          PATH=$PATH:$WSL_CL_PATH
-          export DevEnvDir="%DevEnvDir% "
-          export INCLUDE="%INCLUDE% "
-          export LIB="%LIB% "
-          export LIBPATH="%LIBPATH% "
-          export VCINSTALLDIR="%VCINSTALLDIR% "
-          export VSINSTALLDIR="%VSINSTALLDIR% "
-          export VisualStudioVersion="%VisualStudioVersion% "
-          export WSLcross=true
-          export WSLENV=$WSLENV:INCLUDE/w:LIB/w:LIBPATH/w
+          FOR /F "delims==" %%G IN ('where cl.exe') DO SET _cl_path=%%G > vars.sh
+          echo CL_EXEC="%_cl_path%" >> vars.sh
+          echo WSL_CL_EXEC=`wslpath -u "$CL_EXEC"` >> vars.sh
+          echo WSL_CL_PATH=`dirname "$WSL_CL_EXEC"` >> vars.sh
+          echo export PATH=$PATH:$WSL_CL_PATH >> vars.sh
+          echo export DevEnvDir="%DevEnvDir% " >> vars.sh
+          echo export INCLUDE="%INCLUDE% " >> vars.sh
+          echo export LIB="%LIB% " >> vars.sh
+          echo export LIBPATH="%LIBPATH% " >> vars.sh
+          echo export VCINSTALLDIR="%VCINSTALLDIR% " >> vars.sh
+          echo export VSINSTALLDIR="%VSINSTALLDIR% " >> vars.sh
+          echo export VisualStudioVersion="%VisualStudioVersion% " >> vars.sh
+          echo export WSLcross=true >> vars.sh
+          echo export WSLENV=$WSLENV:INCLUDE/w:LIB/w:LIBPATH/w >> vars.sh
       - name: Set up WSL
         uses: Vampire/setup-wsl@v1.2.0
       - name: Build FFmpeg
         shell: wsl-bash {0}
         run: |
+          cat vars.sh
           echo $PATH
           cl.exe
           MSBuild.exe
