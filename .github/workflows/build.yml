@@ -28,11 +28,10 @@ jobs:
         uses: Vampire/setup-wsl@v1.2.0
         with:
           additional-packages:
-            yasm
+            wget
       - name: Build
         shell: cmd
         run: |
-          set
           bash.exe -c "wget https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/win64/nasm-2.15.05-win64.zip ; unzip nasm-2.15.05-win64.zip"
           dir
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
