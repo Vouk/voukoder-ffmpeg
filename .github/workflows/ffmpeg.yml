@@ -44,7 +44,7 @@ jobs:
       - name: msys2
         shell: msys2 {0}
         run: |
-          ls -la /c/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/MSBuild/Current/Bin/amd64
+          ls -la "/c/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/MSBuild/Current/Bin/amd64"
           #export VS=/mnt/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise
           #PATH=$VS/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64:$VS/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin:$PATH
           #sudo apt -y install yasm
@@ -52,7 +52,7 @@ jobs:
           #BUILD=$(realpath build)
           #tar zxf *.tgz -C build
           cd repo
-          PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags='-MDd -I../build/include' --extra-ldflags='-LIBPATH:../build/lib' --prefix=../build --pkg-config-flags='--static' --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl || true
+          PKG_CONFIG_PATH="../build/lib/pkgconfig" ./configure --toolchain=msvc --extra-cflags='-MDd -I../build/include' --extra-ldflags='-LIBPATH:../build/lib' --prefix=../build --pkg-config-flags='--static' --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl || true
           tail --lines=20 ffbuild/config.log
           #ls -laR ../build
           #  - name: Get artifacts
