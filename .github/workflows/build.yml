@@ -32,7 +32,7 @@ jobs:
           echo export VisualStudioVersion="%VisualStudioVersion% " >> vars.sh
           echo export WSLcross=true >> vars.sh
           echo export WSLENV=$WSLENV:INCLUDE/w:LIB/w:LIBPATH/w >> vars.sh
-          ABC=HALLO
+          set ABC=HALLO
       - name: Set up WSL
         uses: Vampire/setup-wsl@v1.2.0
         with:
