@@ -29,9 +29,12 @@ jobs:
         with:
           additional-packages:
             yasm
-      - name: Set up development tools
+      - name: Build
         shell: cmd
         run: |
+          set
+          bash.exe -c "wget https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/win64/nasm-2.15.05-win64.zip ; unzip nasm-2.15.05-win64.zip"
+          dir
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           md build
           bash.exe -c "cd repo ; PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags='-MDd -I../build/include' --extra-ldflags='-LIBPATH:$VS/VC/Tools/MSVC/14.29.30133/lib/x64:../build/lib' --prefix=../build --pkg-config-flags='--static' --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl"
