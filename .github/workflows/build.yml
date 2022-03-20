@@ -47,8 +47,9 @@ jobs:
         shell: wsl-bash {0}
         run: |
           mkdir build
-          BUILD=$(realpath build)
-          tar zxf *.tgz -C build
+          #BUILD=$(realpath build)
+          #tar zxf *.tgz -C build
           cd repo
-          PKG_CONFIG_PATH=../repo/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags='-MDd -I../repo/include' --extra-ldflags='-LIBPATH:../repo/lib' --prefix=../repo --pkg-config-flags='--static' --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl
-          ls -laR $BUILD
+          PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags='-MDd -I../build/include' --extra-ldflags='-LIBPATH:../build/lib' --prefix=../build --pkg-config-flags='--static' --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl
+          ls -laR ../build
+          
