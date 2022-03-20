@@ -29,11 +29,11 @@ jobs:
         with:
           path: ~/build
           key: ${{ env.cache-name }}
-      - name: Set git to use LF
+      - name: Set up GIT
         run: |
           git config --global core.autocrlf false
           git config --global core.eol lf
-      - name: Checkout
+      - name: Checkout FFmpeg
         uses: actions/checkout@v3.0.0
         with:
           repository: FFmpeg/FFmpeg.git
@@ -47,6 +47,7 @@ jobs:
         shell: wsl-bash {0}
         run: |
           PATH=/mnt/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64:/mnt/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin:$PATH
+          cl.exe
           mkdir build
           #BUILD=$(realpath build)
           #tar zxf *.tgz -C build
