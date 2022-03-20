@@ -36,7 +36,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3.0.0
         with:
-          repository: https://github.com/FFmpeg/FFmpeg.git
+          repository: FFmpeg/FFmpeg.git
           ref: release/5.0
           path: repo
 #      - name: Get artifacts
