@@ -34,6 +34,9 @@ jobs:
           echo export WSLENV=$WSLENV:INCLUDE/w:LIB/w:LIBPATH/w >> vars.sh
       - name: Set up WSL
         uses: Vampire/setup-wsl@v1.2.0
+        with:
+          additional-packages:
+            dos2unix
       - name: Build FFmpeg
         shell: wsl-bash {0}
         run: |
