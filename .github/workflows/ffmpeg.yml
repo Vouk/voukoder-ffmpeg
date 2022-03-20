@@ -1,0 +1,61 @@
+name: FFmpeg
+
+on:
+  workflow_dispatch:
+    inputs:
+      config:
+        description: 'Configuration'     
+        required: true
+        default: 'Debug'
+
+jobs:
+
+  FFmpeg:
+    runs-on: windows-2019
+    needs: []
+    steps:
+      - name: Set up Msys2
+        uses: msys2/setup-msys2@v2
+        with:
+          install: base-devel binutils mingw-w64-x86_64-cmake pkg-config
+          path-type: inherit
+      - name: Set up MSBuild
+        uses: microsoft/setup-msbuild@v1.1
+        with:
+          msbuild-architecture: x64
+      - name: Set up cache
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-ffmpeg
+        with:
+          path: ~/build
+          key: ${{ env.cache-name }}
+      - name: Set up GIT
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - name: Checkout FFmpeg
+        uses: actions/checkout@v3.0.0
+        with:
+          repository: FFmpeg/FFmpeg.git
+          ref: release/5.0
+          path: repo
+#      - name: Set up project files
+#        uses: actions/download-artifact@master
+#        with:
+#          name: oneVPL
+      - name: msys2
+        shell: msys2 {0}
+        run: |
+          export VS=/mnt/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise
+          PATH=$VS/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64:$VS/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin:$PATH
+          #sudo apt -y install yasm
+          mkdir build
+          #BUILD=$(realpath build)
+          #tar zxf *.tgz -C build
+          cd repo
+          PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags='-MDd -I../build/include' --extra-ldflags='-LIBPATH:$VS/VC/Tools/MSVC/14.29.30133/lib/x64:../build/lib' --prefix=../build --pkg-config-flags='--static' --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl || true
+          tail --lines=20 ffbuild/config.log
+          ls -laR ../build
+          #  - name: Get artifacts
+    
