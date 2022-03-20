@@ -81,6 +81,8 @@ jobs:
           BUILD=$(realpath build)
           tar zxf *.tgz -C build
           cd repos/ffmpeg
-          echo "PKG_CONFIG_PATH=$BUILD/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags="-MDd -I$BUILD/include" --extra-ldflags="-LIBPATH:$BUILD/lib" --prefix=$BUILD --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl --enable-libvpl"
-          PKG_CONFIG_PATH=$BUILD/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags=\"-MDd -I$BUILD/include\" --extra-ldflags=\"-LIBPATH:$BUILD/lib\" --prefix=$BUILD --pkg-config-flags=\"--static\" --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl --enable-libvpl
+          PKG_CONFIG_PATH=$BUILD/lib/pkgconfig
+          echo $PKG_CONFIG_PATH
+          echo ./configure --toolchain=msvc --extra-cflags='-MDd -I$BUILD/include' --extra-ldflags='-LIBPATH:$BUILD/lib' --prefix=$BUILD --pkg-config-flags='--static' --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl --enable-libvpl
+          ./configure --toolchain=msvc --extra-cflags='-MDd -I$BUILD/include' --extra-ldflags='-LIBPATH:$BUILD/lib' --prefix=$BUILD --pkg-config-flags='--static' --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl --enable-libvpl
           ls -laR $BUILD
