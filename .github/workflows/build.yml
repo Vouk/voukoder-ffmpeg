@@ -7,7 +7,7 @@ on:
         description: 'Configuration'     
         required: true
         default: 'Debug'
-
+        
 jobs:
 
   FFmpeg:
@@ -32,6 +32,7 @@ jobs:
           echo export VisualStudioVersion="%VisualStudioVersion% " >> vars.sh
           echo export WSLcross=true >> vars.sh
           echo export WSLENV=$WSLENV:INCLUDE/w:LIB/w:LIBPATH/w >> vars.sh
+          echo "ABC=123" >> $env:GITHUB_ENV
       - name: Set up WSL
         uses: Vampire/setup-wsl@v1.2.0
         with:
