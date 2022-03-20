@@ -7,13 +7,19 @@ on:
         description: 'Configuration'     
         required: true
         default: 'Debug'
-
+        
+env:
+  WSLENV: PATH/l
+        
 jobs:
 
   FFmpeg:
     runs-on: windows-2019
     needs: []
     steps:
+      - name: Set up development tools
+        shell: cmd {0}
+        run: ${{ env.VS2019INSTALLDIR }}\VC\Auxiliary\Build\vcvars64.bat
       - name: Set up WSL
         uses: Vampire/setup-wsl@v1.2.0
         with:
@@ -46,14 +52,16 @@ jobs:
       - name: Build FFmpeg
         shell: wsl-bash {0}
         run: |
-          export VS=/mnt/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise
-          PATH=$VS/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64:$VS/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin:$PATH
+          echo $PATH
+          cl.exe
+          #export VS=/mnt/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise
+          #PATH=$VS/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64:$VS/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin:$PATH
           #sudo apt -y install yasm
           mkdir build
           #BUILD=$(realpath build)
           #tar zxf *.tgz -C build
-          cd repo
-          PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags='-MDd -I../build/include' --extra-ldflags='-LIBPATH:$VS/VC/Tools/MSVC/14.29.30133/lib/x64:../build/lib' --prefix=../build --pkg-config-flags='--static' --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl || true
-          tail --lines=20 ffbuild/config.log
-          ls -laR ../build
+          #cd repo
+          #PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags='-MDd -I../build/include' --extra-ldflags='-LIBPATH:$VS/VC/Tools/MSVC/14.29.30133/lib/x64:../build/lib' --prefix=../build --pkg-config-flags='--static' --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl || true
+          #tail --lines=20 ffbuild/config.log
+          #ls -laR ../build
           
