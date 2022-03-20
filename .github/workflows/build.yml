@@ -18,7 +18,8 @@ jobs:
         shell: cmd
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          FOR /F "delims==" %%G IN ('where cl.exe') DO SET _cl_path=%%G > vars.sh
+          echo #!/bin/bash > vars.sh
+          FOR /F "delims==" %%G IN ('where cl.exe') DO SET _cl_path=%%G >> vars.sh
           echo CL_EXEC="%_cl_path%" >> vars.sh
           echo WSL_CL_EXEC=`wslpath -u "$CL_EXEC"` >> vars.sh
           echo WSL_CL_PATH=`dirname "$WSL_CL_EXEC"` >> vars.sh
@@ -40,9 +41,8 @@ jobs:
       - name: Build FFmpeg
         shell: wsl-bash {0}
         run: |
-          dos2unix vars.sh
+          dos2unix vars.sh ; chmod +x vars.sh ; ./vars.sh
           cat vars.sh
-          bash -c vars.sh
           set
           #echo $ABC
           #echo $PATH
