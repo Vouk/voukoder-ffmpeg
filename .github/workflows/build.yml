@@ -32,7 +32,6 @@ jobs:
           echo export VisualStudioVersion="%VisualStudioVersion% " >> vars.sh
           echo export WSLcross=true >> vars.sh
           echo export WSLENV=$WSLENV:INCLUDE/w:LIB/w:LIBPATH/w >> vars.sh
-          echo "ABC=123" >> $GITHUB_ENV
       - name: Set up WSL
         uses: Vampire/setup-wsl@v1.2.0
         with:
@@ -41,10 +40,12 @@ jobs:
       - name: Build FFmpeg
         shell: wsl-bash {0}
         run: |
-          echo $ABC
-          echo $PATH
-          cl.exe
-          MSBuild.exe
+          dos2unix vars.sh
+          cat vars.sh
+          #echo $ABC
+          #echo $PATH
+          #cl.exe
+          #MSBuild.exe
           
 
           
