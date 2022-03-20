@@ -20,8 +20,8 @@ jobs:
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           FOR /F "delims==" %%G IN ('where cl.exe') DO SET _cl_path=%%G > vars.sh
           echo CL_EXEC="%_cl_path%" >> vars.sh
-          echo WSL_CL_EXEC=`wslpath -u "$CL_EXEC"` >> vars.sh
-          echo WSL_CL_PATH=`dirname "$WSL_CL_EXEC"` >> vars.sh
+          echo WSL_CL_EXEC=$(wslpath -u "$CL_EXEC") >> vars.sh
+          echo WSL_CL_PATH=$(dirname "$WSL_CL_EXEC") >> vars.sh
           echo export PATH=$PATH:$WSL_CL_PATH >> vars.sh
           echo export DevEnvDir="%DevEnvDir% " >> vars.sh
           echo export INCLUDE="%INCLUDE% " >> vars.sh
@@ -32,7 +32,6 @@ jobs:
           echo export VisualStudioVersion="%VisualStudioVersion% " >> vars.sh
           echo export WSLcross=true >> vars.sh
           echo export WSLENV=$WSLENV:INCLUDE/w:LIB/w:LIBPATH/w >> vars.sh
-          set ABC=HALLO
       - name: Set up WSL
         uses: Vampire/setup-wsl@v1.2.0
         with:
@@ -41,6 +40,7 @@ jobs:
       - name: Build FFmpeg
         shell: wsl-bash {0}
         run: |
+          ./vars.sh
           echo $ABC
           echo $PATH
           cl.exe
