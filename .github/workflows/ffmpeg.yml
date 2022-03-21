@@ -7,6 +7,12 @@ on:
         description: 'Configuration'     
         required: true
         default: 'Debug'
+        
+env:
+  vsPath: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\
+  msysConfig: debug
+  winConfig: Debug
+  cFlags: -MDd
 
 jobs:
 
@@ -32,11 +38,11 @@ jobs:
       - name: Build FFmpeg
         shell: cmd
         run: |
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
           md build dist
-          D:\a\_temp\setup-msys2\msys2.cmd -c 'cd repo ; PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags="-MDd -I../build/include" --extra-ldflags="-LIBPATH:../build/lib" --prefix=../build --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl ; make ; make install ; cd ../build/lib ; for file in *.a; do mv "$file" "`basename "$file" .a`.lib"; done ; rm -rf fdk-aac.lib pkgconfig *.la ../share ; cd .. ; tar czf ../dist/ffmpeg-win64-static-debug.tar.gz *'
+          D:\a\_temp\setup-msys2\msys2.cmd -c 'cd repo ; PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags="${{ env.cFlags }} -I../build/include" --extra-ldflags="-LIBPATH:../build/lib" --prefix=../build --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl ; make ; make install ; cd ../build/lib ; for file in *.a; do mv "$file" "`basename "$file" .a`.lib"; done ; rm -rf fdk-aac.lib pkgconfig *.la ../share ; cd .. ; tar czf ../dist/ffmpeg-win64-static-${{ env.msysConfig }}.tar.gz *'
       - name: Publish FFmpeg artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: Nightly Build (Debug)
-          path: dist/ffmpeg-win64-static-debug.tar.gz
+          name: Nightly Build (${{ env.winConfig }})
+          path: dist/ffmpeg-win64-static-${{ env.msysConfig }}.tar.gz
