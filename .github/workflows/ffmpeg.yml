@@ -14,10 +14,6 @@ jobs:
     runs-on: windows-2019
     needs: []
     steps:
-      - name: Set up swap space
-        uses: pierotofy/set-swap-space@master
-        with:
-          swap-size-gb: 2
       - name: Set up MSYS2
         uses: msys2/setup-msys2@v2
         with:
