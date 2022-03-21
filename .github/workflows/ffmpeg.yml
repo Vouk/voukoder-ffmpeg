@@ -147,10 +147,45 @@ jobs:
        
   libsnappy:
     if: ${{ false }}
-    runs-on: windows-2019
     steps:
     - name: Set up MSYS2
-      run: echo "bla"
+      uses: msys2/setup-msys2@v2
+      with:
+        install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
+        path-type: inherit
+    - name: Set up cache
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-ffmpeg-${{ env.msysConfig }}
+      with:
+        path: cache
+        key: cache-key
+    - name: Set up GIT
+      run: |
+        git config --global core.autocrlf false
+        git config --global core.eol lf
+    - name: Checkout Snappy
+      uses: actions/checkout@v3.0.0
+      with:
+        repository: google/snappy
+        ref: "1.1.8"
+        path: snappy
+    - name: Build Snappy
+      shell: cmd
+      run: |
+        call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
+        md build build\include build\lib build\lib\pkgconfig dist
+        cd snappy
+        md work
+        cd work
+        cmake -G "Visual Studio 16 2019" .. -DCMAKE_INSTALL_PREFIX=..\..\build -DBUILD_SHARED_LIBS=OFF -DSNAPPY_BUILD_TESTS=OFF
+        MSBuild.exe /property:Configuration="${{ env.winConfig }}" Snappy.sln
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cp ${{ env.winConfig }}/snappy.lib ../../build/lib/snappy.lib" ; cp ../snappy.h ../snappy-c.h ../../build/include/ ; cd ../../build ; tar czf ../dist/libsnappy.tgz *'
+    - name: Publish artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: libsnappy
+        path: dist/libsnappy.tgz
 
   libvpx:
     if: ${{ false }}
