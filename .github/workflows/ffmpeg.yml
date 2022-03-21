@@ -17,6 +17,7 @@ env:
 
 jobs:
   liboggvorbis:
+    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
@@ -67,25 +68,119 @@ jobs:
         path: dist/liboggvorbis.tgz
         
   nvenc:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
-      run: echo "bla"
+      uses: msys2/setup-msys2@v2
+      with:
+        install: base-devel binutils autotools automake
+        path-type: inherit
+    - name: Set up cache
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-ffmpeg-${{ env.msysConfig }}
+      with:
+        path: cache
+        key: cache-key
+    - name: Set up GIT
+      run: |
+        git config --global core.autocrlf false
+        git config --global core.eol lf
+    - name: Checkout NvEnc
+      uses: actions/checkout@v3.0.0
+      with:
+        repository: FFmpeg/nv-codec-headers
+        ref: sdk/9.1
+        path: nvenc
+    - name: Build NvEnc
+      shell: cmd
+      run: |
+        call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
+        md build
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd nvenc ; make PREFIX=../build install ; cd ../build ; tar czf ../dist/nvenc.tgz *'
+    - name: Publish artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: nvenc
+        path: dist/nvenc.tgz
 
   amf:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
-      run: echo "bla"
+      uses: msys2/setup-msys2@v2
+      with:
+        install: base-devel binutils autotools automake
+        path-type: inherit
+    - name: Set up cache
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-ffmpeg-${{ env.msysConfig }}
+      with:
+        path: cache
+        key: cache-key
+    - name: Set up GIT
+      run: |
+        git config --global core.autocrlf false
+        git config --global core.eol lf
+    - name: Checkout AMF
+      uses: actions/checkout@v3.0.0
+      with:
+        repository: GPUOpen-LibrariesAndSDKs/AMF
+        ref: master
+        path: amf
+    - name: Build NvEnc
+      shell: cmd
+      run: |
+        call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
+        md build
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cp -a amf/amf/public/include ../build/include/AMF ; cd ../build ; tar czf ../dist/amf.tgz *'
+    - name: Publish artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: amf
+        path: dist/amf.tgz
         
   onevpl:
     if: ${{ false }}
     runs-on: windows-2019
     steps:
-    - name: Set up MSYS2
-      run: echo "bla"
+      - name: Set up MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          install: base-devel binutils autotools automake
+          path-type: inherit
+      - name: Set up cache
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-ffmpeg-${{ env.msysConfig }}
+        with:
+          path: cache
+          key: cache-key
+      - name: Set up GIT
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - name: Checkout oneVPL
+        uses: actions/checkout@v3.0.0
+        with:
+          repository: oneapi-src/oneVPL
+          ref: master
+          path: onevpl
+      - name: Build oneVPL
+        shell: cmd
+        run: |
+          call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
+          md build dist
+          cd build
+          cmake.exe -G "Visual Studio 16 2019" ..\repos\oneVPL -T host=x64 -A x64 -DBUILD_TOOLS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=..\build -DCMAKE_VS_INCLUDE_INSTALL_TO_DEFAULT_BUILD=ON
+          MSBuild.exe -t:VPL,INSTALL -p:Configuration=${{ env.winConfig }} -m oneVPL.sln
+          D:\a\_temp\setup-msys2\msys2.cmd -c 'cd build ; tar czf ../dist/onevpl.tgz *'
+      - name: Publish artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: onevpl
+          path: dist/onevpl.tgz
         
   libsvtav1:
     if: ${{ false }}
