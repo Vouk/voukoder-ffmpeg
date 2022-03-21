@@ -67,82 +67,7 @@ jobs:
         name: liboggvorbis
         path: dist/liboggvorbis.tgz
         
-  nvenc:
-    runs-on: windows-2019
-    steps:
-    - name: Set up MSYS2
-      uses: msys2/setup-msys2@v2
-      with:
-        install: base-devel binutils autotools automake
-        path-type: inherit
-    - name: Set up cache
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-ffmpeg-${{ env.msysConfig }}
-      with:
-        path: cache
-        key: cache-key
-    - name: Set up GIT
-      run: |
-        git config --global core.autocrlf false
-        git config --global core.eol lf
-    - name: Checkout NvEnc
-      uses: actions/checkout@v3.0.0
-      with:
-        repository: FFmpeg/nv-codec-headers
-        ref: sdk/9.1
-        path: nvenc
-    - name: Build NvEnc
-      shell: cmd
-      run: |
-        call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
-        md build
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd nvenc ; make PREFIX=../build install ; cd ../build ; tar czf ../dist/nvenc.tgz *'
-    - name: Publish artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: nvenc
-        path: dist/nvenc.tgz
-
-  amf:
-    runs-on: windows-2019
-    steps:
-    - name: Set up MSYS2
-      uses: msys2/setup-msys2@v2
-      with:
-        install: base-devel binutils autotools automake
-        path-type: inherit
-    - name: Set up cache
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-ffmpeg-${{ env.msysConfig }}
-      with:
-        path: cache
-        key: cache-key
-    - name: Set up GIT
-      run: |
-        git config --global core.autocrlf false
-        git config --global core.eol lf
-    - name: Checkout AMF
-      uses: actions/checkout@v3.0.0
-      with:
-        repository: GPUOpen-LibrariesAndSDKs/AMF
-        ref: master
-        path: amf
-    - name: Build NvEnc
-      shell: cmd
-      run: |
-        call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
-        md build
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cp -a amf/amf/public/include ../build/include/AMF ; cd ../build ; tar czf ../dist/amf.tgz *'
-    - name: Publish artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: amf
-        path: dist/amf.tgz
-        
   onevpl:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
       - name: Set up MSYS2
@@ -248,31 +173,43 @@ jobs:
   ffmpeg:
     if: ${{ false }}
     runs-on: windows-2019
-    needs: [nvenc,amf,onevpl,libsvtav1,libsnappy,libvpx,libfdk-aac,libmp3lame,libzimg,libopus,liboggvorbis,libx264,libx265]
+    needs: [onevpl,libsvtav1,libsnappy,libvpx,libfdk-aac,libmp3lame,libzimg,libopus,liboggvorbis,libx264,libx265]
     steps:
-      - name: Set up MSYS2
-        uses: msys2/setup-msys2@v2
-        with:
-          install: base-devel binutils mingw-w64-x86_64-cmake nasm
-          path-type: inherit
-      - name: Set up GIT
-        run: |
-          git config --global core.autocrlf false
-          git config --global core.eol lf
-      - name: Checkout FFmpeg
-        uses: actions/checkout@v3.0.0
-        with:
-          repository: FFmpeg/FFmpeg.git
-          ref: release/5.0
-          path: repo
-      - name: Build FFmpeg
-        shell: cmd
-        run: |
-          call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
-          md build dist
-          D:\a\_temp\setup-msys2\msys2.cmd -c 'cd repo ; PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags="${{ env.cFlags }} -I../build/include" --extra-ldflags="-LIBPATH:../build/lib" --prefix=../build --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl ; make ; make install ; cd ../build/lib ; for file in *.a; do mv "$file" "`basename "$file" .a`.lib"; done ; rm -rf fdk-aac.lib pkgconfig *.la ../share ; cd .. ; tar czf ../dist/ffmpeg-win64-static-${{ env.msysConfig }}.tar.gz *'
-      - name: Publish FFmpeg artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: Nightly Build (${{ env.winConfig }})
-          path: dist/ffmpeg-win64-static-${{ env.msysConfig }}.tar.gz
+    - name: Set up MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        install: base-devel binutils mingw-w64-x86_64-cmake nasm
+        path-type: inherit
+    - name: Set up GIT
+      run: |
+        git config --global core.autocrlf false
+        git config --global core.eol lf
+    - name: Checkout FFmpeg
+      uses: actions/checkout@v3.0.0
+      with:
+        repository: FFmpeg/FFmpeg.git
+        ref: release/5.0
+        path: ffmpeg
+    - name: Checkout NvEnc
+      uses: actions/checkout@v3.0.0
+      with:
+        repository: FFmpeg/nv-codec-headers
+        ref: sdk/9.1
+        path: nvenc
+    - name: Checkout AMF
+      uses: actions/checkout@v3.0.0
+      with:
+        repository: GPUOpen-LibrariesAndSDKs/AMF
+        ref: master
+        path: amf
+    - name: Build FFmpeg
+      shell: cmd
+      run: |
+        call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
+        md build dist
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd nvenc ; make PREFIX=../build install ; cp -a ../amf/amf/public/include ../build/include/AMF ; cd ../ffmpeg ; PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags="${{ env.cFlags }} -I../build/include" --extra-ldflags="-LIBPATH:../build/lib" --prefix=../build --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl ; make ; make install ; cd ../build/lib ; for file in *.a; do mv "$file" "`basename "$file" .a`.lib"; done ; rm -rf fdk-aac.lib pkgconfig *.la ../share ; cd .. ; tar czf ../dist/ffmpeg-win64-static-${{ env.msysConfig }}.tar.gz *'
+    - name: Publish FFmpeg artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: Nightly Build (${{ env.winConfig }})
+        path: dist/ffmpeg-win64-static-${{ env.msysConfig }}.tar.gz
