@@ -29,16 +29,10 @@ jobs:
         with:
           additional-packages:
             build-essential unzip nasm
-#      - uses: suisei-cn/actions-download-file@v1
-#        name: Set up NASM
-#        with:
-#          url: "https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/win64/nasm-2.15.05-win64.zip"
-#          target: .
       - name: Configure
         shell: cmd
         run: |
-          #wsl bash --noprofile --norc -euo pipefail -c "unzip -j nasm-2.15.05-win64.zip -d /usr/bin > /dev/null"
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           md build
-          wsl bash --noprofile --norc -euo pipefail -c "export BUILD=$(realpath build) ; cd repo ; PKG_CONFIG_PATH=$BUILD/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags='-MDd -I$BUILD/include' --extra-ldflags='-LIBPATH:$BUILD/lib' --prefix=$BUILD --pkg-config-flags='--static' --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl ; make ; make install"
+          wsl bash --noprofile --norc -euo pipefail -c "export BUILD=$(realpath build) ; cd repo ; PKG_CONFIG_PATH=$BUILD/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags='-MDd -I$BUILD/include' --extra-ldflags='-LIBPATH:$BUILD/lib' --prefix=$BUILD --pkg-config-flags='--static' --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl ; make -j ; make install"
           dir ../build
