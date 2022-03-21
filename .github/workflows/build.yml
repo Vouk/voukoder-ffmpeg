@@ -14,10 +14,26 @@ jobs:
     runs-on: windows-2022
     needs: []
     steps:
+      - name: Set up GIT
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - name: Checkout FFmpeg
+        uses: actions/checkout@v3.0.0
+        with:
+          repository: FFmpeg/FFmpeg.git
+          ref: release/5.0
+          path: repo
+      - name: Set up WSL
+        uses: Vampire/setup-wsl@v1.2.0
+        with:
+          additional-packages:
+            build-essential unzip nasm
       - name: Configure
         shell: cmd
         run: |
-          wsl --set-default-version 2
-          wsl --install -d Debian
-          wsl bash --noprofile --norc -euo pipefail -c "uname -a"
-
+          wsl -l -v
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          md build
+          wsl bash --noprofile --norc -euo pipefail -c "export BUILD=$(realpath build) ; cd repo ; PKG_CONFIG_PATH=$BUILD/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags='-MDd -I$BUILD/include' --extra-ldflags='-LIBPATH:$BUILD/lib' --prefix=$BUILD --pkg-config-flags='--static' --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl ; make -j ; make install"
+          dir ../build
