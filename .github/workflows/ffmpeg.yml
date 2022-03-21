@@ -57,78 +57,91 @@ jobs:
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
+      run: echo "bla"
 
   amf:
     if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
+      run: echo "bla"
         
   onevpl:
     if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
+      run: echo "bla"
         
   libsvtav1:
     if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
+      run: echo "bla"
     
   libvorbis:
     if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
+      run: echo "bla"
     
   libsnappy:
     if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
+      run: echo "bla"
 
   libvpx:
     if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
+      run: echo "bla"
 
   libfdk-aac:
     if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
+      run: echo "bla"
 
   libmp3lame:
     if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
+      run: echo "bla"
 
   libzimg:
     if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
+      run: echo "bla"
 
   libopus:
     if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
+      run: echo "bla"
 
   libx264:
     if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
+      run: echo "bla"
 
   libx265:
     if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
+      run: echo "bla"
 
   ffmpeg:
     if: ${{ false }}
