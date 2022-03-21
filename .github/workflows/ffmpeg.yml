@@ -67,7 +67,7 @@ jobs:
         name: liboggvorbis
         path: dist/liboggvorbis.tgz
         
-  onevpl:
+  libvpl:
     runs-on: windows-2019
     steps:
       - name: Set up MSYS2
@@ -96,9 +96,9 @@ jobs:
         shell: cmd
         run: |
           call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
-          md build dist
-          cd build
-          cmake.exe -G "Visual Studio 16 2019" ..\repos\oneVPL -T host=x64 -A x64 -DBUILD_TOOLS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=..\build -DCMAKE_VS_INCLUDE_INSTALL_TO_DEFAULT_BUILD=ON
+          md temp build dist
+          cd temp
+          cmake.exe -G "Visual Studio 16 2019" ..\onevpl -T host=x64 -A x64 -DBUILD_TOOLS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=..\build -DCMAKE_VS_INCLUDE_INSTALL_TO_DEFAULT_BUILD=ON
           MSBuild.exe -t:VPL,INSTALL -p:Configuration=${{ env.winConfig }} -m oneVPL.sln
           D:\a\_temp\setup-msys2\msys2.cmd -c 'cd build ; tar czf ../dist/onevpl.tgz *'
       - name: Publish artifact
@@ -173,7 +173,7 @@ jobs:
   ffmpeg:
     if: ${{ false }}
     runs-on: windows-2019
-    needs: [onevpl,libsvtav1,libsnappy,libvpx,libfdk-aac,libmp3lame,libzimg,libopus,liboggvorbis,libx264,libx265]
+    needs: [libvpl,libsvtav1,libsnappy,libvpx,libfdk-aac,libmp3lame,libzimg,libopus,liboggvorbis,libx264,libx265]
     steps:
     - name: Set up MSYS2
       uses: msys2/setup-msys2@v2
