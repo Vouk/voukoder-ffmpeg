@@ -16,6 +16,7 @@ env:
 
 jobs:
   libogg:
+    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
@@ -51,7 +52,44 @@ jobs:
       with:
         name: libogg
         path: dist/libogg.tgz
-  
+
+  libvorbis:
+    runs-on: windows-2019
+    steps:
+    - name: Set up MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        install: base-devel binutils autotools automake
+        path-type: inherit
+    - name: Set up cache
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-ffmpeg-${{ env.msysConfig }}
+      with:
+        path: cache
+        key: cache-key
+    - name: Set up GIT
+      run: |
+        git config --global core.autocrlf false
+        git config --global core.eol lf
+    - name: Checkout LibVORBIS
+      uses: actions/checkout@v3.0.0
+      with:
+        repository: xiph/vorbis
+        ref: master
+        path: repo
+    - name: Build LibVORBIS
+      shell: cmd
+      run: |
+        call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
+        md build dist
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd repo ; autoreconf -i ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) --disable-shared ; make -j ; make install ; sed -i '/^Libs\.private.*/d' ../build/lib/pkgconfig/vorbis.pc ; cd ../build ; tar czf ../dist/libvorbis.tgz *'
+    - name: Publish artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: libvorbis
+        path: dist/libvorbis.tgz
+        
   nvenc:
     if: ${{ false }}
     runs-on: windows-2019
@@ -79,14 +117,7 @@ jobs:
     steps:
     - name: Set up MSYS2
       run: echo "bla"
-    
-  libvorbis:
-    if: ${{ false }}
-    runs-on: windows-2019
-    steps:
-    - name: Set up MSYS2
-      run: echo "bla"
-    
+       
   libsnappy:
     if: ${{ false }}
     runs-on: windows-2019
