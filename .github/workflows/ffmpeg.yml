@@ -14,15 +14,13 @@ jobs:
     runs-on: windows-2019
     needs: []
     steps:
-      - name: Set up development tools
-        shell: cmd
-        run: call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
       - name: Set up MSYS2
         uses: msys2/setup-msys2@v2
         with:
           install: base-devel binutils mingw-w64-x86_64-cmake pkg-config git
           path-type: inherit
-      - name: MSYS2
-        shell: msys2 {0}
+      - name: Set up development tools
+        shell: cmd
         run: |
-          echo $PATH
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          D:\a\_temp\setup-msys2\msys2.cmd -use-full-path -c "set"
