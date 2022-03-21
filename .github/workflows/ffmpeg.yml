@@ -15,34 +15,29 @@ env:
   cFlags: -MDd
 
 jobs:
-
-  FFmpeg:
+  libogg:
     runs-on: windows-2019
-    needs: []
     steps:
-      - name: Set up MSYS2
-        uses: msys2/setup-msys2@v2
-        with:
-          install: base-devel binutils mingw-w64-x86_64-cmake nasm
-          path-type: inherit
-      - name: Set up GIT
-        run: |
-          git config --global core.autocrlf false
-          git config --global core.eol lf
-      - name: Checkout FFmpeg
-        uses: actions/checkout@v3.0.0
-        with:
-          repository: FFmpeg/FFmpeg.git
-          ref: release/5.0
-          path: repo
-      - name: Build FFmpeg
-        shell: cmd
-        run: |
-          call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
-          md build dist
-          D:\a\_temp\setup-msys2\msys2.cmd -c 'cd repo ; PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags="${{ env.cFlags }} -I../build/include" --extra-ldflags="-LIBPATH:../build/lib" --prefix=../build --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl ; make ; make install ; cd ../build/lib ; for file in *.a; do mv "$file" "`basename "$file" .a`.lib"; done ; rm -rf fdk-aac.lib pkgconfig *.la ../share ; cd .. ; tar czf ../dist/ffmpeg-win64-static-${{ env.msysConfig }}.tar.gz *'
-      - name: Publish FFmpeg artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: Nightly Build (${{ env.winConfig }})
-          path: dist/ffmpeg-win64-static-${{ env.msysConfig }}.tar.gz
+    - name: Set up MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        install: base-devel binutils mingw-w64-x86_64-cmake nasm
+        path-type: inherit
+    - name: Set up GIT
+      run: |
+        git config --global core.autocrlf false
+        git config --global core.eol lf
+    - name: Checkout FFmpeg
+      uses: actions/checkout@v3.0.0
+      with:
+        repository: FFmpeg/FFmpeg.git
+        ref: release/5.0
+        path: repo
+    - name: Build FFmpeg
+      shell: cmd
+      run: |
+        call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
+        md build dist
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd repo ; autoreconf -i ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=../build --disable-shared ; make ; make install'
+
+
