@@ -11,7 +11,7 @@ on:
 jobs:
 
   FFmpeg:
-    runs-on: windows-2022
+    runs-on: windows-2019
     needs: []
     steps:
       - name: Set up swap space
@@ -31,6 +31,6 @@ jobs:
       - name: Build
         shell: cmd
         run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           md build dist
           D:\a\_temp\setup-msys2\msys2.cmd -c 'cd repo ; PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags="-MDd -I../build/include" --extra-ldflags="-LIBPATH:../build/lib" --prefix=../build --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl ; make -j 1 ; make install ; cd ../build/lib ; for file in *.a; do mv "$file" "`basename "$file" .a`.lib"; done ; rm -rf fdk-aac.lib *.la ; tar czf ../../dist/ffmpeg-win64-static-debug.tar.gz * ; ls -la ..'
