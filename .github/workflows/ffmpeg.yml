@@ -15,6 +15,7 @@ env:
   cFlags: -MDd
 
 jobs:
+
   libogg:
     runs-on: windows-2019
     steps:
@@ -45,12 +46,90 @@ jobs:
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
         md build dist
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd repo ; autoreconf -i ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) --disable-shared ; make -j ; make install'
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd repo ; autoreconf -i ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) --disable-shared ; make -j ; make install ; cd build ; tar czf ../dist/libogg.tgz'
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
         name: libogg
-        path: libogg.tgz        
+        path: dist/libogg.tgz
+  
+  nvenc:
+    if: ${{ false }}
+    runs-on: windows-2019
+    steps:
+    - name: Set up MSYS2
+
+  amf:
+    if: ${{ false }}
+    runs-on: windows-2019
+    steps:
+    - name: Set up MSYS2
+        
+  onevpl:
+    if: ${{ false }}
+    runs-on: windows-2019
+    steps:
+    - name: Set up MSYS2
+        
+  libsvtav1:
+    if: ${{ false }}
+    runs-on: windows-2019
+    steps:
+    - name: Set up MSYS2
+    
+  libvorbis:
+    if: ${{ false }}
+    runs-on: windows-2019
+    steps:
+    - name: Set up MSYS2
+    
+  libsnappy:
+    if: ${{ false }}
+    runs-on: windows-2019
+    steps:
+    - name: Set up MSYS2
+
+  libvpx:
+    if: ${{ false }}
+    runs-on: windows-2019
+    steps:
+    - name: Set up MSYS2
+
+  libfdk-aac:
+    if: ${{ false }}
+    runs-on: windows-2019
+    steps:
+    - name: Set up MSYS2
+
+  libmp3lame:
+    if: ${{ false }}
+    runs-on: windows-2019
+    steps:
+    - name: Set up MSYS2
+
+  libzimg:
+    if: ${{ false }}
+    runs-on: windows-2019
+    steps:
+    - name: Set up MSYS2
+
+  libopus:
+    if: ${{ false }}
+    runs-on: windows-2019
+    steps:
+    - name: Set up MSYS2
+
+  libx264:
+    if: ${{ false }}
+    runs-on: windows-2019
+    steps:
+    - name: Set up MSYS2
+
+  libx265:
+    if: ${{ false }}
+    runs-on: windows-2019
+    steps:
+    - name: Set up MSYS2
 
   ffmpeg:
     if: ${{ false }}
