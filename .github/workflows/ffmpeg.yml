@@ -13,10 +13,10 @@ env:
   msysConfig: debug
   winConfig: Debug
   cFlags: -MDd
+  switches: ""
 
 jobs:
-  libogg:
-    if: ${{ false }}
+  liboggvorbis:
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
@@ -35,60 +35,36 @@ jobs:
       run: |
         git config --global core.autocrlf false
         git config --global core.eol lf
-    - name: Checkout LibOGG
+    - name: Checkout Ogg
       uses: actions/checkout@v3.0.0
       with:
         repository: xiph/ogg
         ref: master
-        path: repo
-    - name: Build LibOGG
-      shell: cmd
-      run: |
-        call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
-        md build dist
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd repo ; autoreconf -i ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) --disable-shared ; make -j ; make install ; cd ../build ; tar czf ../dist/libogg.tgz *'
-    - name: Publish artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: libogg
-        path: dist/libogg.tgz
-
-  libvorbis:
-    runs-on: windows-2019
-    steps:
-    - name: Set up MSYS2
-      uses: msys2/setup-msys2@v2
-      with:
-        install: base-devel binutils autotools automake
-        path-type: inherit
-    - name: Set up cache
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-ffmpeg-${{ env.msysConfig }}
-      with:
-        path: cache
-        key: cache-key
-    - name: Set up GIT
-      run: |
-        git config --global core.autocrlf false
-        git config --global core.eol lf
-    - name: Checkout LibVORBIS
+        path: ogg
+    - name: Checkout Vorbis
       uses: actions/checkout@v3.0.0
       with:
         repository: xiph/vorbis
         ref: master
-        path: repo
-    - name: Build LibVORBIS
+        path: vorbis
+    - name: Build Ogg
       shell: cmd
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
-        md build dist
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd repo ; autoreconf -i ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) --disable-shared ; make -j ; make install ; sed -i '/^Libs\.private.*/d' ../build/lib/pkgconfig/vorbis.pc ; cd ../build ; tar czf ../dist/libvorbis.tgz *'
+        md build
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd ogg ; autoreconf -i ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) --disable-shared ; make -j ; make install'
+    - name: Build Vorbis
+      shell: cmd
+      run: |
+        call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
+        md dist
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd vorbis ; autoreconf -i ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) --disable-shared ; make -j ; make install ; sed -i '/^Libs\.private.*/d' ../build/lib/pkgconfig/vorbis.pc ; cd ../build ; tar czf ../dist/liboggvorbis.tgz *'
+        echo "switches=${{env.switches}} --enable-encoder=libopus --enable-encoder=libvorbis" >> $GITHUB_ENV
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
-        name: libvorbis
-        path: dist/libvorbis.tgz
+        name: liboggvorbis
+        path: dist/liboggvorbis.tgz
         
   nvenc:
     if: ${{ false }}
@@ -177,7 +153,7 @@ jobs:
   ffmpeg:
     if: ${{ false }}
     runs-on: windows-2019
-    needs: [nvenc,amf,onevpl,libsvtav1,libvorbis,libsnappy,libvpx,libfdk-aac,libmp3lame,libzimg,libopus,libogg,libx264,libx265]
+    needs: [nvenc,amf,onevpl,libsvtav1,libsnappy,libvpx,libfdk-aac,libmp3lame,libzimg,libopus,liboggvorbis,libx264,libx265]
     steps:
       - name: Set up MSYS2
         uses: msys2/setup-msys2@v2
