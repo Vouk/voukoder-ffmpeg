@@ -134,7 +134,7 @@ jobs:
   ffmpeg:
     if: ${{ false }}
     runs-on: windows-2019
-    needs: [libogg]
+    needs: [nvenc,amf,onevpl,libsvtav1,libvorbis,libsnappy,libvpx,libfdk-aac,libmp3lame,libzimg,libopus,libogg,libx264,libx265]
     steps:
       - name: Set up MSYS2
         uses: msys2/setup-msys2@v2
