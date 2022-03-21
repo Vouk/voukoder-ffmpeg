@@ -28,7 +28,7 @@ jobs:
         uses: Vampire/setup-wsl@v1.2.0
         with:
           additional-packages:
-            build-essential unzip
+            build-essential unzip nasm
       - uses: suisei-cn/actions-download-file@v1
         name: Set up NASM
         with:
