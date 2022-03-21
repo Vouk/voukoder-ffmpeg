@@ -35,8 +35,8 @@ jobs:
           url: "https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/win64/nasm-2.15.05-win64.zip"
           target: .
       - name: aa
-        shell: wsl-bash {0}
-        run: cat "/d/a/_temp/wsl-shell-wrapper/wsl-bash.BAT"
+        shell: cmd
+        run: type D:\a\_temp\wsl-shell-wrapper\wsl-bash.BAT
       - name: Configure
         shell: cmd
         run: |
