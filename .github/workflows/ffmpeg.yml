@@ -30,8 +30,8 @@ jobs:
     - name: Checkout FFmpeg
       uses: actions/checkout@v3.0.0
       with:
-        repository: FFmpeg/FFmpeg.git
-        ref: release/5.0
+        repository: xiph/ogg
+        ref: master
         path: repo
     - name: Build FFmpeg
       shell: cmd
