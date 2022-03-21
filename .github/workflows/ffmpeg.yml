@@ -19,7 +19,7 @@ jobs:
         with:
           install: base-devel binutils mingw-w64-x86_64-cmake nasm
           path-type: inherit
-      - name: Clone FFmpeg 5.0
+      - name: Set up GIT
         run: |
           git config --global core.autocrlf false
           git config --global core.eol lf
@@ -29,13 +29,13 @@ jobs:
           repository: FFmpeg/FFmpeg.git
           ref: release/5.0
           path: repo
-      - name: Build
+      - name: Build FFmpeg
         shell: cmd
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           md build dist
-          D:\a\_temp\setup-msys2\msys2.cmd -c 'cd repo ; PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags="-MDd -I../build/include" --extra-ldflags="-LIBPATH:../build/lib" --prefix=../build --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl ; make -j 1 ; make install ; cd ../build/lib ; for file in *.a; do mv "$file" "`basename "$file" .a`.lib"; done ; rm -rf fdk-aac.lib *.la ; tar czf ../../dist/ffmpeg-win64-static-debug.tar.gz * ; ls -laR ..'
-      - name: Archive code coverage results
+          D:\a\_temp\setup-msys2\msys2.cmd -c 'cd repo ; PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags="-MDd -I../build/include" --extra-ldflags="-LIBPATH:../build/lib" --prefix=../build --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl ; make ; make install ; cd ../build/lib ; for file in *.a; do mv "$file" "`basename "$file" .a`.lib"; done ; rm -rf fdk-aac.lib pkgconfig *.la ../share ; cd .. ; tar czf ../dist/ffmpeg-win64-static-debug.tar.gz *'
+      - name: Publish FFmpeg artifacts
         uses: actions/upload-artifact@v3
         with:
           name: Nightly Build (Debug)
