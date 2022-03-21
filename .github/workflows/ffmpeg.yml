@@ -190,6 +190,7 @@ jobs:
         path: dist/libsnappy.tgz
 
   libvpx:
+    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
@@ -219,7 +220,7 @@ jobs:
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
         md build build\include build\lib build\lib\pkgconfig dist
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd vpx ; ./configure --prefix=../build --target=x86_64-win64-vs16 --enable-vp9-highbitdepth --disable-shared --disable-examples --disable-tools --disable-docs --disable-libyuv --disable-unit_tests --disable-postproc ; make ; make install ; mv ../build/lib/x64/vpxmd.lib ../build/lib/vpx.lib ; rm -rf ../build/lib/x64 ; cd ../build ; tar czf ../dist/libvpx.tgz *'
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd vpx ; ./configure --prefix=../build --target=x86_64-win64-vs16 --enable-vp9-highbitdepth --disable-shared --disable-examples --disable-tools --disable-docs --disable-libyuv --disable-unit_tests --disable-postproc ; make -j ; make install ; mv ../build/lib/x64/vpxmd.lib ../build/lib/vpx.lib ; rm -rf ../build/lib/x64 ; cd ../build ; tar czf ../dist/libvpx.tgz *'
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
@@ -227,11 +228,42 @@ jobs:
         path: dist/libvpx.tgz
 
   libfdk-aac:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
-      run: echo "bla"
+      uses: msys2/setup-msys2@v2
+      with:
+        install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
+        path-type: inherit
+    - name: Set up cache
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-ffmpeg-${{ env.msysConfig }}
+      with:
+        path: cache
+        key: cache-key
+    - name: Set up GIT
+      run: |
+        git config --global core.autocrlf false
+        git config --global core.eol lf
+    - name: Checkout FDK AAC
+      uses: actions/checkout@v3.0.0
+      with:
+        repository: mstorsjo/fdk-aac
+        ref: master
+        path: fdk-aac
+    - name: Build LibVpx
+      shell: cmd
+      run: |
+        call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
+        md build dist
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd fdk-aac ; autoreconf -i ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) --disable-shared --disabled-static ; make -j ; make install ; cd ../build ; tar czf ../dist/libfdkaac.tgz *'
+        #patch -N -p1 -i ../../patches/0003-dynamic-loading-of-shared-fdk-aac-library-5.0.patch  
+    - name: Publish artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: libfdkaac
+        path: dist/libfdkaac.tgz
 
   libmp3lame:
     if: ${{ false }}
