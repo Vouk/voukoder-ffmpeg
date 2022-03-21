@@ -34,6 +34,9 @@ jobs:
         with:
           url: "https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/win64/nasm-2.15.05-win64.zip"
           target: .
+      - name: aa
+        shell: wsl-bash {0}
+        run: uname -a
       - name: Configure
         shell: cmd
         run: |
