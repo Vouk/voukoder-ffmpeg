@@ -181,7 +181,7 @@ jobs:
         cd work
         cmake -G "Visual Studio 16 2019" .. -DCMAKE_INSTALL_PREFIX=..\..\build -DBUILD_SHARED_LIBS=OFF -DSNAPPY_BUILD_TESTS=OFF
         MSBuild.exe /property:Configuration="${{ env.winConfig }}" Snappy.sln
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cp ${{ env.winConfig }}/snappy.lib ../../build/lib/snappy.lib" ; cp ../snappy.h ../snappy-c.h ../../build/include/ ; cd ../../build ; tar czf ../dist/libsnappy.tgz *'
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cp ${{ env.winConfig }}/snappy.lib ../../build/lib/snappy.lib ; cp ../snappy.h ../snappy-c.h ../../build/include/ ; cd ../../build ; tar czf ../dist/libsnappy.tgz *'
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
