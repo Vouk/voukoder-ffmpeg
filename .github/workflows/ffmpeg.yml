@@ -23,4 +23,5 @@ jobs:
         shell: cmd
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          type D:\a\_temp\setup-msys2\msys2.cmd
           D:\a\_temp\setup-msys2\msys2.cmd -use-full-path -c "set"
