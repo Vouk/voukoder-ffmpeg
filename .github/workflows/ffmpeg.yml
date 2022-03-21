@@ -15,46 +15,14 @@ jobs:
     needs: []
     steps:
       - name: Set up development tools
-        shell: cmd {0}
+        shell: cmd
         run: C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat
       - name: Set up MSYS2
         uses: msys2/setup-msys2@v2
         with:
           install: base-devel binutils mingw-w64-x86_64-cmake pkg-config git
           path-type: inherit
-      - name: Set up MSBuild
-        uses: microsoft/setup-msbuild@v1.1
-        with:
-          msbuild-architecture: x64
-      - name: Set up cache
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-ffmpeg
-        with:
-          path: ~/build
-          key: ${{ env.cache-name }}
-      - name: Checkout FFmpeg
+      - name: MSYS2
         shell: msys2 {0}
         run: |
-          git clone -q -b release/5.0 https://github.com/FFmpeg/FFmpeg.git repo
-#      - name: Set up project files
-#        uses: actions/download-artifact@master
-#        with:
-#          name: oneVPL
-      - name: msys2
-        shell: msys2 {0}
-        run: |
-          ls -la "/c/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64"
           echo $PATH
-          #export VS=/mnt/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise
-          PATH=/c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2019/Enterprise/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64:$PATH
-          #sudo apt -y install yasm
-          mkdir build
-          #BUILD=$(realpath build)
-          #tar zxf *.tgz -C build
-          cd repo
-          PKG_CONFIG_PATH="../build/lib/pkgconfig" ./configure --toolchain=msvc --extra-cflags='-MDd -I../build/include' --extra-ldflags='-LIBPATH:../build/lib' --prefix=../build --pkg-config-flags='--static' --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl || true
-          tail --lines=20 ffbuild/config.log
-          #ls -laR ../build
-          #  - name: Get artifacts
-    
