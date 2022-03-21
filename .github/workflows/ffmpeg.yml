@@ -71,42 +71,42 @@ jobs:
     if: ${{ false }}
     runs-on: windows-2019
     steps:
-      - name: Set up MSYS2
-        uses: msys2/setup-msys2@v2
-        with:
-          install: base-devel binutils autotools automake
-          path-type: inherit
-      - name: Set up cache
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-ffmpeg-${{ env.msysConfig }}
-        with:
-          path: cache
-          key: cache-key
-      - name: Set up GIT
-        run: |
-          git config --global core.autocrlf false
-          git config --global core.eol lf
-      - name: Checkout oneVPL
-        uses: actions/checkout@v3.0.0
-        with:
-          repository: oneapi-src/oneVPL
-          ref: master
-          path: onevpl
-      - name: Build oneVPL
-        shell: cmd
-        run: |
-          call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
-          md temp build dist
-          cd temp
-          cmake.exe -G "Visual Studio 16 2019" ..\onevpl -T host=x64 -A x64 -DBUILD_TOOLS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=..\build -DCMAKE_VS_INCLUDE_INSTALL_TO_DEFAULT_BUILD=ON
-          MSBuild.exe -t:VPL,INSTALL -p:Configuration=${{ env.winConfig }} -m oneVPL.sln
-          D:\a\_temp\setup-msys2\msys2.cmd -c 'cd ../build ; tar czf ../dist/libvpl.tgz *'
-      - name: Publish artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: libvpl
-          path: dist/libvpl.tgz
+    - name: Set up MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        install: base-devel binutils autotools automake
+        path-type: inherit
+    - name: Set up cache
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-ffmpeg-${{ env.msysConfig }}
+      with:
+        path: cache
+        key: cache-key
+    - name: Set up GIT
+      run: |
+        git config --global core.autocrlf false
+        git config --global core.eol lf
+    - name: Checkout oneVPL
+      uses: actions/checkout@v3.0.0
+      with:
+        repository: oneapi-src/oneVPL
+        ref: master
+        path: onevpl
+    - name: Build oneVPL
+      shell: cmd
+      run: |
+        call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
+        md temp build dist
+        cd temp
+        cmake.exe -G "Visual Studio 16 2019" ..\onevpl -T host=x64 -A x64 -DBUILD_TOOLS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=..\build -DCMAKE_VS_INCLUDE_INSTALL_TO_DEFAULT_BUILD=ON
+        MSBuild.exe -t:VPL,INSTALL -p:Configuration=${{ env.winConfig }} -m oneVPL.sln
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd ../build ; tar czf ../dist/libvpl.tgz *'
+    - name: Publish artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: libvpl
+        path: dist/libvpl.tgz
         
   libsvtav1:
     if: ${{ false }}
@@ -190,7 +190,6 @@ jobs:
         path: dist/libsnappy.tgz
 
   libvpx:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
