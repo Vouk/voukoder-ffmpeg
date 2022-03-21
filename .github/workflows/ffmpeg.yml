@@ -68,6 +68,7 @@ jobs:
         path: dist/liboggvorbis.tgz
         
   libvpl:
+    if: ${{ false }}
     runs-on: windows-2019
     steps:
       - name: Set up MSYS2
@@ -108,7 +109,6 @@ jobs:
           path: dist/onevpl.tgz
         
   libsvtav1:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
@@ -127,7 +127,7 @@ jobs:
       run: |
         git config --global core.autocrlf false
         git config --global core.eol lf
-    - name: Checkout Ogg
+    - name: Checkout SVT AV1
       uses: actions/checkout@v3.0.0
       with:
         repository: xiph/ogg
@@ -136,27 +136,20 @@ jobs:
     - name: Checkout Vorbis
       uses: actions/checkout@v3.0.0
       with:
-        repository: xiph/vorbis
+        repository: AOMediaCodec/SVT-AV1
         ref: master
-        path: vorbis
-    - name: Build Ogg
+        path: svtav1
+    - name: Build SVT AV1
       shell: cmd
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
         md build
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd ogg ; autoreconf -i ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) --disable-shared ; make -j ; make install'
-    - name: Build Vorbis
-      shell: cmd
-      run: |
-        call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
-        md dist
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd vorbis ; autoreconf -i ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) --disable-shared ; make -j ; make install ; sed -i '/^Libs\.private.*/d' ../build/lib/pkgconfig/vorbis.pc ; cd ../build ; tar czf ../dist/liboggvorbis.tgz *'
-        echo "switches=${{env.switches}} --enable-encoder=libopus --enable-encoder=libvorbis" >> $GITHUB_ENV
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd svtav1/Build/windows ; ./build.bat 2017 ${{ env.msysConfig }} static ; cp -r ../../Source/API ../../../build/include/svt-av1 ; cp ../../Bin/${{ env.msysConfig }}/SvtAv1Enc.lib ../../../build/lib/ ; cp SvtAv1Enc.pc ../../../build/lib/pkgconfig/ ; cd ../../../build ; tar czf ../dist/libsvtav1.tgz *'
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
-        name: liboggvorbis
-        path: dist/liboggvorbis.tgz
+        name: libsvtav1
+        path: dist/libsvtav1.tgz
        
   libsnappy:
     if: ${{ false }}
