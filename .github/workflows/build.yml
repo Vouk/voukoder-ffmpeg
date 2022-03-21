@@ -36,7 +36,7 @@ jobs:
           target: .
       - name: aa
         shell: wsl-bash {0}
-        run: uname -a
+        run: cat "/d/a/_temp/wsl-shell-wrapper/wsl-bash.BAT"
       - name: Configure
         shell: cmd
         run: |
