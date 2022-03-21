@@ -38,6 +38,6 @@ jobs:
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
         md build dist
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd repo ; autoreconf -i ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=../build --disable-shared ; make ; make install'
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd repo ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=../build --disable-shared ; make ; make install'
 
 
