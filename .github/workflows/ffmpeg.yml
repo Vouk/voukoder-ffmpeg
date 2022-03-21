@@ -15,7 +15,6 @@ env:
   cFlags: -MDd
 
 jobs:
-
   libogg:
     runs-on: windows-2019
     steps:
