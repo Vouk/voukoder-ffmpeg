@@ -439,6 +439,7 @@ jobs:
       shell: cmd
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
+        set NASM_EXECUTABLE=nasm.exe
         md build build\include build\lib build\lib\pkgconfig dist
         cd x265\build\vc15-x86_64
         mkdir work work10 work12
