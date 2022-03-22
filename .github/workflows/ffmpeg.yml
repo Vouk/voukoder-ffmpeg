@@ -364,7 +364,7 @@ jobs:
         md build build\include build\lib build\lib\pkgconfig dist
         cd opus\win32\VS2015
         MSBuild.exe /property:Configuration="${{ env.winConfig }}" /property:Platform=x64 /property:PlatformToolset=v142 opus.vcxproj
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cp x64/${{ env.winConfig }}/opus.lib ../../../build/lib/opus.lib ; cd ../../.. ; cp -r opus/includebuild/include/opus ; cp opus/opus.pc.in build/lib/pkgconfig/opus.pc ; sed -i "s#@prefix@#$BUILD#g" build/lib/pkgconfig/opus.pc ; sed -i "s/@exec_prefix@/\$\{prefix\}/g" build/lib/pkgconfig/opus.pc ; sed -i "s/@libdir@/\$\{prefix\}\/lib/g" build/lib/pkgconfig/opus.pc ; sed -i "s/@includedir@/\$\{prefix\}\/include/g" build/lib/pkgconfig/opus.pc ; sed -i "s/@LIBM@//g" build/lib/pkgconfig/opus.pc; sed -i "s/@VERSION@/2.0.0/g" build/lib/pkgconfig/opus.pc ; cd build ; tar czf ../dist/libopus.tgz *'
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cp x64/${{ env.winConfig }}/opus.lib ../../../build/lib/opus.lib ; cd ../../.. ; cp -r opus/include/build/include/opus ; cp opus/opus.pc.in build/lib/pkgconfig/opus.pc ; sed -i "s#@prefix@#$BUILD#g" build/lib/pkgconfig/opus.pc ; sed -i "s/@exec_prefix@/\$\{prefix\}/g" build/lib/pkgconfig/opus.pc ; sed -i "s/@libdir@/\$\{prefix\}\/lib/g" build/lib/pkgconfig/opus.pc ; sed -i "s/@includedir@/\$\{prefix\}\/include/g" build/lib/pkgconfig/opus.pc ; sed -i "s/@LIBM@//g" build/lib/pkgconfig/opus.pc; sed -i "s/@VERSION@/2.0.0/g" build/lib/pkgconfig/opus.pc ; cd build ; tar czf ../dist/libopus.tgz *'
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
