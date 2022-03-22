@@ -469,7 +469,6 @@ jobs:
         path: dist/libx265.tgz
 
   ffmpeg:
-    if: ${{ false }}
     runs-on: windows-2019
     needs: [libvpl,libsvtav1,libsnappy,libvpx,libfdk-aac,libmp3lame,libzimg,libopus,liboggvorbis,libx264,libx265]
     steps:
