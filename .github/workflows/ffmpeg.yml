@@ -434,7 +434,7 @@ jobs:
       uses: actions/checkout@v3.0.0
       with:
         repository: videolan/x265
-        ref: Release_3.5
+        ref: Release_3.1
         path: x265
     - name: Build X265
       shell: cmd
