@@ -313,18 +313,18 @@ jobs:
       run: |
         git config --global core.autocrlf false
         git config --global core.eol lf
-    - name: Checkout Snappy
+    - name: Checkout ZIMG
       uses: actions/checkout@v3.0.0
       with:
         repository: sekrit-twc/zimg
         ref: release-2.9.2
         path: zimg
-    - name: Build Snappy
+    - name: Build ZIMG
       shell: cmd
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
         md build build\include build\lib build\lib\pkgconfig dist
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd zimg ; ./autogen.sh ; ./configure --prefix=$(realpath ../build) ; cd _msvc/zimg ; MSBuild.exe /maxcpucount /property:Configuration="${{ env.winConfig }}" /property:ConfigurationType=StaticLibrary /property:WindowsTargetPlatformVersion=10.0.17134.0 /property:PlatformToolset=v142 /property:Platform=x64 /property:WholeProgramOptimization=false zimg.vcxproj ; cp x64/${{ env.winConfig }}/z.lib ../../../build/lib/zimg.lib ; cd ../.. ; cp src/zimg/api/zimg.h  ../build/include/zimg.h ; cp zimg.pc ../build/lib/pkgconfig/zimg.pc ; cd ../build ; tar czf ../dist/libzimg.tgz *'
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd zimg ; ./autogen.sh ; ./configure --prefix=$(realpath ../build) ; cd _msvc/zimg ; MSBuild.exe /maxcpucount /property:Configuration="${{ env.winConfig }}" /property:ConfigurationType=StaticLibrary /property:WindowsTargetPlatformVersion=10.0.17134.0 /property:PlatformToolset=v142 /property:Platform=x64 /property:WholeProgramOptimization=false /target:zimg zimg.vcxproj ; cp x64/${{ env.winConfig }}/z.lib ../../../build/lib/zimg.lib ; cd ../.. ; cp src/zimg/api/zimg.h  ../build/include/zimg.h ; cp zimg.pc ../build/lib/pkgconfig/zimg.pc ; cd ../build ; tar czf ../dist/libzimg.tgz *'
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
