@@ -407,5 +407,5 @@ jobs:
     - name: Publish FFmpeg artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: Nightly Build (${{ env.winConfig }})
+        name: ${{ env.winConfig }} package build
         path: dist/ffmpeg-win64-static-${{ env.msysConfig }}.tar.gz
