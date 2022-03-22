@@ -18,7 +18,6 @@ env:
 
 jobs:
   liboggvorbis:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
@@ -412,6 +411,7 @@ jobs:
         path: dist/libx264.tgz
 
   libx265:
+    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
