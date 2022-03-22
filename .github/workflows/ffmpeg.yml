@@ -426,8 +426,6 @@ jobs:
       with:
         path: cache
         key: cache-key
-    - name: Set up NASM
-      uses: ilammy/setup-nasm@v1.2.1
     - name: Set up GIT
       run: |
         git config --global core.autocrlf false
@@ -436,7 +434,7 @@ jobs:
       uses: actions/checkout@v3.0.0
       with:
         repository: videolan/x265
-        ref: master
+        ref: Release_3.5
         path: x265
     - name: Build X265
       shell: cmd
@@ -446,10 +444,7 @@ jobs:
         cd x265\build\vc15-x86_64
         mkdir work work10 work12
         cd work12
-        cmake -G "Visual Studio 16 2019" ..\..\..\source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON
-        MSBuild.exe /property:Configuration="${{ env.winConfig }}" x265.sln
-        
-        rem D:\a\_temp\setup-msys2\msys2.cmd -c 'cmake -G "Visual Studio 16 2019" ../../../source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON ; MSBuild.exe /property:Configuration="${{ env.winConfig }}" x265.sln'
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cmake -G "Visual Studio 16 2019" ../../../source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON ; MSBuild.exe /property:Configuration="${{ env.winConfig }}" x265.sln'
         
         rem MSBuild.exe /property:Configuration="${{ env.winConfig }}" x265-static.vcxproj
         rem cp ${{ env.winConfig }}/x265-static.lib ../work/x265_12bit.lib
