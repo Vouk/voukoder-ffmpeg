@@ -257,7 +257,7 @@ jobs:
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
         md build dist
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd fdk-aac ; autoreconf -i ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) --disable-shared --disabled-static ; make -j ; make install ; cd ../build ; tar czf ../dist/libfdkaac.tgz *'
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd fdk-aac ; autoreconf -i ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) --disable-shared --disable-static ; make -j ; make install ; cd ../build ; tar czf ../dist/libfdkaac.tgz *'
         #patch -N -p1 -i ../../patches/0003-dynamic-loading-of-shared-fdk-aac-library-5.0.patch  
     - name: Publish artifact
       uses: actions/upload-artifact@v2
