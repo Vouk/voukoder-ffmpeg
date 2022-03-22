@@ -446,20 +446,20 @@ jobs:
         cmake -G "Visual Studio 16 2019" ../../../source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON
         MSBuild.exe /property:Configuration="${{ env.winConfig }}" x265-static.vcxproj
         cp ${{ env.winConfig }}/x265-static.lib ../work/x265_12bit.lib
-        cd ../work10
-        cmake -G "Visual Studio 16 2019" ../../../source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF
-        MSBuild.exe /property:Configuration="${{ env.winConfig }}" x265-static.vcxproj
-        cp ${{ env.winConfig }}/x265-static.lib ../work/x265_10bit.lib
-        cd ../work
-        cmake -G "Visual Studio 16 2019" ../../../source -DCMAKE_INSTALL_PREFIX=../../../../build -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DEXTRA_LIB="x265_10bit.lib;x265_12bit.lib" -DLINKED_10BIT=ON -DLINKED_12BIT=ON
-        MSBuild.exe /property:Configuration="${{ env.winConfig }}" x265-static.vcxproj
-        cp ${{ env.winConfig }}/x265-static.lib ./x265_main.lib
-        LIB.EXE /ignore:4006 /ignore:4221 /OUT:x265.lib x265_main.lib x265_10bit.lib x265_12bit.lib
-        cp x265.lib ../../../../build/lib/x265.lib
-        cp x265.pc ../../../../build/lib/pkgconfig/x265.pc
-        cp x265_config.h ../../../../build/include/
-        cp ../../../source/x265.h ../../../../build/include/
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd ../../../../build ; tar czf ../dist/libx265.tgz *'
+        rem cd ../work10
+        rem cmake -G "Visual Studio 16 2019" ../../../source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF
+        rem MSBuild.exe /property:Configuration="${{ env.winConfig }}" x265-static.vcxproj
+        rem cp ${{ env.winConfig }}/x265-static.lib ../work/x265_10bit.lib
+        rem cd ../work
+        rem cmake -G "Visual Studio 16 2019" ../../../source -DCMAKE_INSTALL_PREFIX=../../../../build -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DEXTRA_LIB="x265_10bit.lib;x265_12bit.lib" -DLINKED_10BIT=ON -DLINKED_12BIT=ON
+        rem MSBuild.exe /property:Configuration="${{ env.winConfig }}" x265-static.vcxproj
+        rem cp ${{ env.winConfig }}/x265-static.lib ./x265_main.lib
+        rem LIB.EXE /ignore:4006 /ignore:4221 /OUT:x265.lib x265_main.lib x265_10bit.lib x265_12bit.lib
+        rem cp x265.lib ../../../../build/lib/x265.lib
+        rem cp x265.pc ../../../../build/lib/pkgconfig/x265.pc
+        rem cp x265_config.h ../../../../build/include/
+        rem cp ../../../source/x265.h ../../../../build/include/
+        rem D:\a\_temp\setup-msys2\msys2.cmd -c 'cd ../../../../build ; tar czf ../dist/libx265.tgz *'
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
