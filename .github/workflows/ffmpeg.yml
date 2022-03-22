@@ -18,7 +18,6 @@ env:
 
 jobs:
   liboggvorbis:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
@@ -69,7 +68,6 @@ jobs:
         path: dist/liboggvorbis.tgz
         
   libvpl:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
@@ -110,7 +108,6 @@ jobs:
         path: dist/libvpl.tgz
         
   libsvtav1:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
@@ -148,7 +145,6 @@ jobs:
         path: dist/libsvtav1.tgz
        
   libsnappy:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
@@ -191,7 +187,6 @@ jobs:
         path: dist/libsnappy.tgz
 
   libvpx:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
@@ -228,47 +223,7 @@ jobs:
         name: libvpx
         path: dist/libvpx.tgz
 
-  libfdk-aac:
-    if: ${{ false }}
-    runs-on: windows-2019
-    steps:
-    - name: Set up MSYS2
-      uses: msys2/setup-msys2@v2
-      with:
-        install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
-        path-type: inherit
-    - name: Set up cache
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-ffmpeg-${{ env.msysConfig }}
-      with:
-        path: cache
-        key: cache-key
-    - name: Set up GIT
-      run: |
-        git config --global core.autocrlf false
-        git config --global core.eol lf
-    - name: Checkout FDK AAC
-      uses: actions/checkout@v3.0.0
-      with:
-        repository: mstorsjo/fdk-aac
-        ref: master
-        path: fdk-aac
-    - name: Build FDK AAC
-      shell: cmd
-      run: |
-        call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
-        md build dist
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd fdk-aac ; autoreconf -i ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) --disable-shared --disable-static ; make -j ; make install ; cd ../build ; tar czf ../dist/libfdkaac.tgz *'
-        #patch -N -p1 -i ../../patches/0003-dynamic-loading-of-shared-fdk-aac-library-5.0.patch  
-    - name: Publish artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: libfdkaac
-        path: dist/libfdkaac.tgz
-
   libmp3lame:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
@@ -296,7 +251,6 @@ jobs:
         path: dist/libmp3lame.tgz
 
   libzimg:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
@@ -334,7 +288,6 @@ jobs:
         path: dist/libzimg.tgz
 
   libopus:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
@@ -374,7 +327,6 @@ jobs:
         path: dist/libopus.tgz
 
   libx264:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
@@ -411,67 +363,10 @@ jobs:
         name: libx264
         path: dist/libx264.tgz
 
-  libx265:
-    runs-on: windows-2019
-    steps:
-    - name: Set up MSYS2
-      uses: msys2/setup-msys2@v2
-      with:
-        install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
-        path-type: inherit
-    - name: Set up cache
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-ffmpeg-${{ env.msysConfig }}
-      with:
-        path: cache
-        key: cache-key
-    - name: Set up GIT
-      run: |
-        git config --global core.autocrlf false
-        git config --global core.eol lf
-    - name: Checkout X265
-      uses: actions/checkout@v3.0.0
-      with:
-        repository: videolan/x265
-        ref: Release_3.5
-        path: x265
-    - name: Build X265
-      shell: cmd
-      run: |
-        call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
-        md build build\include build\lib build\lib\pkgconfig dist
-        cd x265\build\vc15-x86_64
-        mkdir work work10 work12
-        cd work12
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'mv D:/a/_temp/msys64/usr/bin/nasm.exe D:/a/_temp/msys64/usr/bin/Nasm ; cmake -G "Visual Studio 16 2019" ../../../source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON ; MSBuild.exe /property:Configuration="${{ env.winConfig }}" x265-static.vcxproj'
-        
-        rem MSBuild.exe /property:Configuration="${{ env.winConfig }}" x265-static.vcxproj
-        rem cp ${{ env.winConfig }}/x265-static.lib ../work/x265_12bit.lib
-        rem cd ../work10
-        rem cmake -G "Visual Studio 16 2019" ../../../source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF
-        rem MSBuild.exe /property:Configuration="${{ env.winConfig }}" x265-static.vcxproj
-        rem cp ${{ env.winConfig }}/x265-static.lib ../work/x265_10bit.lib
-        rem cd ../work
-        rem cmake -G "Visual Studio 16 2019" ../../../source -DCMAKE_INSTALL_PREFIX=../../../../build -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DEXTRA_LIB="x265_10bit.lib;x265_12bit.lib" -DLINKED_10BIT=ON -DLINKED_12BIT=ON
-        rem MSBuild.exe /property:Configuration="${{ env.winConfig }}" x265-static.vcxproj
-        rem cp ${{ env.winConfig }}/x265-static.lib ./x265_main.lib
-        rem LIB.EXE /ignore:4006 /ignore:4221 /OUT:x265.lib x265_main.lib x265_10bit.lib x265_12bit.lib
-        rem cp x265.lib ../../../../build/lib/x265.lib
-        rem cp x265.pc ../../../../build/lib/pkgconfig/x265.pc
-        rem cp x265_config.h ../../../../build/include/
-        rem cp ../../../source/x265.h ../../../../build/include/
-        rem D:\a\_temp\setup-msys2\msys2.cmd -c 'cd ../../../../build ; tar czf ../dist/libx265.tgz *'
-    - name: Publish artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: libx265
-        path: dist/libx265.tgz
-
   ffmpeg:
     if: ${{ false }}
     runs-on: windows-2019
-    needs: [libvpl,libsvtav1,libsnappy,libvpx,libfdk-aac,libmp3lame,libzimg,libopus,liboggvorbis,libx264,libx265]
+    needs: [libvpl,libsvtav1,libsnappy,libvpx,libmp3lame,libzimg,libopus,liboggvorbis,libx264]
     steps:
     - name: Set up MSYS2
       uses: msys2/setup-msys2@v2
@@ -500,12 +395,16 @@ jobs:
         repository: GPUOpen-LibrariesAndSDKs/AMF
         ref: master
         path: amf
+    - name: Set up artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: build_artifacts
     - name: Build FFmpeg
       shell: cmd
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
         md build dist
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd nvenc ; make PREFIX=../build install ; cp -a ../amf/amf/public/include ../build/include/AMF ; cd ../ffmpeg ; PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags="${{ env.cFlags }} -I../build/include" --extra-ldflags="-LIBPATH:../build/lib" --prefix=../build --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl ; make ; make install ; cd ../build/lib ; for file in *.a; do mv "$file" "`basename "$file" .a`.lib"; done ; rm -rf fdk-aac.lib pkgconfig *.la ../share ; cd .. ; tar czf ../dist/ffmpeg-win64-static-${{ env.msysConfig }}.tar.gz *'
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd build ; tar xzvf build_artifacts/*.tgz .; ls -laR ; cd ../nvenc ; make PREFIX=../build install ; cp -a ../amf/amf/public/include ../build/include/AMF ; cd ../ffmpeg ; PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags="${{ env.cFlags }} -I../build/include" --extra-ldflags="-LIBPATH:../build/lib" --prefix=../build --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl ; make ; make install ; cd ../build/lib ; for file in *.a; do mv "$file" "`basename "$file" .a`.lib"; done ; rm -rf fdk-aac.lib pkgconfig *.la ../share ; cd .. ; tar czf ../dist/ffmpeg-win64-static-${{ env.msysConfig }}.tar.gz *'
     - name: Publish FFmpeg artifacts
       uses: actions/upload-artifact@v3
       with:
