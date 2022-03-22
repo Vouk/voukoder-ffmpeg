@@ -1,4 +1,4 @@
-name: Build FFmpeg
+name: LibFDKAAC
 
 on:
   workflow_dispatch:
