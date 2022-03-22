@@ -18,7 +18,6 @@ env:
 
 jobs:
   liboggvorbis:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
@@ -69,7 +68,6 @@ jobs:
         path: dist/liboggvorbis.tgz
         
   libvpl:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
@@ -110,7 +108,6 @@ jobs:
         path: dist/libvpl.tgz
         
   libsvtav1:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
@@ -148,7 +145,6 @@ jobs:
         path: dist/libsvtav1.tgz
        
   libsnappy:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
@@ -191,7 +187,6 @@ jobs:
         path: dist/libsnappy.tgz
 
   libvpx:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
@@ -229,7 +224,6 @@ jobs:
         path: dist/libvpx.tgz
 
   libfdk-aac:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
@@ -268,7 +262,6 @@ jobs:
         path: dist/libfdkaac.tgz
 
   libmp3lame:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
@@ -296,7 +289,6 @@ jobs:
         path: dist/libmp3lame.tgz
 
   libzimg:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
@@ -334,7 +326,6 @@ jobs:
         path: dist/libzimg.tgz
 
   libopus:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
@@ -374,7 +365,6 @@ jobs:
         path: dist/libopus.tgz
 
   libx264:
-    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
@@ -412,6 +402,7 @@ jobs:
         path: dist/libx264.tgz
 
   libx265:
+    if: ${{ false }}
     runs-on: windows-2019
     steps:
     - name: Set up MSYS2
