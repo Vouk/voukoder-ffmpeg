@@ -100,7 +100,7 @@ jobs:
         cd temp
         cmake.exe -G "Visual Studio 16 2019" ..\onevpl -T host=x64 -A x64 -DBUILD_TOOLS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=..\build -DCMAKE_VS_INCLUDE_INSTALL_TO_DEFAULT_BUILD=ON
         MSBuild.exe -t:VPL,INSTALL -p:Configuration=${{ env.winConfig }} -m oneVPL.sln
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd ../build ; tar czf ../dist/libvpl.tgz *'
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd ../build ; rm -rf bin/cmake ; tar czf ../dist/libvpl.tgz *'
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
@@ -403,7 +403,7 @@ jobs:
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
         md build dist
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd build ; for file in `ls ../build_artifacts/**/*.tgz`; do tar -xzf $file; done ; ls -laR ; cd ../nvenc ; make PREFIX=../build install ; cp -a ../amf/amf/public/include ../build/include/AMF ; cd ../ffmpeg ; PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags="${{ env.cFlags }} -I../build/include" --extra-ldflags="-LIBPATH:../build/lib" --prefix=../build --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl --enable-encoder=libvpl --enable-encoder=libsvtav1 --enable-encoder=libsnappy --enable-encoder=libvpx --enable-encoder=libmp3lame --enable-encoder=libzimg --enable-encoder=libopus --enable-encoder=libogg --enable-encoder=libvorbis --enable-encoder=libx264 ; make ; make install ; cd ../build/lib ; for file in *.a; do mv "$file" "`basename "$file" .a`.lib"; done ; rm -rf fdk-aac.lib pkgconfig *.la ../share ; cd .. ; tar czf ../dist/ffmpeg-win64-static-${{ env.msysConfig }}.tar.gz *'
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd build ; for file in `ls ../build_artifacts/**/*.tgz`; do tar -xzf $file; done ;  rf bin/*.dll ; cd ../nvenc ; make PREFIX=../build install ; cp -a ../amf/amf/public/include ../build/include/AMF ; cd ../ffmpeg ; PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags="${{ env.cFlags }} -I../build/include" --extra-ldflags="-LIBPATH:../build/lib" --prefix=../build --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl --enable-encoder=libvpl --enable-encoder=libsvtav1 --enable-encoder=libsnappy --enable-encoder=libvpx --enable-encoder=libmp3lame --enable-encoder=libzimg --enable-encoder=libopus --enable-encoder=libogg --enable-encoder=libvorbis --enable-encoder=libx264 ; make ; make install ; cd ../build/lib ; for file in *.a; do mv "$file" "`basename "$file" .a`.lib"; done ; rm -rf fdk-aac.lib pkgconfig *.la ../share ; cd .. ; tar czf ../dist/ffmpeg-win64-static-${{ env.msysConfig }}.tar.gz *'
     - name: Publish FFmpeg artifacts
       uses: actions/upload-artifact@v3
       with:
