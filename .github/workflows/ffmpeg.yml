@@ -444,7 +444,7 @@ jobs:
         cd x265\build\vc15-x86_64
         mkdir work work10 work12
         cd work12
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cmake -G "Visual Studio 16 2019" ../../../source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON ; MSBuild.exe /property:Configuration="${{ env.winConfig }}" x265-static.vcxproj'
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'mv D:/a/_temp/msys64/usr/bin/nasm.exe D:/a/_temp/msys64/usr/bin/Nasm.exe ; cmake -G "Visual Studio 16 2019" ../../../source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON ; MSBuild.exe /property:Configuration="${{ env.winConfig }}" x265-static.vcxproj'
         
         rem MSBuild.exe /property:Configuration="${{ env.winConfig }}" x265-static.vcxproj
         rem cp ${{ env.winConfig }}/x265-static.lib ../work/x265_12bit.lib
