@@ -7,7 +7,15 @@ on:
         description: 'Configuration'     
         required: true
         default: 'Debug'
-        
+     
+env:
+  vsPath: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\
+  msysConfig: debug
+  winConfig: Debug
+  cFlags: -MDd
+  switches: "--enable-encoder=libvpl --enable-encoder=libsvtav1 --enable-encoder=libsnappy --enable-encoder=libvpx --enable-encoder=libmp3lame --enable-encoder=libzimg --enable-encoder=libopus --enable-encoder=libogg --enable-encoder=libvorbis --enable-encoder=libx264"
+  NASM_EXECUTABLE: nasm
+  
 jobs:
 
   libfdk-aac:
