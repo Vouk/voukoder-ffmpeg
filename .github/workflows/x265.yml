@@ -14,7 +14,7 @@ env:
   winConfig: Debug
   cFlags: -MDd
   switches: "--enable-encoder=libvpl --enable-encoder=libsvtav1 --enable-encoder=libsnappy --enable-encoder=libvpx --enable-encoder=libmp3lame --enable-encoder=libzimg --enable-encoder=libopus --enable-encoder=libogg --enable-encoder=libvorbis --enable-encoder=libx264"
-  NASM_EXECUTABLE: nasm
+
   
 jobs:
 
@@ -43,6 +43,8 @@ jobs:
         repository: videolan/x265
         ref: Release_3.5
         path: x265
+    - name: Set up NASM
+      uses: ilammy/setup-nasm@v1.2.1
     - name: Build X265
       shell: cmd
       run: |
