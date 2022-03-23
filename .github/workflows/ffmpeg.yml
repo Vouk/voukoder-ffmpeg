@@ -411,7 +411,7 @@ jobs:
         path: dist/libfdkaac.tgz
 
   ffmpeg:
-    runs-on: windows-2019
+    runs-on: self-hosted
     #needs: [libvpl,libsvtav1,libsnappy,libvpx,libmp3lame,libzimg,libopus,liboggvorbis,libx264,libfdkaac]
     steps:
     - name: Set up MSYS2
