@@ -423,14 +423,16 @@ jobs:
       run: |
         git config --global core.autocrlf false
         git config --global core.eol lf
+    - name: Checkout patches
+      uses: actions/checkout@v3.0.0
     - name: Checkout FFmpeg
       uses: actions/checkout@v3.0.0
       with:
         repository: FFmpeg/FFmpeg.git
         ref: release/5.0
         path: ffmpeg
-    - name: Checkout NvEnc
-      uses: actions/checkout@v3.0.0
+    #- name: Checkout NvEnc
+    #  uses: actions/checkout@v3.0.0
     #  with:
     #    repository: FFmpeg/nv-codec-headers
     #    ref: sdk/9.1
@@ -441,10 +443,6 @@ jobs:
     #    repository: GPUOpen-LibrariesAndSDKs/AMF
     #    ref: master
     #    path: amf
-    - name: Checkout patches
-      uses: actions/checkout@v3.0.0
-      with:
-        path: patches
     - name: Set up artifacts
       uses: actions/download-artifact@v3
       with:
