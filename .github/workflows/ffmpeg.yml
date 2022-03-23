@@ -431,9 +431,11 @@ jobs:
         repository: GPUOpen-LibrariesAndSDKs/AMF
         ref: master
         path: amf
-    - name: Checkout AMF
+    - name: Checkout patches
       uses: actions/checkout@v3.0.0
       with:
+        repository: Vouk/voukoder-ffmpeg-buildscript
+        ref: master
         path: patches
     - name: Set up artifacts
       uses: actions/download-artifact@v3
