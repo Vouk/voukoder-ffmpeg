@@ -1,21 +1,8 @@
-From 1d2c98204a4609dfc4c41fe522fe89d0a51b37a4 Mon Sep 17 00:00:00 2001
-From: Daniel Stankewitz <daniel.stankewitz@gmail.com>
-Date: Wed, 16 Mar 2022 16:34:11 +0100
-Subject: [PATCH] libfdk patch
-
----
- configure                        |  6 +--
- libavcodec/libfdk-aac_internal.h | 84 ++++++++++++++++++++++++++++++++
- libavcodec/libfdk-aacdec.c       | 33 +++++++++++--
- libavcodec/libfdk-aacenc.c       | 24 ++++++++-
- 4 files changed, 138 insertions(+), 9 deletions(-)
- create mode 100644 libavcodec/libfdk-aac_internal.h
-
 diff --git a/configure b/configure
-index 82642deabe..63ec645b74 100755
+index 7a62f0c248..e4b5dae609 100755
 --- a/configure
 +++ b/configure
-@@ -1784,7 +1784,6 @@ EXTERNAL_LIBRARY_GPL_LIST="
+@@ -1783,7 +1783,6 @@ EXTERNAL_LIBRARY_GPL_LIST="
  
  EXTERNAL_LIBRARY_NONFREE_LIST="
      decklink
@@ -23,15 +10,15 @@ index 82642deabe..63ec645b74 100755
      libtls
  "
  
-@@ -1881,6 +1880,7 @@ EXTERNAL_LIBRARY_LIST="
+@@ -1880,6 +1879,7 @@ EXTERNAL_LIBRARY_LIST="
      openssl
      pocketsphinx
      vapoursynth
-+    libfdk_aac
++	libfdk_aac
  "
  
  HWACCEL_AUTODETECT_LIBRARY_LIST="
-@@ -6518,9 +6518,7 @@ enabled libdav1d          && require_pkg_config libdav1d "dav1d >= 0.5.0" "dav1d
+@@ -6532,9 +6532,7 @@ enabled libdav1d          && require_pkg_config libdav1d "dav1d >= 0.5.0" "dav1d
  enabled libdavs2          && require_pkg_config libdavs2 "davs2 >= 1.6.0" davs2.h davs2_decoder_open
  enabled libdc1394         && require_pkg_config libdc1394 libdc1394-2 dc1394/dc1394.h dc1394_new
  enabled libdrm            && require_pkg_config libdrm libdrm xf86drm.h drmGetVersion
@@ -134,7 +121,7 @@ index 0000000000..9bcfdb9aba
 +#endif /* AVCODEC_LIBFDK_AAC_INTERNAL_H */
 \ No newline at end of file
 diff --git a/libavcodec/libfdk-aacdec.c b/libavcodec/libfdk-aacdec.c
-index d7b84015be..b9ef581250 100644
+index ffa1fdcce3..ebf6350b41 100644
 --- a/libavcodec/libfdk-aacdec.c
 +++ b/libavcodec/libfdk-aacdec.c
 @@ -24,6 +24,7 @@
@@ -149,12 +136,12 @@ index d7b84015be..b9ef581250 100644
  typedef struct FDKAACDecContext {
      const AVClass *class;
      HANDLE_AACDECODER handle;
-+    void *hLib;
++	void *hLib;
 +    aacDecLib pfn;
      uint8_t *decoder_buffer;
      int decoder_buffer_size;
      uint8_t *anc_buffer;
-@@ -112,7 +115,7 @@ static const AVClass fdk_aac_dec_class = {
+@@ -101,7 +104,7 @@ static const AVClass fdk_aac_dec_class = {
  static int get_stream_info(AVCodecContext *avctx)
  {
      FDKAACDecContext *s   = avctx->priv_data;
@@ -163,7 +150,7 @@ index d7b84015be..b9ef581250 100644
      int channel_counts[0x24] = { 0 };
      int i, ch_error       = 0;
      uint64_t ch_layout    = 0;
-@@ -230,8 +233,10 @@ static av_cold int fdk_aac_decode_close(AVCodecContext *avctx)
+@@ -216,8 +219,10 @@ static av_cold int fdk_aac_decode_close(AVCodecContext *avctx)
  {
      FDKAACDecContext *s = avctx->priv_data;
  
@@ -176,7 +163,7 @@ index d7b84015be..b9ef581250 100644
      av_freep(&s->decoder_buffer);
      av_freep(&s->anc_buffer);
  
-@@ -243,6 +248,28 @@ static av_cold int fdk_aac_decode_init(AVCodecContext *avctx)
+@@ -229,6 +234,27 @@ static av_cold int fdk_aac_decode_init(AVCodecContext *avctx)
      FDKAACDecContext *s = avctx->priv_data;
      AAC_DECODER_ERROR err;
  
@@ -201,12 +188,11 @@ index d7b84015be..b9ef581250 100644
 +    DLSYM(aacDecoder_AncDataInit);
 +#define aacDecoder_AncDataInit s->pfn.aacDecoder_AncDataInit
 +
-+
      s->handle = aacDecoder_Open(avctx->extradata_size ? TT_MP4_RAW : TT_MP4_ADTS, 1);
      if (!s->handle) {
          av_log(avctx, AV_LOG_ERROR, "Error opening decoder\n");
 diff --git a/libavcodec/libfdk-aacenc.c b/libavcodec/libfdk-aacenc.c
-index 936049f12b..36f73af933 100644
+index 7ee2f13ac7..ff604671a6 100644
 --- a/libavcodec/libfdk-aacenc.c
 +++ b/libavcodec/libfdk-aacenc.c
 @@ -26,6 +26,7 @@
@@ -258,8 +244,6 @@ index 936049f12b..36f73af933 100644
 +    DLSYM(aacEncoder_SetParam);
 +#define aacEncoder_SetParam s->pfn.aacEncoder_SetParam
 +
-     if ((err = aacEncOpen(&s->handle, 0, avctx->ch_layout.nb_channels)) != AACENC_OK) {
+     if ((err = aacEncOpen(&s->handle, 0, avctx->channels)) != AACENC_OK) {
          av_log(avctx, AV_LOG_ERROR, "Unable to open the encoder: %s\n",
                 aac_get_error(err));
--- 
-2.29.2
