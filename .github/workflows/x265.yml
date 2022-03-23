@@ -1,0 +1,59 @@
+name: X265
+
+on:
+  workflow_dispatch:
+    inputs:
+      config:
+        description: 'Configuration'     
+        required: true
+        default: 'Debug'
+     
+env:
+  vsPath: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\
+  msysConfig: debug
+  winConfig: Debug
+  cFlags: -MDd
+  switches: "--enable-encoder=libvpl --enable-encoder=libsvtav1 --enable-encoder=libsnappy --enable-encoder=libvpx --enable-encoder=libmp3lame --enable-encoder=libzimg --enable-encoder=libopus --enable-encoder=libogg --enable-encoder=libvorbis --enable-encoder=libx264"
+  NASM_EXECUTABLE: nasm
+  
+jobs:
+
+  x265:
+    runs-on: windows-2019
+    steps:
+    - name: Set up MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
+        path-type: inherit
+    - name: Set up cache
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-ffmpeg-${{ env.msysConfig }}
+      with:
+        path: cache
+        key: cache-key
+    - name: Set up GIT
+      run: |
+        git config --global core.autocrlf false
+        git config --global core.eol lf
+    - name: Checkout FDK AAC
+      uses: actions/checkout@v3.0.0
+      with:
+        repository: videolan/x265
+        ref: Release_3.5
+        path: x265
+    - name: Build X265
+      shell: cmd
+      run: |
+        call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
+        md build dist
+        cd x265/build/vc15-x86_64
+        md work12
+        cd work12
+        cmake -G "Visual Studio 15 Win64" ..\..\..\source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON
+    - name: Publish artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: libfdkaac
+        path: dist/libfdkaac.tgz
