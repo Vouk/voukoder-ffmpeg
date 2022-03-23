@@ -51,7 +51,7 @@ jobs:
         cd x265/build/vc15-x86_64
         md work12
         cd work12
-        cmake -G "Visual Studio 15 Win64" ..\..\..\source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON
+        cmake -G "Visual Studio 16 2019" ..\..\..\source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
