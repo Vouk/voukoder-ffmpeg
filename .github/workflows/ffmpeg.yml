@@ -451,7 +451,7 @@ jobs:
       shell: cmd
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd ffmpeg ; git apply --ignore-whitespace --verbose ../patches/0003-dynamic-loading-of-shared-fdk-aac-library-5.0.patch'
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd ffmpeg ; git apply --ignore-whitespace --verbose ../patches/0003-dynamic-loading-of-shared-fdk-aac-library-5.0.patch ; pwd ; dir'
         cd
         dir
         md build dist
