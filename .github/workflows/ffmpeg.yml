@@ -452,7 +452,7 @@ jobs:
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
         md build dist
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd ffmpeg ; git apply --ignore-whitespace --verbose ../patches/0003-dynamic-loading-of-shared-fdk-aac-library-5.0.patch ; cd ../build ; for file in `ls ../build_artifacts/**/*.tgz`; do tar -xzvf $file; done ;'
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'ls -la ; ls -laR build_artifacts ; cd ffmpeg ; git apply --ignore-whitespace --verbose ../patches/0003-dynamic-loading-of-shared-fdk-aac-library-5.0.patch ; cd ../build ; for file in `ls ../build_artifacts/**/*.tgz`; do tar -xzvf $file; done ;'
     - name: Publish FFmpeg artifacts
       uses: actions/upload-artifact@v3
       with:
