@@ -21,18 +21,18 @@ jobs:
   x265-12:
     runs-on: windows-2019
     steps:
-    - name: Set up MSYS2
-      uses: msys2/setup-msys2@v2
-      with:
-        install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
-        path-type: inherit
-    - name: Set up cache
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-ffmpeg-${{ env.msysConfig }}
-      with:
-        path: cache
-        key: cache-key
+#    - name: Set up MSYS2
+#      uses: msys2/setup-msys2@v2
+#      with:
+#        install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
+#        path-type: inherit
+#    - name: Set up cache
+#      uses: actions/cache@v2
+#      env:
+#        cache-name: cache-ffmpeg-${{ env.msysConfig }}
+#      with:
+#        path: cache
+#        key: cache-key
     - name: Set up GIT
       run: |
         git config --global core.autocrlf false
@@ -41,7 +41,7 @@ jobs:
       uses: actions/checkout@v3.0.0
       with:
         repository: videolan/x265
-        ref: stable
+        ref: Release_3.5
         path: x265
     #- name: Set up NASM
     #  uses: ilammy/setup-nasm@v1.2.1
@@ -53,7 +53,8 @@ jobs:
         cd x265/build/vc15-x86_64
         md work12
         cd work12
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'which cmake ; cmake -G "Visual Studio 16 2019" ../../../source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON ; echo done'
+        cmake -G "Visual Studio 16 2019" ..\..\..\source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON
+        rem D:\a\_temp\setup-msys2\msys2.cmd -c 'cmake -G "Visual Studio 16 2019" ../../../source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON'
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
