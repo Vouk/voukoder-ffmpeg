@@ -9,7 +9,7 @@ on:
         default: 'Debug'
      
 env:
-  vsPath: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\
+  vsPath: C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\
   msysConfig: debug
   winConfig: Debug
   cFlags: -MDd
@@ -19,7 +19,7 @@ env:
 jobs:
 
   x265-12:
-    runs-on: windows-2019
+    runs-on: windows-2016
     steps:
 #    - name: Set up MSYS2
 #      uses: msys2/setup-msys2@v2
@@ -53,10 +53,10 @@ jobs:
         cd x265/build/vc15-x86_64
         md work12
         cd work12
-        cmake -G "Visual Studio 16 2019" ..\..\..\source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON
+        cmake -G "Visual Studio 15 x64" ..\..\..\source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON
         rem D:\a\_temp\setup-msys2\msys2.cmd -c 'cmake -G "Visual Studio 16 2019" ../../../source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON'
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
-        name: libfdkaac
-        path: dist/libfdkaac.tgz
+        name: libx265
+        path: dist/libx265.tgz
