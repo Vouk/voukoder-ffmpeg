@@ -43,8 +43,8 @@ jobs:
         repository: videolan/x265
         ref: Release_3.5
         path: x265
-    #- name: Set up NASM
-    #  uses: ilammy/setup-nasm@v1.2.1
+    - name: Set up NASM
+      uses: ilammy/setup-nasm@v1.2.1
     - name: Build X265
       shell: cmd
       run: |
