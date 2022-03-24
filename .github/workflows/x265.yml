@@ -37,7 +37,7 @@ jobs:
       run: |
         git config --global core.autocrlf false
         git config --global core.eol lf
-    - name: Checkout FDK AAC
+    - name: Checkout X265
       uses: actions/checkout@v3.0.0
       with:
         repository: videolan/x265
@@ -53,7 +53,7 @@ jobs:
         cd x265/build/vc15-x86_64
         md work12
         cd work12
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cmake -G "Visual Studio 16 2019" ../../../source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON ; echo done'
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cmake -G "which cmake ; Visual Studio 16 2019" ../../../source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON ; echo done'
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
