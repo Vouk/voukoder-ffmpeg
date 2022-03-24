@@ -96,7 +96,7 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         path: build
-    - name: Build X265 (10 bit)
+    - name: Build X265
       shell: cmd
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
