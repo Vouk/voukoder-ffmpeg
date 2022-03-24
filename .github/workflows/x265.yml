@@ -37,11 +37,11 @@ jobs:
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
         md build dist
         cd x265/build/vc15-x86_64
-        md work12
-        cd work12
+        md work
+        cd work
         cmake -G "Visual Studio 16 2019" ..\..\..\source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON
         MSBuild.exe /property:Configuration="${{ env.winConfig }}" x265-static.vcxproj
-        move ${{ env.winConfig }}/x265-static.lib dist/x265_12bit.lib
+        move ${{ env.winConfig }}\x265-static.lib dist\x265_12bit.lib
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
