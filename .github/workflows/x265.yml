@@ -26,7 +26,7 @@ jobs:
       run: |
         git config --global core.autocrlf false
         git config --global core.eol lf
-        git clone -b Release_3.5 https://github.com/videolan/x265/tree/Release_3.5 x265
+        git clone -b Release_3.5 https://github.com/videolan/x265.git x265
     - name: Set up NASM
       uses: ilammy/setup-nasm@v1.2.1
     - name: Build X265 (12 bit)
