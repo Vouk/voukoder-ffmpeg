@@ -38,9 +38,10 @@ jobs:
         md work12
         cd work12
         cmake -G "Visual Studio 16 2019" ..\..\..\source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON
-        rem D:\a\_temp\setup-msys2\msys2.cmd -c 'cmake -G "Visual Studio 16 2019" ../../../source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON'
+        MSBuild.exe /property:Configuration="${{ env.winConfig }}" x265-static.vcxproj
+        move ${{ env.winConfig }}/x265-static.lib dist/x265_12bit.lib
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
-        name: libx265-12
-        path: dist/libx265.tgz
+        name: x265_12bit
+        path: dist/x265_12bit.tgz
