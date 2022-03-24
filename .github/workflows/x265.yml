@@ -18,7 +18,7 @@ env:
   
 jobs:
 
-  x265-12:
+  libx265-12:
     runs-on: windows-2019
     steps:
     - name: Set up MSBuild
@@ -41,9 +41,76 @@ jobs:
         cd work
         cmake -G "Visual Studio 16 2019" ..\..\..\source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON
         MSBuild.exe /property:Configuration="${{ env.winConfig }}" x265-static.vcxproj
-        move ${{ env.winConfig }}\x265-static.lib dist\x265_12bit.lib
+        move ${{ env.winConfig }}\x265-static.lib ..\..\..\..\dist\x265_12bit.lib
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
         name: x265_12bit
         path: dist/x265_12bit.tgz
+
+  libx265-10:
+    runs-on: windows-2019
+    steps:
+    - name: Set up MSBuild
+      uses: microsoft/setup-msbuild@v1.1
+    - name: Set up NASM
+      uses: ilammy/setup-nasm@v1.2.1
+    - name: Checkout X265
+      shell: cmd
+      run: |
+        git config --global core.autocrlf false
+        git config --global core.eol lf
+        git clone -b Release_3.5 https://github.com/videolan/x265.git x265
+    - name: Build X265 (10 bit)
+      shell: cmd
+      run: |
+        call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
+        md build dist
+        cd x265/build/vc15-x86_64
+        md work
+        cd work
+        cmake -G "Visual Studio 16 2019" ..\..\..\source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF
+        MSBuild.exe /property:Configuration="${{ env.winConfig }}" x265-static.vcxproj
+        move ${{ env.winConfig }}\x265-static.lib ..\..\..\..\dist\x265_10bit.lib
+    - name: Publish artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: x265_10bit
+        path: dist/x265_10bit.lib
+
+  libx265:
+    runs-on: windows-2019
+    needs: [libx265-12,libx265-10]
+    steps:
+    - name: Set up MSBuild
+      uses: microsoft/setup-msbuild@v1.1
+    - name: Set up NASM
+      uses: ilammy/setup-nasm@v1.2.1
+    - name: Checkout X265
+      shell: cmd
+      run: |
+        git config --global core.autocrlf false
+        git config --global core.eol lf
+        git clone -b Release_3.5 https://github.com/videolan/x265.git x265
+    - name: Set up artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: build_artifacts
+    - name: Build X265 (10 bit)
+      shell: cmd
+      run: |
+        call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
+        md build dist
+        cd x265/build/vc15-x86_64
+        md work
+        cd work
+        cmake -G "Visual Studio 15 Win64" ../../../source -DCMAKE_INSTALL_PREFIX=$BUILD -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DEXTRA_LIB="x265_10bit.lib;x265_12bit.lib" -DLINKED_10BIT=ON -DLINKED_12BIT=ON
+        
+        cmake -G "Visual Studio 16 2019" ..\..\..\source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF
+        MSBuild.exe /property:Configuration="${{ env.winConfig }}" x265-static.vcxproj
+        move ${{ env.winConfig }}\x265-static.lib dist\x265_10bit.lib
+    - name: Publish artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: x265_10bit
+        path: dist/x265_10bit.lib
