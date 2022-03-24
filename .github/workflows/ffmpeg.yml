@@ -401,7 +401,6 @@ jobs:
         path: dist/libfdkaac.tgz
 
   libx265-12:
-    if: ${{false}}
     runs-on: windows-2019
     steps:
     - name: Set up MSBuild
@@ -432,7 +431,6 @@ jobs:
         path: dist/x265_12bit.lib
 
   libx265-10:
-    if: ${{false}}
     runs-on: windows-2019
     steps:
     - name: Set up MSBuild
@@ -500,12 +498,12 @@ jobs:
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
-        name: x265_10bit
-        path: dist/x265_10bit.lib
+        name: x265
+        path: dist/x265.lib
 
   ffmpeg:
     runs-on: windows-2019
-    needs: [libopus,libvpl,libsvtav1,libsnappy,libvpx,libmp3lame,libzimg,liboggvorbis,libx264,libfdkaac]
+    needs: [libopus,libvpl,libsvtav1,libsnappy,libvpx,libmp3lame,libzimg,liboggvorbis,libx264,libx265,libfdkaac]
     steps:
     - name: Set up MSYS2
       uses: msys2/setup-msys2@v2
