@@ -13,7 +13,7 @@ env:
   msysConfig: debug
   winConfig: Debug
   cFlags: -MDd
-  switches: "--enable-libsvtav1 --enable-libsnappy --enable-libvpx --enable-libmp3lame --enable-libzimg --enable-libopus --enable-libogg --enable-libvorbis --enable-libx264 --enable-libx265 --enable-libfdk-aac" #--enable-libvpl
+  switches: "--enable-libsvtav1 --enable-libsnappy --enable-libvpx --enable-libmp3lame --enable-libzimg --enable-libopus --enable-libvorbis --enable-libx264 --enable-libx265 --enable-libfdk-aac" #--enable-libvpl
   NASM_EXECUTABLE: nasm
   
 jobs:
