@@ -26,7 +26,7 @@ jobs:
         install: base-devel binutils autotools automake
         path-type: inherit
     - name: Set up cache
-      uses: actions/cache@v2
+      uses: actions/cache@v1
       with:
         key: ffmpeg-build
         path: build
@@ -57,7 +57,7 @@ jobs:
         install: base-devel binutils autotools automake
         path-type: inherit
     - name: Set up cache
-      uses: actions/cache@v2
+      uses: actions/cache@v1
       with:
         key: ffmpeg-build
         path: build
@@ -87,7 +87,7 @@ jobs:
         install: base-devel binutils autotools automake
         path-type: inherit
     - name: Set up cache
-      uses: actions/cache@v2
+      uses: actions/cache@v1
       with:
         key: ffmpeg-build
         path: build
@@ -120,7 +120,7 @@ jobs:
         install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
         path-type: inherit
     - name: Set up cache
-      uses: actions/cache@v2
+      uses: actions/cache@v1
       with:
         key: ffmpeg-build
         path: build
@@ -150,7 +150,7 @@ jobs:
         install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
         path-type: inherit
     - name: Set up cache
-      uses: actions/cache@v2
+      uses: actions/cache@v1
       with:
         key: ffmpeg-build
         path: build
@@ -185,7 +185,7 @@ jobs:
         install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
         path-type: inherit
     - name: Set up cache
-      uses: actions/cache@v2
+      uses: actions/cache@v1
       with:
         key: ffmpeg-build
         path: build
@@ -215,7 +215,7 @@ jobs:
         install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm svn
         path-type: inherit
     - name: Set up cache
-      uses: actions/cache@v2
+      uses: actions/cache@v1
       with:
         key: ffmpeg-build
         path: build
@@ -235,7 +235,7 @@ jobs:
         install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
         path-type: inherit
     - name: Set up cache
-      uses: actions/cache@v2
+      uses: actions/cache@v1
       with:
         key: ffmpeg-build
         path: build
@@ -265,7 +265,7 @@ jobs:
         install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
         path-type: inherit
     - name: Set up cache
-      uses: actions/cache@v2
+      uses: actions/cache@v1
       with:
         key: ffmpeg-build
         path: build
@@ -297,7 +297,7 @@ jobs:
         install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
         path-type: inherit
     - name: Set up cache
-      uses: actions/cache@v2
+      uses: actions/cache@v1
       with:
         key: ffmpeg-build
         path: build
@@ -327,7 +327,7 @@ jobs:
         install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
         path-type: inherit
     - name: Set up cache
-      uses: actions/cache@v2
+      uses: actions/cache@v1
       with:
         key: ffmpeg-build
         path: build
@@ -352,7 +352,7 @@ jobs:
     runs-on: windows-2019
     steps:
     - name: Set up cache
-      uses: actions/cache@v2
+      uses: actions/cache@v1
       with:
         key: ffmpeg-build
         path: build
@@ -382,7 +382,7 @@ jobs:
     runs-on: windows-2019
     steps:
     - name: Set up cache
-      uses: actions/cache@v2
+      uses: actions/cache@v1
       with:
         key: ffmpeg-build
         path: build	
@@ -413,7 +413,7 @@ jobs:
     needs: [libx265-12,libx265-10]
     steps:
     - name: Set up cache
-      uses: actions/cache@v2
+      uses: actions/cache@v1
       with:
         key: ffmpeg-build
         path: build
@@ -454,7 +454,7 @@ jobs:
     needs: [libopus,libvpl,libsvtav1,libsnappy,libvpx,libmp3lame,libzimg,libvorbis,libx264,libx265,libfdkaac]
     steps:
     - name: Set up cache
-      uses: actions/cache@v2
+      uses: actions/cache@v1
       with:
         key: ffmpeg-build
         path: build
