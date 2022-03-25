@@ -54,7 +54,7 @@ jobs:
 
   libvorbis:
     runs-on: windows-2019
-	needs: [libogg]
+    needs: [libogg]
     steps:
     - name: Set up MSYS2
       uses: msys2/setup-msys2@v2
