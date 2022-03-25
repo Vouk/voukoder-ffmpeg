@@ -100,13 +100,14 @@ jobs:
       shell: cmd
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
-        md dist
+        md build dist
         cd x265/build/vc15-x86_64
         md work
         cd work
         cmake -G "Visual Studio 16 2019" ..\..\..\source -DCMAKE_INSTALL_PREFIX=..\..\..\..\build -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DEXTRA_LIB="libx265_10bit.lib;libx265_12bit.lib" -DLINKED_10BIT=ON -DLINKED_12BIT=ON
         MSBuild.exe /property:Configuration="${{ env.winConfig }}" x265-static.vcxproj
-        ${{ env.vsPath }}Tools\MSVC\14.29.30133\bin\Hostx64\x64\lib.exe /ignore:4006 /ignore:4221 /OUT:..\..\..\..\dist\x265.lib ${{ env.winConfig }}\x265-static.lib ..\..\..\..\build\x265_10bit\libx265_10bit.lib ..\..\..\..\build\x265_12bit\libx265_12bit.lib
+        dir "${{ env.vsPath }}Tools\MSVC"
+        "${{ env.vsPath }}Tools\MSVC\14.29.30133\bin\Hostx64\x64\lib.exe" /ignore:4006 /ignore:4221 /OUT:..\..\..\..\dist\x265.lib ${{ env.winConfig }}\x265-static.lib ..\..\..\..\build\x265_10bit\libx265_10bit.lib ..\..\..\..\build\x265_12bit\libx265_12bit.lib
         cp x265.pc ..\..\..\..\build\lib\pkgconfig\x265.pc
         cp x265_config.h ..\..\..\..\build\include
         cp ..\..\..\source\x265.h ..\..\..\..\build\lib\include
