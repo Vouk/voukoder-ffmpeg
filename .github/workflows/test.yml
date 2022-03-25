@@ -1,0 +1,60 @@
+name: X265
+
+on:
+  workflow_dispatch:
+    inputs:
+      config:
+        description: 'Configuration'     
+        required: true
+        default: 'Debug'
+     
+env:
+  vsPath: C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\
+  msysConfig: debug
+  winConfig: Debug
+  cFlags: -MDd
+  switches: "--enable-encoder=libvpl --enable-encoder=libsvtav1 --enable-encoder=libsnappy --enable-encoder=libvpx --enable-encoder=libmp3lame --enable-encoder=libzimg --enable-encoder=libopus --enable-encoder=libogg --enable-encoder=libvorbis --enable-encoder=libx264"
+ 
+jobs:
+
+  libx265:
+    runs-on: windows-2019
+    needs: [libx265-12,libx265-10]
+    steps:
+    - name: Set up MSBuild
+      uses: microsoft/setup-msbuild@v1.1
+    - name: Set up NASM
+      uses: ilammy/setup-nasm@v1.2.1
+    - name: Checkout X265
+      shell: cmd
+      run: |
+        git config --global core.autocrlf false
+        git config --global core.eol lf
+        git clone -b Release_3.5 https://github.com/videolan/x265.git x265
+    - name: Set up dependant libs
+      uses: actions/download-artifact@v3
+      with:
+        path: build
+    - name: Build X265
+      shell: cmd
+      run: |
+        call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
+        md build dist
+        cd x265/build/vc15-x86_64
+        md work
+        cd work
+        rem cmake -G "Visual Studio 16 2019" ..\..\..\source -DCMAKE_INSTALL_PREFIX=..\..\..\..\build -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DEXTRA_LIB="libx265_10bit.lib;libx265_12bit.lib" -DLINKED_10BIT=ON -DLINKED_12BIT=ON
+        rem MSBuild.exe /property:Configuration="${{ env.winConfig }}" x265-static.vcxproj
+        echo "${{ env.vsPath }}Tools\MSVC"
+        dir "${{ env.vsPath }}Tools\MSVC"
+        "${{ env.vsPath }}Tools\MSVC\14.29.30133\bin\Hostx64\x64\lib.exe" /ignore:4006 /ignore:4221 /OUT:..\..\..\..\dist\x265.lib ${{ env.winConfig }}\x265-static.lib ..\..\..\..\build\x265_10bit\libx265_10bit.lib ..\..\..\..\build\x265_12bit\libx265_12bit.lib
+        cp x265.pc ..\..\..\..\build\lib\pkgconfig\x265.pc
+        cp x265_config.h ..\..\..\..\build\include
+        cp ..\..\..\source\x265.h ..\..\..\..\build\lib\include
+        cd ..\..\..\..\build
+        rem tgz
+    - name: Publish artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: x265
+        path: dist/x265.lib
