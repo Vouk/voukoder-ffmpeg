@@ -46,11 +46,6 @@ jobs:
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
         md build
         D:\a\_temp\setup-msys2\msys2.cmd -c 'cd ogg ; autoreconf -i ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) --disable-shared ; make -j ; make install'
-#    - name: Publish artifact
-#      uses: actions/upload-artifact@v2
-#      with:
-#        name: liboggvorbis
-#        path: dist/liboggvorbis.tgz
 
   libvorbis:
     runs-on: windows-2019
