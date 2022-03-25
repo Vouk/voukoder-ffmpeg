@@ -24,12 +24,6 @@ jobs:
       uses: microsoft/setup-msbuild@v1.1
     - name: Set up NASM
       uses: ilammy/setup-nasm@v1.2.1
-    - name: Checkout X265
-      shell: cmd
-      run: |
-        git config --global core.autocrlf false
-        git config --global core.eol lf
-        git clone -b Release_3.5 https://github.com/videolan/x265.git x265
     - name: Set up dependant libs
       uses: actions/download-artifact@v3
       with:
@@ -42,7 +36,7 @@ jobs:
         cd x265/build/vc15-x86_64
         md work
         cd work
-        dir "${{ env.vsPath }}"
+        dir "${{ env.vsPath }}VC\Tools"
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
