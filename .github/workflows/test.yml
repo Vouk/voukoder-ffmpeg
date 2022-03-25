@@ -36,7 +36,7 @@ jobs:
         cd x265/build/vc15-x86_64
         md work
         cd work
-        dir "${{ env.vsPath }}VC\Tools"
+        dir "${{ env.vsPath }}VC\Tools\MSVC"
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
