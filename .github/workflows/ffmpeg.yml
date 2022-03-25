@@ -461,7 +461,6 @@ jobs:
         path: dist/x265_10bit.lib
 
   libx265:
-    if: ${{false}}
     runs-on: windows-2019
     needs: [libx265-12,libx265-10]
     steps:
