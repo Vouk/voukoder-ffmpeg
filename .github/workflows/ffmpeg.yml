@@ -10,9 +10,9 @@ on:
         
 env:
   vsPath: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\
-  msysConfig: debug
-  winConfig: Debug
-  cFlags: -MDd
+  msysConfig: release
+  winConfig: Release
+  cFlags: -MD
   switches: "--enable-libsvtav1 --enable-libsnappy --enable-libvpx --enable-libmp3lame --enable-libzimg --enable-libopus --enable-libvorbis --enable-libx264 --enable-libx265 --enable-libfdk-aac" #--enable-libvpl
   NASM_EXECUTABLE: nasm
   
