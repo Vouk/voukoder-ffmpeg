@@ -111,17 +111,12 @@ jobs:
         cd work
         cmake -G "Visual Studio 16 2019" ..\..\..\source -DCMAKE_INSTALL_PREFIX=..\..\..\..\build -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DEXTRA_LIB="libx265_10bit.lib;libx265_12bit.lib" -DLINKED_10BIT=ON -DLINKED_12BIT=ON
         MSBuild.exe /property:Configuration="${{ env.winConfig }}" x265-static.vcxproj
-        echo -3
         cp x265.pc ..\..\..\..\dist\lib\pkgconfig\x265.pc
-        echo -2
         move ${{ env.winConfig }}\x265-static.lib ..\..\..\..\build\
-        echo -1
         move x265_config.h ..\..\..\..\dist\include\
         cd ..\..\..\..
-        echo 0
         "${{ env.vsPath }}VC\Tools\MSVC\14.29.30133\bin\Hostx64\x64\lib.exe" /ignore:4006 /ignore:4221 /OUT:dist\lib\x265.lib build\x265-static.lib build\x265_10bit\x265_10bit.lib build\x265_12bit\x265_12bit.lib
-        echo 1
-        copy source/x265.h dist/include/
+        copy source\x265.h dist\include\
         dir /s dist
         D:\a\_temp\setup-msys2\msys2.cmd -c 'cd dist ; tar czf ../libx265.tgz *'
     - name: Publish artifact
