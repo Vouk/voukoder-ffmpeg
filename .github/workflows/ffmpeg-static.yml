@@ -79,6 +79,7 @@ jobs:
     - name: Build Vorbis
       shell: cmd
       run: |
+        dir /s build
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
         D:\a\_temp\setup-msys2\msys2.cmd -c 'cd vorbis ; autoreconf -i ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) --disable-shared ; make -j ; make install ; sed -i '/^Libs\.private.*/d' ../build/lib/pkgconfig/vorbis.pc'
         
