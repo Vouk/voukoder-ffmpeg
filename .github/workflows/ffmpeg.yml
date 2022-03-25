@@ -13,7 +13,7 @@ env:
   msysConfig: debug
   winConfig: Debug
   cFlags: -MDd
-  switches: "--enable-encoder=libvpl --enable-encoder=libsvtav1 --enable-encoder=libsnappy --enable-encoder=libvpx --enable-encoder=libmp3lame --enable-encoder=libzimg --enable-encoder=libopus --enable-encoder=libogg --enable-encoder=libvorbis --enable-encoder=libx264 --enable-encoder=libfdk-aac"
+  switches: "--enable-encoder=libvpl --enable-encoder=libsvtav1 --enable-encoder=libsnappy --enable-encoder=libvpx --enable-encoder=libmp3lame --enable-encoder=libzimg --enable-encoder=libopus --enable-encoder=libogg --enable-encoder=libvorbis --enable-encoder=libx264 --enable-encoder=libx265 --enable-encoder=libfdk-aac"
   NASM_EXECUTABLE: nasm
   
 jobs:
@@ -464,6 +464,11 @@ jobs:
     runs-on: windows-2019
     needs: [libx265-12,libx265-10]
     steps:
+    - name: Set up MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        install: base-devel binutils autotools automake
+        path-type: inherit
     - name: Set up MSBuild
       uses: microsoft/setup-msbuild@v1.1
     - name: Set up NASM
@@ -482,23 +487,25 @@ jobs:
       shell: cmd
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
-        md dist
+        md dist dist\include dist\lib dist\lib\pkgconfig
         cd x265/build/vc15-x86_64
         md work
         cd work
         cmake -G "Visual Studio 16 2019" ..\..\..\source -DCMAKE_INSTALL_PREFIX=..\..\..\..\build -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DEXTRA_LIB="libx265_10bit.lib;libx265_12bit.lib" -DLINKED_10BIT=ON -DLINKED_12BIT=ON
         MSBuild.exe /property:Configuration="${{ env.winConfig }}" x265-static.vcxproj
-        LIB.EXE /ignore:4006 /ignore:4221 /OUT:..\..\..\..\dist\x265.lib ${{ env.winConfig }}\x265-static.lib ..\..\..\..\build\libx265_10bit.lib ..\..\..\..\build\libx265_12bit.lib
-        cp x265.pc ..\..\..\..\build\lib\pkgconfig\x265.pc
-        cp x265_config.h ..\..\..\..\build\include
-        cp ..\..\..\source\x265.h ..\..\..\..\build\lib\include
-        cd ..\..\..\..\build
-        rem tgz
+        cp x265.pc ..\..\..\..\dist\lib\pkgconfig\x265.pc
+        move ${{ env.winConfig }}\x265-static.lib ..\..\..\..\build\
+        move x265_config.h ..\..\..\..\dist\include\
+        cd ..\..\..\..
+        "${{ env.vsPath }}VC\Tools\MSVC\14.29.30133\bin\Hostx64\x64\lib.exe" /ignore:4006 /ignore:4221 /OUT:dist\lib\x265.lib build\x265-static.lib build\x265_10bit\x265_10bit.lib build\x265_12bit\x265_12bit.lib
+        copy x265\source\x265.h dist\include\
+        dir /s dist
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd dist ; tar czf ../libx265.tgz *'
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
-        name: x265
-        path: dist/x265.lib
+        name: libx265
+        path: libx265.tgz
 
   ffmpeg:
     runs-on: windows-2019
