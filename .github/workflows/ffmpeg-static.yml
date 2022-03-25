@@ -451,10 +451,9 @@ jobs:
         cd ..\..\..\..\build\lib
         "${{ env.vsPath }}VC\Tools\MSVC\14.29.30133\bin\Hostx64\x64\lib.exe" /ignore:4006 /ignore:4221 /OUT:x265.lib x265-static.lib x265_10bit.lib x265_12bit.lib
         copy ..\..\x265\source\x265.h ..\..\dist\include\
-		rm build\lib\x265_10bit.lib
-		rm build\lib\x265_12bit.lib
+	rm build\lib\x265_10bit.lib build\lib\x265_12bit.lib
 
-  ffmpeg:
+ffmpeg:
     runs-on: windows-2019
     needs: [libopus,libvpl,libsvtav1,libsnappy,libvpx,libmp3lame,libzimg,liboggvorbis,libx264,libx265,libfdkaac]
     steps:
