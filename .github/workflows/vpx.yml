@@ -27,12 +27,7 @@ jobs:
       run: |
         git config --global core.autocrlf false
         git config --global core.eol lf
-    - name: Checkout LibVpx
-      uses: actions/checkout@v3.0.0
-      with:
-        repository: webmproject/libvpx
-        ref: master
-        path: vpx
+        git clone https://github.com/webmproject/libvpx.git vpx
     - name: Check cache
       id: libvpx-cache
       uses: actions/cache@v3
