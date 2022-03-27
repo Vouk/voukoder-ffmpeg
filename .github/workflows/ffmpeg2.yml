@@ -549,7 +549,7 @@ jobs:
 
   ffmpeg:
     runs-on: windows-2022
-    needs: [libopus,libvpl,libsvtav1,libsnappy,libvpx,libmp3lame,libzimg,liboggvorbis,libx264,libx265,libfdkaac]
+    needs: [libopus,libvpl,libsvtav1,libsnappy,libmp3lame,libzimg,liboggvorbis,libx264,libx265,libfdkaac]
     steps:
     - name: Set up MSYS2
       uses: msys2/setup-msys2@v2
