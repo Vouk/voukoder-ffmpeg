@@ -1,4 +1,4 @@
-name: FFmpeg (v143)
+name: vpx
 
 on:
   workflow_dispatch:
