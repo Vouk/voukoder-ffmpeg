@@ -12,7 +12,7 @@ on:
         
 env:
   vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
-  switches: "--enable-libsvtav1 --enable-libsnappy --enable-libvpx --enable-libmp3lame --enable-libzimg --enable-libopus --enable-libvorbis --enable-libx264 --enable-libx265 --enable-libfdk-aac" #--enable-libvpl
+  switches: "--enable-libsvtav1 --enable-libsnappy --enable-libmp3lame --enable-libzimg --enable-libopus --enable-libvorbis --enable-libx264 --enable-libx265 --enable-libfdk-aac" #--enable-libvpl --enable-libvpx
   NASM_EXECUTABLE: nasm
   msysConfig: Release
   winConfig: release
@@ -190,6 +190,7 @@ jobs:
 
   libvpx:
     runs-on: windows-2022
+    if: ${{false}}
     steps:
     - name: Set up MSYS2
       uses: msys2/setup-msys2@v2
@@ -368,18 +369,6 @@ jobs:
   libfdkaac:
     runs-on: windows-2022
     steps:
-    - name: Set up MSYS2
-      uses: msys2/setup-msys2@v2
-      with:
-        install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
-        path-type: inherit
-    - name: Set up cache
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-ffmpeg-${{ env.msysConfig }}
-      with:
-        path: cache
-        key: cache-key
     - name: Set up GIT
       run: |
         git config --global core.autocrlf false
@@ -390,7 +379,20 @@ jobs:
         repository: mstorsjo/fdk-aac
         ref: master
         path: fdkaac
+    - name: Check cache for LIBFDK
+      id: libfdkaac-cache
+      uses: actions/cache@v3
+      with:
+        path: dist
+        key: ${{ env.msysConfig }}-${{ hashFiles('fdkaac') }}
+    - name: Set up MSYS2
+      if: steps.libfdkaac-cache.outputs.cache-hit != 'true'
+      uses: msys2/setup-msys2@v2
+      with:
+        install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
+        path-type: inherit
     - name: Build FDK AAC
+      if: steps.libfdkaac-cache.outputs.cache-hit != 'true'
       shell: cmd
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
