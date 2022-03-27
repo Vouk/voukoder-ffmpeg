@@ -22,18 +22,6 @@ jobs:
   liboggvorbis:
     runs-on: windows-2022
     steps:
-    - name: Set up MSYS2
-      uses: msys2/setup-msys2@v2
-      with:
-        install: base-devel binutils autotools automake
-        path-type: inherit
-    - name: Set up cache
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-ffmpeg-${{ env.msysConfig }}
-      with:
-        path: cache
-        key: cache-key
     - name: Set up GIT
       run: |
         git config --global core.autocrlf false
@@ -50,13 +38,27 @@ jobs:
         repository: xiph/vorbis
         ref: master
         path: vorbis
+    - name: Check cache
+      id: liboggvorbis-cache
+      uses: actions/cache@v3
+      with:
+        path: dist
+        key: liboggvorbis-${{ env.msysConfig }}-${{ hashFiles('ogg') }}-${{ hashFiles('vorbis') }}
+    - name: Set up MSYS2
+      if: steps.liboggvorbis-cache.outputs.cache-hit != 'true'
+      uses: msys2/setup-msys2@v2
+      with:
+        install: base-devel binutils autotools automake
+        path-type: inherit
     - name: Build Ogg
+      if: steps.liboggvorbis-cache.outputs.cache-hit != 'true'
       shell: cmd
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
         md build
         D:\a\_temp\setup-msys2\msys2.cmd -c 'cd ogg ; autoreconf -i ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) --disable-shared ; make -j ; make install'
     - name: Build Vorbis
+      if: steps.liboggvorbis-cache.outputs.cache-hit != 'true'
       shell: cmd
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
@@ -72,18 +74,6 @@ jobs:
   libvpl:
     runs-on: windows-2022
     steps:
-    - name: Set up MSYS2
-      uses: msys2/setup-msys2@v2
-      with:
-        install: base-devel binutils autotools automake
-        path-type: inherit
-    - name: Set up cache
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-ffmpeg-${{ env.msysConfig }}
-      with:
-        path: cache
-        key: cache-key
     - name: Set up GIT
       run: |
         git config --global core.autocrlf false
@@ -94,7 +84,20 @@ jobs:
         repository: oneapi-src/oneVPL
         ref: master
         path: onevpl
+    - name: Check cache
+      id: libvpl-cache
+      uses: actions/cache@v3
+      with:
+        path: dist
+        key: libvpl-${{ env.msysConfig }}-${{ hashFiles('onevpl') }}
+    - name: Set up MSYS2
+      if: steps.libvpl-cache.outputs.cache-hit != 'true'
+      uses: msys2/setup-msys2@v2
+      with:
+        install: base-devel binutils autotools automake
+        path-type: inherit
     - name: Build oneVPL
+      if: steps.libvpl-cache.outputs.cache-hit != 'true'
       shell: cmd
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
@@ -112,18 +115,6 @@ jobs:
   libsvtav1:
     runs-on: windows-2022
     steps:
-    - name: Set up MSYS2
-      uses: msys2/setup-msys2@v2
-      with:
-        install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
-        path-type: inherit
-    - name: Set up cache
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-ffmpeg-${{ env.msysConfig }}
-      with:
-        path: cache
-        key: cache-key
     - name: Set up GIT
       run: |
         git config --global core.autocrlf false
@@ -134,7 +125,20 @@ jobs:
         repository: AOMediaCodec/SVT-AV1
         ref: master
         path: svtav1
+    - name: Check cache
+      id: libsvtav1-cache
+      uses: actions/cache@v3
+      with:
+        path: dist
+        key: libsvtav1-${{ env.msysConfig }}-${{ hashFiles('svtav1') }}
+    - name: Set up MSYS2
+      if: steps.libsvtav1-cache.outputs.cache-hit != 'true'
+      uses: msys2/setup-msys2@v2
+      with:
+        install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
+        path-type: inherit
     - name: Build SVT AV1
+      if: steps.libsvtav1-cache.outputs.cache-hit != 'true'
       shell: cmd
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
@@ -149,18 +153,6 @@ jobs:
   libsnappy:
     runs-on: windows-2022
     steps:
-    - name: Set up MSYS2
-      uses: msys2/setup-msys2@v2
-      with:
-        install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
-        path-type: inherit
-    - name: Set up cache
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-ffmpeg-${{ env.msysConfig }}
-      with:
-        path: cache
-        key: cache-key
     - name: Set up GIT
       run: |
         git config --global core.autocrlf false
@@ -171,6 +163,18 @@ jobs:
         repository: google/snappy
         ref: "1.1.8"
         path: snappy
+    - name: Check cache
+      id: libsnappy-cache
+      uses: actions/cache@v3
+      with:
+        path: dist
+        key: libsnappy-${{ env.msysConfig }}-${{ hashFiles('snappy') }}
+    - name: Set up MSYS2
+      if: steps.libsnappy-cache.outputs.cache-hit != 'true'
+      uses: msys2/setup-msys2@v2
+      with:
+        install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
+        path-type: inherit
     - name: Build Snappy
       shell: cmd
       run: |
@@ -192,18 +196,6 @@ jobs:
     runs-on: windows-2022
     if: ${{false}}
     steps:
-    - name: Set up MSYS2
-      uses: msys2/setup-msys2@v2
-      with:
-        install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
-        path-type: inherit
-    - name: Set up cache
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-ffmpeg-${{ env.msysConfig }}
-      with:
-        path: cache
-        key: cache-key
     - name: Set up GIT
       run: |
         git config --global core.autocrlf false
@@ -214,7 +206,20 @@ jobs:
         repository: webmproject/libvpx
         ref: master
         path: vpx
+    - name: Check cache
+      id: libvpx-cache
+      uses: actions/cache@v3
+      with:
+        path: dist
+        key: libvpx-${{ env.msysConfig }}-${{ hashFiles('vpx') }}
+    - name: Set up MSYS2
+      if: steps.libvpx-cache.outputs.cache-hit != 'true'
+      uses: msys2/setup-msys2@v2
+      with:
+        install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
+        path-type: inherit
     - name: Build LibVpx
+      if: steps.libvpx-cache.outputs.cache-hit != 'true'
       shell: cmd
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
@@ -256,18 +261,6 @@ jobs:
   libzimg:
     runs-on: windows-2022
     steps:
-    - name: Set up MSYS2
-      uses: msys2/setup-msys2@v2
-      with:
-        install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
-        path-type: inherit
-    - name: Set up cache
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-ffmpeg-${{ env.msysConfig }}
-      with:
-        path: cache
-        key: cache-key
     - name: Set up GIT
       run: |
         git config --global core.autocrlf false
@@ -278,7 +271,20 @@ jobs:
         repository: sekrit-twc/zimg
         ref: release-2.9.2
         path: zimg
+    - name: Check cache
+      id: libzimg-cache
+      uses: actions/cache@v3
+      with:
+        path: dist
+        key: libzimg-${{ env.msysConfig }}-${{ hashFiles('zimg') }}
+    - name: Set up MSYS2
+      if: steps.libzimg-cache.outputs.cache-hit != 'true'
+      uses: msys2/setup-msys2@v2
+      with:
+        install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
+        path-type: inherit
     - name: Build ZIMG
+      if: steps.libzimg-cache.outputs.cache-hit != 'true'
       shell: cmd
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
