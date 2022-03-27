@@ -51,7 +51,7 @@ jobs:
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
         md build build\include build\lib build\lib\pkgconfig dist
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd vpx ; ./configure --prefix=../build --target=x86_64-win64-vs17 --enable-vp9-highbitdepth --disable-shared --disable-examples --disable-tools --disable-docs --disable-libyuv --disable-unit_tests --disable-postproc ; ls -laR # make -j ; make install ; mv ../build/lib/x64/vpxmd.lib ../build/lib/vpx.lib ; rm -rf ../build/lib/x64 ; cd ../build ; tar czf ../dist/libvpx.tgz *'
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd vpx ; ./configure --prefix=../build --target=x86_64-win64-vs17 --enable-vp9-highbitdepth --disable-shared --disable-examples --disable-tools --disable-docs --disable-libyuv --disable-unit_tests --disable-postproc || true ; cat config.log ; ls -laR # make -j ; make install ; mv ../build/lib/x64/vpxmd.lib ../build/lib/vpx.lib ; rm -rf ../build/lib/x64 ; cd ../build ; tar czf ../dist/libvpx.tgz *'
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
