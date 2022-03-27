@@ -1,0 +1,57 @@
+name: FFmpeg (v143)
+
+on:
+  workflow_dispatch:
+    inputs:
+      config:
+        type: choice
+        description: Configuration
+        options: 
+        - Debug
+        - Release
+        
+env:
+  vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
+  switches: "--enable-libsvtav1 --enable-libsnappy --enable-libvpx --enable-libmp3lame --enable-libzimg --enable-libopus --enable-libvorbis --enable-libx264 --enable-libx265 --enable-libfdk-aac" #--enable-libvpl
+  NASM_EXECUTABLE: nasm
+  msysConfig: Release
+  winConfig: release
+  cFlags: -MD
+  
+jobs:
+  libvpx:
+    runs-on: windows-2022
+    steps:
+    - name: Set up MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
+        path-type: inherit
+    - name: Set up cache
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-ffmpeg-${{ env.msysConfig }}
+      with:
+        path: cache
+        key: cache-key
+    - name: Set up GIT
+      run: |
+        git config --global core.autocrlf false
+        git config --global core.eol lf
+    - name: Checkout LibVpx
+      uses: actions/checkout@v3.0.0
+      with:
+        repository: webmproject/libvpx
+        ref: master
+        path: vpx
+    - name: Build LibVpx
+      shell: cmd
+      run: |
+        call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
+        md build build\include build\lib build\lib\pkgconfig dist
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd vpx ; ./configure --prefix=../build --target=x86_64-win64-vs17 --enable-vp9-highbitdepth --disable-shared --disable-examples --disable-tools --disable-docs --disable-libyuv --disable-unit_tests --disable-postproc ; make -j ; make install ; mv ../build/lib/x64/vpxmd.lib ../build/lib/vpx.lib ; rm -rf ../build/lib/x64 ; cd ../build ; tar czf ../dist/libvpx.tgz *'
+    - name: Publish artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: libvpx
+        path: dist/libvpx.tgz
