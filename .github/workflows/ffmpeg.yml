@@ -1,4 +1,4 @@
-name: FFmpeg
+name: FFmpeg (v142)
 
 on:
   workflow_dispatch:
