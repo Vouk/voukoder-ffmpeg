@@ -293,18 +293,6 @@ jobs:
   libopus:
     runs-on: windows-2022
     steps:
-    - name: Set up MSYS2
-      uses: msys2/setup-msys2@v2
-      with:
-        install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
-        path-type: inherit
-    - name: Set up cache
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-ffmpeg-${{ env.msysConfig }}
-      with:
-        path: cache
-        key: cache-key
     - name: Set up GIT
       run: |
         git config --global core.autocrlf false
@@ -314,8 +302,21 @@ jobs:
       with:
         repository: xiph/opus
         ref: master
-        path: opus
+        path: opus        
+    - name: Check cache
+      id: libopus-cache
+      uses: actions/cache@v3
+      with:
+        path: dist
+        key: libopus-${{ env.msysConfig }}-${{ hashFiles('opus') }}
+    - name: Set up MSYS2
+      if: steps.libopus-cache.outputs.cache-hit != 'true'
+      uses: msys2/setup-msys2@v2
+      with:
+        install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
+        path-type: inherit
     - name: Build OPUS
+      if: steps.libopus-cache.outputs.cache-hit != 'true'
       shell: cmd
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
@@ -332,18 +333,6 @@ jobs:
   libx264:
     runs-on: windows-2022
     steps:
-    - name: Set up MSYS2
-      uses: msys2/setup-msys2@v2
-      with:
-        install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
-        path-type: inherit
-    - name: Set up cache
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-ffmpeg-${{ env.msysConfig }}
-      with:
-        path: cache
-        key: cache-key
     - name: Set up GIT
       run: |
         git config --global core.autocrlf false
@@ -354,7 +343,20 @@ jobs:
         repository: mirror/x264
         ref: master
         path: x264
+    - name: Check cache
+      id: libx264-cache
+      uses: actions/cache@v3
+      with:
+        path: dist
+        key: libx264-${{ env.msysConfig }}-${{ hashFiles('x264') }}
+    - name: Set up MSYS2
+      if: steps.libx264-cache.outputs.cache-hit != 'true'
+      uses: msys2/setup-msys2@v2
+      with:
+        install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
+        path-type: inherit
     - name: Build X264
+      if: steps.libx264-cache.outputs.cache-hit != 'true'
       shell: cmd
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
@@ -379,12 +381,12 @@ jobs:
         repository: mstorsjo/fdk-aac
         ref: master
         path: fdkaac
-    - name: Check cache for LIBFDK
+    - name: Check cache
       id: libfdkaac-cache
       uses: actions/cache@v3
       with:
         path: dist
-        key: ${{ env.msysConfig }}-${{ hashFiles('fdkaac') }}
+        key: libfdkaac-${{ env.msysConfig }}-${{ hashFiles('fdkaac') }}
     - name: Set up MSYS2
       if: steps.libfdkaac-cache.outputs.cache-hit != 'true'
       uses: msys2/setup-msys2@v2
@@ -407,17 +409,26 @@ jobs:
   libx265-12:
     runs-on: windows-2022
     steps:
-    - name: Set up MSBuild
-      uses: microsoft/setup-msbuild@v1.1
-    - name: Set up NASM
-      uses: ilammy/setup-nasm@v1.2.1
     - name: Checkout X265
       shell: cmd
       run: |
         git config --global core.autocrlf false
         git config --global core.eol lf
         git clone -b Release_3.5 https://github.com/videolan/x265.git x265
+    - name: Check cache
+      id: libx26512-cache
+      uses: actions/cache@v3
+      with:
+        path: dist
+        key: libx265-12-${{ env.msysConfig }}-${{ hashFiles('x265') }}
+    - name: Set up MSBuild
+      if: steps.libx26512-cache.outputs.cache-hit != 'true'
+      uses: microsoft/setup-msbuild@v1.1
+    - name: Set up NASM
+      if: steps.libx26512-cache.outputs.cache-hit != 'true'
+      uses: ilammy/setup-nasm@v1.2.1
     - name: Build X265 (12 bit)
+      if: steps.libx26512-cache.outputs.cache-hit != 'true'
       shell: cmd
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
@@ -437,17 +448,26 @@ jobs:
   libx265-10:
     runs-on: windows-2022
     steps:
-    - name: Set up MSBuild
-      uses: microsoft/setup-msbuild@v1.1
-    - name: Set up NASM
-      uses: ilammy/setup-nasm@v1.2.1
     - name: Checkout X265
       shell: cmd
       run: |
         git config --global core.autocrlf false
         git config --global core.eol lf
         git clone -b Release_3.5 https://github.com/videolan/x265.git x265
+    - name: Check cache
+      id: libx26510-cache
+      uses: actions/cache@v3
+      with:
+        path: dist
+        key: libx265-10-${{ env.msysConfig }}-${{ hashFiles('x265') }}
+    - name: Set up MSBuild
+      if: steps.libx26510-cache.outputs.cache-hit != 'true'
+      uses: microsoft/setup-msbuild@v1.1
+    - name: Set up NASM
+      if: steps.libx26510-cache.outputs.cache-hit != 'true'
+      uses: ilammy/setup-nasm@v1.2.1
     - name: Build X265 (10 bit)
+      if: steps.libx26510-cache.outputs.cache-hit != 'true'
       shell: cmd
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
@@ -468,30 +488,41 @@ jobs:
     runs-on: windows-2022
     needs: [libx265-12,libx265-10]
     steps:
-    - name: Set up MSYS2
-      uses: msys2/setup-msys2@v2
-      with:
-        install: base-devel binutils autotools automake
-        path-type: inherit
-    - name: Set up MSBuild
-      uses: microsoft/setup-msbuild@v1.1
-    - name: Set up NASM
-      uses: ilammy/setup-nasm@v1.2.1
     - name: Checkout X265
       shell: cmd
       run: |
         git config --global core.autocrlf false
         git config --global core.eol lf
         git clone -b Release_3.5 https://github.com/videolan/x265.git x265
+    - name: Check cache
+      id: libx265-cache
+      uses: actions/cache@v3
+      with:
+        path: di
+        key: libx265-${{ env.msysConfig }}-${{ hashFiles('x265') }}
+    - name: Set up MSYS2
+      if: steps.libx265-cache.outputs.cache-hit != 'true'
+      uses: msys2/setup-msys2@v2
+      with:
+        install: base-devel binutils autotools automake
+        path-type: inherit
+    - name: Set up MSBuild
+      if: steps.libx265-cache.outputs.cache-hit != 'true'
+      uses: microsoft/setup-msbuild@v1.1
+    - name: Set up NASM
+      if: steps.libx265-cache.outputs.cache-hit != 'true'
+      uses: ilammy/setup-nasm@v1.2.1
     - name: Set up dependant libs
+      if: steps.libx265-cache.outputs.cache-hit != 'true'
       uses: actions/download-artifact@v3
       with:
         path: build
     - name: Build X265
+      if: steps.libx265-cache.outputs.cache-hit != 'true'
       shell: cmd
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
-        md dist dist\include dist\lib dist\lib\pkgconfig
+        md di dist dist\include dist\lib dist\lib\pkgconfig
         cd x265/build/vc15-x86_64
         md work
         cd work
@@ -503,13 +534,12 @@ jobs:
         cd ..\..\..\..
         "${{ env.vsPath }}VC\Tools\MSVC\14.29.30133\bin\Hostx64\x64\lib.exe" /ignore:4006 /ignore:4221 /OUT:dist\lib\x265.lib build\x265-static.lib build\x265_10bit\x265_10bit.lib build\x265_12bit\x265_12bit.lib
         copy x265\source\x265.h dist\include\
-        dir /s dist
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd dist ; tar czf ../libx265.tgz *'
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd dist ; tar czf ../di/libx265.tgz *'
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
         name: libx265
-        path: libx265.tgz
+        path: di/libx265.tgz
 
   ffmpeg:
     runs-on: windows-2022
