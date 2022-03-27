@@ -21,19 +21,8 @@ env:
 jobs:
   libvpx:
     runs-on: windows-2022
+    if: ${{false}}
     steps:
-    - name: Set up MSYS2
-      uses: msys2/setup-msys2@v2
-      with:
-        install: base-devel binutils autotools automake nasm
-        path-type: inherit
-    - name: Set up cache
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-ffmpeg-${{ env.msysConfig }}
-      with:
-        path: cache
-        key: cache-key
     - name: Set up GIT
       run: |
         git config --global core.autocrlf false
@@ -44,12 +33,25 @@ jobs:
         repository: webmproject/libvpx
         ref: master
         path: vpx
+    - name: Check cache
+      id: libvpx-cache
+      uses: actions/cache@v3
+      with:
+        path: dist
+        key: libvpx-${{ env.msysConfig }}-${{ hashFiles('vpx') }}
+    - name: Set up MSYS2
+      if: steps.libvpx-cache.outputs.cache-hit != 'true'
+      uses: msys2/setup-msys2@v2
+      with:
+        install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
+        path-type: inherit
     - name: Build LibVpx
+      if: steps.libvpx-cache.outputs.cache-hit != 'true'
       shell: cmd
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
         md build build\include build\lib build\lib\pkgconfig dist
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd vpx ; ./configure --prefix=../build --target=x86_64-win64-vs17 --enable-vp9-highbitdepth --disable-shared --disable-examples --disable-tools --disable-docs --disable-libyuv --disable-unit_tests --disable-postproc || true ; cat config.log #; make -j ; make install ; mv ../build/lib/x64/vpxmd.lib ../build/lib/vpx.lib ; rm -rf ../build/lib/x64 ; cd ../build ; tar czf ../dist/libvpx.tgz *'
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd vpx ; ./configure --prefix=../build --target=x86_64-win64-vs17 --enable-vp9-highbitdepth --disable-shared --disable-examples --disable-tools --disable-docs --disable-libyuv --disable-unit_tests --disable-postproc ; make -j ; make install ; mv ../build/lib/x64/vpxmd.lib ../build/lib/vpx.lib ; rm -rf ../build/lib/x64 ; cd ../build ; tar czf ../dist/libvpx.tgz *'
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
