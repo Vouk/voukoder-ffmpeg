@@ -21,7 +21,7 @@ env:
 jobs:
   libvpx:
     runs-on: windows-2022
-    if: ${{false}}
+    if: ${{true}}
     steps:
     - name: Set up GIT
       run: |
