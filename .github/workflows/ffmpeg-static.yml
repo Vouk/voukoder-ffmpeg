@@ -15,7 +15,7 @@ on:
         
 env:
   vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
-  switches: "--enable-libsvtav1 --enable-libsnappy --enable-libmp3lame --enable-libzimg --enable-libopus --enable-libvorbis --enable-libx264 --enable-libx265 --enable-libfdk-aac" #--enable-libvpl --enable-libvpx
+  switches: "--enable-libsvtav1 --enable-libsnappy --enable-libmp3lame --enable-libzimg --enable-libopus --enable-libvpx --enable-libvorbis --enable-libx264 --enable-libx265 --enable-libfdk-aac" #--enable-libvpl
   NASM_EXECUTABLE: nasm
   msysConfig: Debug
   winConfig: debug
@@ -197,12 +197,12 @@ jobs:
 
   libvpx:
     runs-on: windows-2022
-    if: ${{false}}
     steps:
     - name: Set up GIT
       run: |
         git config --global core.autocrlf false
         git config --global core.eol lf
+        git clone https://github.com/webmproject/libvpx.git vpx
     - name: Checkout LibVpx
       uses: actions/checkout@v3.0.0
       with:
@@ -552,7 +552,7 @@ jobs:
 
   ffmpeg:
     runs-on: windows-2022
-    needs: [libopus,libvpl,libsvtav1,libsnappy,libmp3lame,libzimg,liboggvorbis,libx264,libx265,libfdkaac]
+    needs: [libopus,libvpl,libsvtav1,libsnappy,libmp3lame,libzimg,libvpx,liboggvorbis,libx264,libx265,libfdkaac]
     steps:
     - name: Set up MSYS2
       uses: msys2/setup-msys2@v2
