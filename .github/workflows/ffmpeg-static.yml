@@ -10,6 +10,9 @@ on:
         - Debug
         - Release
         
+  schedule:
+    - cron: "0 5 * * 1"
+        
 env:
   vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
   switches: "--enable-libsvtav1 --enable-libsnappy --enable-libmp3lame --enable-libzimg --enable-libopus --enable-libvorbis --enable-libx264 --enable-libx265 --enable-libfdk-aac" #--enable-libvpl --enable-libvpx
