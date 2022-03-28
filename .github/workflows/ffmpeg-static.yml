@@ -17,9 +17,9 @@ env:
   vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
   switches: "--enable-libvpl --enable-libsvtav1 --enable-libsnappy --enable-libmp3lame --enable-libzimg --enable-libopus --enable-libvpx --enable-libvorbis --enable-libx264 --enable-libx265 --enable-libfdk-aac"
   NASM_EXECUTABLE: nasm
-  msysConfig: debug
-  winConfig: Debug
-  cFlags: -MDd
+  msysConfig: release
+  winConfig: Release
+  cFlags: -MD
   useCartwheel: true
   
 jobs:
