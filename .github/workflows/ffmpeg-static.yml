@@ -108,8 +108,10 @@ jobs:
         md temp build dist
         cd temp
         cmake.exe -G "Visual Studio 17 2022" ..\onevpl -T host=x64 -A x64 -DBUILD_TOOLS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=..\build -DCMAKE_VS_INCLUDE_INSTALL_TO_DEFAULT_BUILD=ON
-        MSBuild.exe -t:VPL,INSTALL -p:Configuration=${{ env.winConfig }} -p:TargetName=vpl -m oneVPL.sln
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd ../build ; rm -rf bin/cmake ; tar czf ../dist/libvpl.tgz *'
+        MSBuild.exe -t:VPL,INSTALL -p:Configuration=${{ env.winConfig }} -m oneVPL.sln
+        cd ..\build
+        IF EXIST "lib\vpld.lib" move "lib\vpld.lib" "lib\vpl.lib"
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'rm -rf bin/cmake ; tar czf ../dist/libvpl.tgz *'
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
