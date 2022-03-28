@@ -560,6 +560,7 @@ jobs:
         git config --global core.eol lf
         git config --global user.email "daniel.stankewitz@gmail.com"
         git config --global user.name "Daniel Stankewitz"
+        git clone https://github.com/intel-media-ci/cartwheel-ffmpeg --recursive cartwheel
     - name: Checkout patches
       uses: actions/checkout@v3.0.0
     - name: Checkout FFmpeg
@@ -569,14 +570,6 @@ jobs:
         repository: FFmpeg/FFmpeg.git
         ref: release/5.0
         path: ffmpeg
-    - name: Checkout FFmpeg from Cartwheel
-      if: ${{env.useCartwheel}}
-      uses: actions/checkout@v3.0.0
-      with:
-        repository: intel-media-ci/cartwheel-ffmpeg
-        ref: master
-        path: cartwheel
-        submodules: 'recursive'
     - name: Checkout NvEnc
       uses: actions/checkout@v3.0.0
       with:
