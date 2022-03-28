@@ -576,6 +576,7 @@ jobs:
         repository: intel-media-ci/cartwheel-ffmpeg
         ref: master
         path: cartwheel
+        submodules: 'recursive'
     - name: Checkout NvEnc
       uses: actions/checkout@v3.0.0
       with:
