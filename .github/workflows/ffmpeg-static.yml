@@ -15,7 +15,7 @@ on:
         
 env:
   vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
-  switches: "--enable-libvpl --enable-libsvtav1 --enable-libsnappy --enable-libmp3lame --enable-libzimg --enable-libopus --enable-libvpx --enable-libvorbis --enable-libx264 --enable-libx265 --enable-libfdk-aac"
+  switches: "--enable-libvpl --enable-libsvtav1 --enable-libsnappy --enable-libmp3lame --enable-libzimg --enable-libopus --enable-libvorbis --enable-libx264 --enable-libx265 --enable-libfdk-aac" #--enable-libvpx 
   NASM_EXECUTABLE: nasm
   msysConfig: release
   winConfig: Release
@@ -199,6 +199,7 @@ jobs:
         path: dist/libsnappy.tgz
 
   libvpx:
+    if: ${{false}}
     runs-on: windows-2022
     steps:
     - name: Set up GIT
@@ -549,7 +550,7 @@ jobs:
 
   ffmpeg:
     runs-on: windows-2022
-    needs: [libopus,libvpl,libsvtav1,libsnappy,libmp3lame,libzimg,libvpx,liboggvorbis,libx264,libx265,libfdkaac]
+    needs: [libopus,libvpl,libsvtav1,libsnappy,libmp3lame,libzimg,liboggvorbis,libx264,libx265,libfdkaac] #libvpx,
     steps:
     - name: Set up MSYS2
       uses: msys2/setup-msys2@v2
