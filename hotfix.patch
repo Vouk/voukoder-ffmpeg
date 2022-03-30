@@ -1,0 +1,20 @@
+diff --git a/ffmpeg b/ffmpeg
+index 3721aae..336fe22 160000
+--- a/ffmpeg
++++ b/ffmpeg
+@@ -1 +1 @@
+-Subproject commit 3721aaeaaae9f817abb843117ae8dae1dc280a7f
++Subproject commit 336fe225a6a0e12d2ba701c641df63d36151f6fb-dirty
+diff --git a/patches/0075-qsv-use-a-new-method-to-create-mfx-session-when-usin.patch b/patches/0075-qsv-use-a-new-method-to-create-mfx-session-when-usin.patch
+index d1a787a..6a53eb0 100644
+--- a/patches/0075-qsv-use-a-new-method-to-create-mfx-session-when-usin.patch
++++ b/patches/0075-qsv-use-a-new-method-to-create-mfx-session-when-usin.patch
+@@ -908,7 +908,7 @@ index 1e8ac56eed..500cf4c0bc 100644
+ +            break;
+ +        else if (sts != MFX_ERR_NONE) {
+ +            impl_idx++;
+-+            continue;
+++            break;
+ +        }
+ +
+ +        sts = MFXCreateSession(loader, impl_idx, &session);
