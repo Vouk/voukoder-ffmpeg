@@ -251,7 +251,7 @@ jobs:
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
         md build dist
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'svn co svn://svn.code.sf.net/p/lame/svn/trunk/lame@6474 lame ; cd lame ; autoreconf -i ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) --enable-nasm --disable-frontend --disable-shared --enable-static ; make -j ; make install ; cd ../build ; tar czf ../dist/libmp3lame.tgz *
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'svn co https://svn.code.sf.net/p/lame/svn/trunk/lame@6474 lame ; cd lame ; autoreconf -i ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) --enable-nasm --disable-frontend --disable-shared --enable-static ; make -j ; make install ; cd ../build ; tar czf ../dist/libmp3lame.tgz *
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
