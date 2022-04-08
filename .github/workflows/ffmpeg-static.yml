@@ -11,7 +11,7 @@ on:
         - Release
         
   schedule:
-    - cron: "0 5 * * 1"
+    - cron: "0 5 * * *"
         
 env:
   vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
