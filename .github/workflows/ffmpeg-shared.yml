@@ -1,4 +1,4 @@
-name: FFmpeg shared (v143)
+name: FFmpeg Shared (v143)
 
 on:
   workflow_dispatch:
