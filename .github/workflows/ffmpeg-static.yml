@@ -239,14 +239,7 @@ jobs:
       with:
         install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm svn
         path-type: inherit
-    - name: Check cache
-      id: liblame-cache
-      uses: actions/cache@v3
-      with:
-        path: dist
-        key: liblame-${{ env.msysConfig }}-${{ hashFiles('svtav1') }}
     - name: Build LAME
-      if: steps.liblame-cache.outputs.cache-hit != 'true'
       shell: cmd
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
