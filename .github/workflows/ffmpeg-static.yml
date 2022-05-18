@@ -239,14 +239,14 @@ jobs:
       with:
         install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm svn
         path-type: inherit
-    - name: Set up cache
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-ffmpeg-${{ env.msysConfig }}
+    - name: Check cache
+      id: liblame-cache
+      uses: actions/cache@v3
       with:
-        path: cache
-        key: cache-key
+        path: dist
+        key: liblame-${{ env.msysConfig }}-${{ hashFiles('svtav1') }}
     - name: Build LAME
+      if: steps.liblame-cache.outputs.cache-hit != 'true'
       shell: cmd
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
