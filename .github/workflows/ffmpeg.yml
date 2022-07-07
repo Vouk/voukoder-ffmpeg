@@ -157,7 +157,17 @@ jobs:
         path: dist/libvpl.tgz
     - name: Add component to switches
       run: |
-        echo "COMPONENTS=${{ env.COMPONENTS }}--enable-libvpl\ " >> $GITHUB_ENV
+        echo "COMPONENTS=${{ env.COMPONENTS }}--enable-libvpl " >> $env:GITHUB_ENV
+    - name: read
+      run: |
+        echo "sw: ${{ env.COMPONENTS }}"
+        
+  bla:
+    runs-on: windows-2022
+    steps:
+    - name: Add component to switches
+      run: |
+        echo "COMPONENTS=${{ env.COMPONENTS }}--enable-bla " >> $env:GITHUB_ENV
     - name: read
       run: |
         echo "sw: ${{ env.COMPONENTS }}"
@@ -165,7 +175,7 @@ jobs:
   ffmpeg:
     runs-on: windows-2022
     #needs: [libopus,libvpl,libsvtav1,libsnappy,libmp3lame,libzimg,liboggvorbis,libx264,libx265,libfdkaac,libvpx]
-    needs: [libvpl]
+    needs: [libvpl,bla]
     steps:
     - name: Set up MSYS2
       uses: msys2/setup-msys2@v2
