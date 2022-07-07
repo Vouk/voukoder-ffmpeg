@@ -1,0 +1,36 @@
+name: Build all FFmpeg versions
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ffmpeg-static-debug:
+    uses: Vouk/voukoder-ffmpeg/new/master/.github/workflows/ffmpeg.yml@master
+    with:
+      source: cartwheel
+      type: static
+      config: debug
+      ffmpegRef: master
+      nvencRef: sdk/9.1
+      amfRef: master
+
+  ffmpeg-static-release:
+    uses: Vouk/voukoder-ffmpeg/new/master/.github/workflows/ffmpeg.yml@master
+    with:
+      source: cartwheel
+      type: static
+      config: release
+      ffmpegRef: master
+      nvencRef: sdk/9.1
+      amfRef: master
+      
+  ffmpeg-shared-debug:
+    uses: Vouk/voukoder-ffmpeg/new/master/.github/workflows/ffmpeg.yml@master
+    with:
+      source: ffmpeg
+      type: shared
+      config: debug
+      ffmpegRef: release/5.0
+      nvencRef: sdk/11.0
+      amfRef: master
+      
