@@ -559,7 +559,7 @@ jobs:
         md work
         cd work
         cmake -G "Visual Studio 17 2022" ..\..\..\source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF
-        MSBuild.exe /property:Configuration="${{ eninputs.config }}" x265-static.vcxproj
+        MSBuild.exe /property:Configuration="${{ inputs.config }}" x265-static.vcxproj
         move ${{ inputs.config }}\x265-static.lib ..\..\..\..\dist\x265_10bit.lib
     - name: Publish artifact
       uses: actions/upload-artifact@v2
