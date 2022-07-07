@@ -1,0 +1,104 @@
+name: Build FFmpeg
+
+on:
+  workflow_dispatch:
+    inputs:
+      config:
+        type: choice
+        required: true
+        default: 'debug' 
+        description: 'Configuration'
+        options: 
+        - debug
+        - release
+      ref:
+        type: string
+        required: true
+        default: 'release/5.0' 
+        description: 'GitHub refId'
+      source:
+        type: choice
+        required: true
+        default: 'ffmpeg' 
+        description: Source
+        options: 
+        - ffmpeg
+        - cartwheel
+      type:
+        type: choice
+        required: true
+        default: 'static' 
+        description: Type
+        options: 
+        - static
+        - shared
+              
+env:
+  vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
+  #switches: "--enable-libvpl --enable-libsvtav1 --enable-libsnappy --enable-libmp3lame --enable-libzimg --enable-libopus --enable-libvorbis --enable-libx264 --enable-libx265 --enable-libfdk-aac --enable-libvpx "
+  switches: ""
+  NASM_EXECUTABLE: nasm
+  cFlags: ${{ inputs.config == 'release' ? '-MD' : '-MDd' }}
+  
+jobs:
+  ffmpeg:
+    runs-on: windows-2022
+    #needs: [libopus,libvpl,libsvtav1,libsnappy,libmp3lame,libzimg,liboggvorbis,libx264,libx265,libfdkaac,libvpx]
+    steps:
+    - name: Set up MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        install: base-devel binutils mingw-w64-x86_64-cmake nasm
+        path-type: inherit
+    - name: Set up GIT
+      run: |
+        git config --global core.autocrlf false
+        git config --global core.eol lf
+        git config --global user.email "daniel.stankewitz@gmail.com"
+        git config --global user.name "Daniel Stankewitz"
+    - name: Checkout patches
+      uses: actions/checkout@v3.0.0
+    - name: Checkout FFmpeg
+      if: ${{ inputs.source == 'ffmpeg' }} 
+      uses: actions/checkout@v3.0.0
+      with:
+        repository: FFmpeg/FFmpeg.git
+        ref: ${{ inputs.ref }} 
+        path: ffmpeg
+    - name: Checkout NvEnc
+      uses: actions/checkout@v3.0.0
+      with:
+        repository: FFmpeg/nv-codec-headers
+        ref: sdk/9.1
+        path: nvenc
+    - name: Checkout AMF
+      uses: actions/checkout@v3.0.0
+      with:
+        repository: GPUOpen-LibrariesAndSDKs/AMF
+        ref: master
+        path: amf
+    - name: Set up artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: build_artifacts
+    - name: Build FFmpeg
+      if: ${{ inputs.source == 'ffmpeg' }} 
+      shell: cmd
+      run: |
+        call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
+        md build dist
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd ffmpeg ; git apply --ignore-whitespace --verbose ../0003-dynamic-loading-of-shared-fdk-aac-library-5.0.patch ; sed -i "s/#define X264_API_IMPORTS 1/\/\/#define X264_API_IMPORTS 1/g" libavcodec/libx264.c ; cd ../build ; for file in `ls ../build_artifacts/**/*.tgz`; do tar -xzf $file; done ; rm -f bin/*.dll ; cd ../nvenc ; make PREFIX=../build install ; cp -a ../amf/amf/public/include ../build/include/AMF ; cd ../ffmpeg ; PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags="${{ env.cFlags }} -I../build/include" --extra-ldflags="-LIBPATH:../build/lib" --prefix=../build --pkg-config-flags="--static" --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl ${{ env.switches }} ; make ; make install ; cd ../build/lib ; for file in *.a; do mv "$file" "`basename "$file" .a`.lib" ; done ; rm -rf fdk-aac.lib cmake pkgconfig *.la ../share ; cd .. ; tar czf ../dist/ffmpeg-win64-${{ inputs.type }}-${{ inputs.config }}.tar.gz *'
+    - name: Build FFmpeg from Cartwheel
+      if: ${{ inputs.source == 'cartwheel' }}
+      shell: cmd
+      run: |
+        call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
+        md build dist
+        rem D:\a\_temp\setup-msys2\msys2.cmd -c 'git config --global user.email "daniel.stankewitz@gmail.com" ; git config --global user.name "Daniel Stankewitz" ; git clone https://github.com/intel-media-ci/cartwheel-ffmpeg --recursive cartwheel ; cd cartwheel ; git checkout b3f9843cffd4118e35bb000779444ca2f4196342 ; git submodule update --init --recursive ; cd ffmpeg ; git am ../patches/*.patch ; git apply --ignore-whitespace --verbose ../../0003-dynamic-loading-of-shared-fdk-aac-library-5.0.patch ; sed -i "s/#define X264_API_IMPORTS 1/\/\/#define X264_API_IMPORTS 1/g" libavcodec/libx264.c ; cd ../../build ; for file in `ls ../build_artifacts/**/*.tgz`; do tar -xzf $file; done ; rm -f bin/*.dll ; cd ../nvenc ; make PREFIX=../build install ; cp -a ../amf/amf/public/include ../build/include/AMF ; cd ../cartwheel/ffmpeg ; PKG_CONFIG_PATH=../../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags="${{ env.cFlags }} -I../../build/include" --extra-ldflags="-LIBPATH:../../build/lib" --prefix=../../build --pkg-config-flags="--static" --extra-libs=Ole32.lib --extra-libs=Advapi32.lib --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --disable-devices --disable-demuxers --disable-decoders --disable-network --enable-w32threads --enable-gpl ${{ env.switches }} ; make ; make install ; cd ../../build/lib ; for file in *.a; do mv "$file" "`basename "$file" .a`.lib" ; done ; rm -rf fdk-aac.lib cmake pkgconfig *.la ../share ; cd .. ; tar czf ../dist/ffmpeg-win64-static-${{ env.msysConfig }}.tar.gz *'
+        rem D:\a\_temp\setup-msys2\msys2.cmd -c 'git config --global user.email "daniel.stankewitz@gmail.com" ; git config --global user.name "Daniel Stankewitz" ; git clone https://github.com/intel-media-ci/cartwheel-ffmpeg --recursive cartwheel ; cd cartwheel ; git checkout 2757a1d43ca83a3762b24a7ddd74b3291873f89c ; cd patches ; git apply --ignore-whitespace ../../hotfix.patch ; cd .. ; git submodule update --init --recursive ; cd ffmpeg ; git am ../patches/*.patch ; git apply --ignore-whitespace --verbose ../../0001-dynamic-loading-of-shared-fdk-aac-library-cw-5.0.patch ; sed -i "s/#define X264_API_IMPORTS 1/\/\/#define X264_API_IMPORTS 1/g" libavcodec/libx264.c ; cd ../../build ; for file in `ls ../build_artifacts/**/*.tgz`; do tar -xzf $file; done ; rm -f bin/*.dll ; cd ../nvenc ; make PREFIX=../build install ; cp -a ../amf/amf/public/include ../build/include/AMF ; cd ../cartwheel/ffmpeg ; PKG_CONFIG_PATH=../../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags="${{ env.cFlags }} -I../../build/include" --extra-ldflags="-LIBPATH:../../build/lib" --prefix=../../build --pkg-config-flags="--static" --extra-libs=Ole32.lib --extra-libs=Advapi32.lib --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --enable-w32threads --enable-gpl ${{ env.switches }} ; make ; make install ; cd ../../build/lib ; for file in *.a; do mv "$file" "`basename "$file" .a`.lib" ; done ; rm -rf fdk-aac.lib cmake pkgconfig *.la ../share ; cd .. ; tar czf ../dist/ffmpeg-win64-static-${{ env.msysConfig }}.tar.gz *'
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'git config --global user.email "daniel.stankewitz@gmail.com" ; git config --global user.name "Daniel Stankewitz" ; git clone https://github.com/intel-media-ci/cartwheel-ffmpeg --recursive cartwheel ; cd cartwheel ; cd patches ; git apply --ignore-whitespace ../../hotfix.patch ; cd .. ; git submodule update --init --recursive ; cd ffmpeg ; git am ../patches/*.patch ; git apply --ignore-whitespace --verbose ../../0001-dynamic-loading-of-shared-fdk-aac-library-cw-5.0.patch ; sed -i "s/#define X264_API_IMPORTS 1/\/\/#define X264_API_IMPORTS 1/g" libavcodec/libx264.c ; cd ../../build ; for file in `ls ../build_artifacts/**/*.tgz`; do tar -xzf $file; done ; rm -f bin/*.dll ; cd ../nvenc ; make PREFIX=../build install ; cp -a ../amf/amf/public/include ../build/include/AMF ; cd ../cartwheel/ffmpeg ; PKG_CONFIG_PATH=../../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags="${{ env.cFlags }} -I../../build/include" --extra-ldflags="-LIBPATH:../../build/lib" --prefix=../../build --pkg-config-flags="--static" --extra-libs=Ole32.lib --extra-libs=Advapi32.lib --disable-doc --disable-shared --enable-static --enable-runtime-cpudetect --enable-w32threads --enable-gpl ${{ env.switches }} ; make ; make install ; cd ../../build/lib ; for file in *.a; do mv "$file" "`basename "$file" .a`.lib" ; done ; rm -rf fdk-aac.lib cmake pkgconfig *.la ../share ; cd .. ; tar czf ../dist/ffmpeg-win64-${{ inputs.type }}-${{ inputs.config }}.tar.gz *'
+    - name: Publish FFmpeg artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ inputs.config }} package build
+        path: dist/ffmpeg-win64-static-${{ inputs.config }}.tar.gz
