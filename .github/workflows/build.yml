@@ -2,6 +2,8 @@ name: Build all FFmpeg versions
 
 on:
   workflow_dispatch:
+  schedule:
+  - cron: "0 1 * * *"
 
 jobs:
   ffmpeg-static-debug:
