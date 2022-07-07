@@ -181,7 +181,6 @@ jobs:
         path-type: inherit
     - name: Set up GIT
       run: |
-        echo "sw: ${{ env.COMPONENTS }}"
         git config --global core.autocrlf false
         git config --global core.eol lf
         git config --global user.email "daniel.stankewitz@gmail.com"
