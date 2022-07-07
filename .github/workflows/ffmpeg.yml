@@ -106,6 +106,7 @@ env:
   NASM_EXECUTABLE: nasm
   cFlags: ${{ inputs.config == 'release' && '-MD' || '-MDd' }}
   variant: ${{ inputs.type == 'static' && ' --pkg-config-flags="--static" --disable-shared --enable-static' || ' --disable-static --enable-shared' }}
+  msbuildConfig: ${{ inputs.config == 'release' && 'Release' || 'Debug' }}
   
 jobs:
   libvpl:
@@ -142,7 +143,7 @@ jobs:
         md temp build dist
         cd temp
         cmake.exe -G "Visual Studio 17 2022" ..\onevpl -T host=x64 -A x64 -DBUILD_TOOLS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=..\build -DCMAKE_VS_INCLUDE_INSTALL_TO_DEFAULT_BUILD=ON
-        MSBuild.exe -t:VPL,INSTALL -p:Configuration=${{ inputs.config }} -m vpl.sln
+        MSBuild.exe -t:VPL,INSTALL -p:Configuration=${{ env.msbuildConfig }} -m vpl.sln
         cd ..\build
         IF EXIST "lib\vpld.lib" move "lib\vpld.lib" "lib\vpl.lib"
         D:\a\_temp\setup-msys2\msys2.cmd -c 'rm -rf bin/cmake ; tar czf ../dist/libvpl.tgz *'
@@ -275,7 +276,7 @@ jobs:
         md work
         cd work
         cmake -G "Visual Studio 17 2022" .. -DCMAKE_INSTALL_PREFIX=..\..\build -DBUILD_SHARED_LIBS=OFF -DSNAPPY_BUILD_TESTS=OFF
-        MSBuild.exe /property:Configuration="${{ inputs.config }}" Snappy.sln
+        MSBuild.exe /property:Configuration="${{ env.msbuildConfig }}" Snappy.sln
         D:\a\_temp\setup-msys2\msys2.cmd -c 'cp ${{ inputs.config }}/snappy.lib ../../build/lib/snappy.lib ; cp ../snappy.h ../snappy-c.h ../../build/include/ ; cd ../../build ; tar czf ../dist/libsnappy.tgz *'
     - name: Publish artifact
       uses: actions/upload-artifact@v2
@@ -367,7 +368,7 @@ jobs:
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
         md build build\include build\lib build\lib\pkgconfig dist
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd zimg ; ./autogen.sh ; ./configure --prefix=$(realpath ../build) ; cd _msvc/zimg ; MSBuild.exe /property:Configuration="${{ inputs.config }}" /property:ConfigurationType=StaticLibrary /property:PlatformToolset=v143 /property:Platform=x64 /property:WholeProgramOptimization=false zimg.vcxproj ; cp x64/${{ inputs.config }}/z.lib ../../../build/lib/zimg.lib ; cd ../.. ; cp src/zimg/api/zimg.h  ../build/include/zimg.h ; cp zimg.pc ../build/lib/pkgconfig/zimg.pc ; cd ../build ; tar czf ../dist/libzimg.tgz *'
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd zimg ; ./autogen.sh ; ./configure --prefix=$(realpath ../build) ; cd _msvc/zimg ; MSBuild.exe /property:Configuration="${{ env.msbuildConfig }}" /property:ConfigurationType=StaticLibrary /property:PlatformToolset=v143 /property:Platform=x64 /property:WholeProgramOptimization=false zimg.vcxproj ; cp x64/${{ inputs.config }}/z.lib ../../../build/lib/zimg.lib ; cd ../.. ; cp src/zimg/api/zimg.h  ../build/include/zimg.h ; cp zimg.pc ../build/lib/pkgconfig/zimg.pc ; cd ../build ; tar czf ../dist/libzimg.tgz *'
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
@@ -406,7 +407,7 @@ jobs:
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
         md build build\include build\lib build\lib\pkgconfig dist
         cd opus\win32\VS2015
-        MSBuild.exe /property:Configuration="${{ inputs.config }}" /property:Platform=x64 /property:PlatformToolset=v143 opus.vcxproj
+        MSBuild.exe /property:Configuration="${{ env.msbuildConfig }}" /property:Platform=x64 /property:PlatformToolset=v143 opus.vcxproj
         D:\a\_temp\setup-msys2\msys2.cmd -c 'cp x64/${{ inputs.config }}/opus.lib ../../../build/lib/opus.lib ; cd ../../.. ; cp -r opus/include build/include/opus ; cp opus/opus.pc.in build/lib/pkgconfig/opus.pc ; sed -i "s#@prefix@#$(realpath ../../../build)#g" build/lib/pkgconfig/opus.pc ; sed -i "s/@exec_prefix@/\$\{prefix\}/g" build/lib/pkgconfig/opus.pc ; sed -i "s/@libdir@/\$\{prefix\}\/lib/g" build/lib/pkgconfig/opus.pc ; sed -i "s/@includedir@/\$\{prefix\}\/include/g" build/lib/pkgconfig/opus.pc ; sed -i "s/@LIBM@//g" build/lib/pkgconfig/opus.pc; sed -i "s/@VERSION@/2.0.0/g" build/lib/pkgconfig/opus.pc ; cd build ; tar czf ../dist/libopus.tgz *'
     - name: Publish artifact
       uses: actions/upload-artifact@v2
@@ -521,7 +522,7 @@ jobs:
         md work
         cd work
         cmake -G "Visual Studio 17 2022" ..\..\..\source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON
-        MSBuild.exe /property:Configuration="${{ inputs.config }}" x265-static.vcxproj
+        MSBuild.exe /property:Configuration="${{ env.msbuildConfig }}" x265-static.vcxproj
         move ${{ inputs.config }}\x265-static.lib ..\..\..\..\dist\x265_12bit.lib
     - name: Publish artifact
       uses: actions/upload-artifact@v2
@@ -560,7 +561,7 @@ jobs:
         md work
         cd work
         cmake -G "Visual Studio 17 2022" ..\..\..\source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF
-        MSBuild.exe /property:Configuration="${{ inputs.config }}" x265-static.vcxproj
+        MSBuild.exe /property:Configuration="${{ env.msbuildConfig }}" x265-static.vcxproj
         move ${{ inputs.config }}\x265-static.lib ..\..\..\..\dist\x265_10bit.lib
     - name: Publish artifact
       uses: actions/upload-artifact@v2
@@ -611,7 +612,7 @@ jobs:
         md work
         cd work
         cmake -G "Visual Studio 17 2022" ..\..\..\source -DCMAKE_INSTALL_PREFIX=..\..\..\..\build -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DEXTRA_LIB="libx265_10bit.lib;libx265_12bit.lib" -DLINKED_10BIT=ON -DLINKED_12BIT=ON
-        MSBuild.exe /property:Configuration="${{ inputs.config }}" x265-static.vcxproj
+        MSBuild.exe /property:Configuration="${{ env.msbuildConfig }}" x265-static.vcxproj
         cp x265.pc ..\..\..\..\dist\lib\pkgconfig\x265.pc
         move ${{ inputs.config }}\x265-static.lib ..\..\..\..\build\
         move x265_config.h ..\..\..\..\dist\include\
