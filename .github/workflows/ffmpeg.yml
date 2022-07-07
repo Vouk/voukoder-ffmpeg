@@ -156,9 +156,8 @@ jobs:
         name: libvpl
         path: dist/libvpl.tgz
     - name: Set the value
-      id: step_one
       run: |
-        echo "switches=${{ env.switches }} --enable-libvpl' " >> $GITHUB_ENV
+        echo "switches='${{ env.switches }} --enable-libvpl '" >> $GITHUB_ENV
 
   ffmpeg:
     runs-on: windows-2022
