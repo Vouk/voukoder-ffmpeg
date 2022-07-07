@@ -3,6 +3,12 @@ name: Build FFmpeg
 on:
   workflow_dispatch:
     inputs:
+      env:
+        type: string
+        required: true
+        default: 'windows-2022' 
+        description: 'Environment'
+        
       source:
         type: choice
         required: true
@@ -11,6 +17,24 @@ on:
         options: 
         - ffmpeg
         - cartwheel
+      
+      type:
+        type: choice
+        required: true
+        default: 'static' 
+        description: Type
+        options: 
+        - static
+        - shared
+
+      config:
+        type: choice
+        required: true
+        default: 'debug' 
+        description: 'Configuration'
+        options: 
+        - debug
+        - release
         
       ffmpegRef:
         type: string
@@ -29,34 +53,59 @@ on:
         required: true
         default: 'master' 
         description: 'AMF refId'
-
-      config:
-        type: choice
-        required: true
-        default: 'debug' 
-        description: 'Configuration'
-        options: 
-        - debug
-        - release
-
-      type:
-        type: choice
-        required: true
-        default: 'static' 
-        description: Type
-        options: 
-        - static
-        - shared
-              
+             
 env:
   vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
   #switches: "--enable-libvpl --enable-libsvtav1 --enable-libsnappy --enable-libmp3lame --enable-libzimg --enable-libopus --enable-libvorbis --enable-libx264 --enable-libx265 --enable-libfdk-aac --enable-libvpx "
-  switches: ""
+  switches: "--enable-libvpl"
   NASM_EXECUTABLE: nasm
   cFlags: ${{ inputs.config == 'release' && '-MD' || '-MDd' }}
   variant: ${{ inputs.type == 'static' && ' --pkg-config-flags="--static" --disable-shared --enable-static' || ' --disable-static --enable-shared' }}
   
 jobs:
+  libvpl:
+    runs-on: ${{ inputs.env }}
+    steps:
+    - name: Set up GIT
+      run: |
+        git config --global core.autocrlf false
+        git config --global core.eol lf
+    - name: Checkout oneVPL
+      uses: actions/checkout@v3.0.0
+      with:
+        repository: oneapi-src/oneVPL
+        ref: master
+        path: onevpl
+    - name: Check cache
+      id: libvpl-cache
+      uses: actions/cache@v3
+      with:
+        path: dist
+        key: libvpl-${{ inputs.env }}-${{ inputs.config }}-${{ hashFiles('onevpl') }}
+    - name: Set up MSYS2
+      if: steps.libvpl-cache.outputs.cache-hit != 'true'
+      uses: msys2/setup-msys2@v2
+      with:
+        install: base-devel binutils autotools automake
+        path-type: inherit
+    - name: Build oneVPL
+      if: steps.libvpl-cache.outputs.cache-hit != 'true'
+      shell: cmd
+      run: |
+        call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
+        md temp build dist
+        cd temp
+        cmake.exe -G "Visual Studio 17 2022" ..\onevpl -T host=x64 -A x64 -DBUILD_TOOLS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=..\build -DCMAKE_VS_INCLUDE_INSTALL_TO_DEFAULT_BUILD=ON
+        MSBuild.exe -t:VPL,INSTALL -p:Configuration=${{ inputs.config }} -m vpl.sln
+        cd ..\build
+        IF EXIST "lib\vpld.lib" move "lib\vpld.lib" "lib\vpl.lib"
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'rm -rf bin/cmake ; tar czf ../dist/libvpl.tgz *'
+    - name: Publish artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: libvpl
+        path: dist/libvpl.tgz
+
   ffmpeg:
     runs-on: windows-2022
     #needs: [libopus,libvpl,libsvtav1,libsnappy,libmp3lame,libzimg,liboggvorbis,libx264,libx265,libfdkaac,libvpx]
