@@ -38,7 +38,7 @@ env:
   #switches: "--enable-libvpl --enable-libsvtav1 --enable-libsnappy --enable-libmp3lame --enable-libzimg --enable-libopus --enable-libvorbis --enable-libx264 --enable-libx265 --enable-libfdk-aac --enable-libvpx "
   switches: ""
   NASM_EXECUTABLE: nasm
-  cFlags: ${{ inputs.config == 'release' ? '-MD' : '-MDd' }}
+  cFlags: ${{ inputs.config == 'release' && '-MD' || '-MDd' }}
   
 jobs:
   ffmpeg:
