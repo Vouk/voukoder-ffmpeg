@@ -100,8 +100,8 @@ on:
         
 env:
   vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
-  #switches: "--enable-libvpl --enable-libsvtav1 --enable-libsnappy --enable-libmp3lame --enable-libzimg --enable-libopus --enable-libvorbis --enable-libx264 --enable-libx265 --enable-libfdk-aac --enable-libvpx "
-  switches: ""
+  #COMPONENTS: "--enable-libvpl --enable-libsvtav1 --enable-libsnappy --enable-libmp3lame --enable-libzimg --enable-libopus --enable-libvorbis --enable-libx264 --enable-libx265 --enable-libfdk-aac --enable-libvpx "
+  COMPONENTS: ""
   NASM_EXECUTABLE: nasm
   cFlags: ${{ inputs.config == 'release' && '-MD' || '-MDd' }}
   variant: ${{ inputs.type == 'static' && ' --pkg-config-flags="--static" --disable-shared --enable-static' || ' --disable-static --enable-shared' }}
@@ -155,10 +155,13 @@ jobs:
       with:
         name: libvpl
         path: dist/libvpl.tgz
-    - name: Set the value
+    - name: Add component to switches
       run: |
-        echo "switches='${{ env.switches }} --enable-libvpl '" >> $GITHUB_ENV
-
+        echo "COMPONENTS=${{ env.COMPONENTS }}--enable-libvpl\ " >> $GITHUB_ENV
+    - name: read
+      run: |
+        echo "sw: ${{ env.COMPONENTS }}"
+        
   ffmpeg:
     runs-on: windows-2022
     #needs: [libopus,libvpl,libsvtav1,libsnappy,libmp3lame,libzimg,liboggvorbis,libx264,libx265,libfdkaac,libvpx]
@@ -171,6 +174,7 @@ jobs:
         path-type: inherit
     - name: Set up GIT
       run: |
+        echo "sw: ${{ env.COMPONENTS }}"
         git config --global core.autocrlf false
         git config --global core.eol lf
         git config --global user.email "daniel.stankewitz@gmail.com"
