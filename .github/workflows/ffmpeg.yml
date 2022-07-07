@@ -3,19 +3,6 @@ name: Build FFmpeg
 on:
   workflow_dispatch:
     inputs:
-      config:
-        type: choice
-        required: true
-        default: 'debug' 
-        description: 'Configuration'
-        options: 
-        - debug
-        - release
-      ref:
-        type: string
-        required: true
-        default: 'release/5.0' 
-        description: 'GitHub refId'
       source:
         type: choice
         required: true
@@ -24,6 +11,22 @@ on:
         options: 
         - ffmpeg
         - cartwheel
+        
+      ref:
+        type: string
+        required: true
+        default: 'release/5.0' 
+        description: 'GitHub refId'
+
+      config:
+        type: choice
+        required: true
+        default: 'debug' 
+        description: 'Configuration'
+        options: 
+        - debug
+        - release
+
       type:
         type: choice
         required: true
