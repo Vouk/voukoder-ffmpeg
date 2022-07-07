@@ -1,4 +1,4 @@
-name: Build FFmpeg
+name: 'Build FFmpeg'
 
 on:
   workflow_dispatch:
