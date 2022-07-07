@@ -4,11 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       env:
-        type: string
+        type: choice
         required: true
         default: 'windows-2022' 
         description: 'Environment'
-        
+        options: 
+        - windows-2022
+
       source:
         type: choice
         required: true
