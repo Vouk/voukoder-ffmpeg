@@ -7,6 +7,7 @@ jobs:
   ffmpeg-static-debug:
     uses: ./.github/workflows/ffmpeg.yml
     with:
+      env: windows-2022
       source: cartwheel
       type: static
       config: debug
@@ -17,6 +18,7 @@ jobs:
   ffmpeg-static-release:
     uses: ./.github/workflows/ffmpeg.yml
     with:
+      env: windows-2022
       source: cartwheel
       type: static
       config: release
@@ -27,6 +29,7 @@ jobs:
   ffmpeg-shared-debug:
     uses: ./.github/workflows/ffmpeg.yml
     with:
+      env: windows-2022
       source: ffmpeg
       type: shared
       config: debug
