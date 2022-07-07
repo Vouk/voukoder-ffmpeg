@@ -5,7 +5,7 @@ on:
 
 jobs:
   ffmpeg-static-debug:
-    uses: Vouk/voukoder-ffmpeg/new/master/.github/workflows/ffmpeg.yml@master
+    uses: ./.github/workflows/ffmpeg.yml
     with:
       source: cartwheel
       type: static
@@ -15,7 +15,7 @@ jobs:
       amfRef: master
 
   ffmpeg-static-release:
-    uses: Vouk/voukoder-ffmpeg/new/master/.github/workflows/ffmpeg.yml@master
+    uses: ./.github/workflows/ffmpeg.yml
     with:
       source: cartwheel
       type: static
@@ -25,7 +25,7 @@ jobs:
       amfRef: master
       
   ffmpeg-shared-debug:
-    uses: Vouk/voukoder-ffmpeg/new/master/.github/workflows/ffmpeg.yml@master
+    uses: ./.github/workflows/ffmpeg.yml
     with:
       source: ffmpeg
       type: shared
