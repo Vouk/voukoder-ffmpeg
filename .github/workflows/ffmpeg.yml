@@ -150,7 +150,7 @@ jobs:
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
-        name: libvpl
+        name: libvpl-${{ inputs.env }}-${{ inputs.config }}
         path: dist/libvpl.tgz
 
   liboggvorbis:
@@ -201,7 +201,7 @@ jobs:
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
-        name: liboggvorbis
+        name: liboggvorbis-${{ inputs.env }}-${{ inputs.config }}
         path: dist/liboggvorbis.tgz
         
   libsvtav1:
@@ -239,7 +239,7 @@ jobs:
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
-        name: libsvtav1
+        name: libsvtav1-${{ inputs.env }}-${{ inputs.config }}
         path: dist/libsvtav1.tgz
        
   libsnappy:
@@ -281,7 +281,7 @@ jobs:
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
-        name: libsnappy
+        name: libsnappy-${{ inputs.env }}-${{ inputs.config }}
         path: dist/libsnappy.tgz
 
   libvpx:
@@ -314,7 +314,7 @@ jobs:
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
-        name: libvpx
+        name: libvpx-${{ inputs.env }}-${{ inputs.config }}
         path: dist/libvpx.tgz
 
   libmp3lame:
@@ -334,7 +334,7 @@ jobs:
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
-        name: libmp3lame
+        name: libmp3lame-${{ inputs.env }}-${{ inputs.config }}
         path: dist/libmp3lame.tgz
 
   libzimg:
@@ -372,7 +372,7 @@ jobs:
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
-        name: libzimg
+        name: libzimg-${{ inputs.env }}-${{ inputs.config }}
         path: dist/libzimg.tgz
 
   libopus:
@@ -412,7 +412,7 @@ jobs:
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
-        name: libopus
+        name: libopus-${{ inputs.env }}-${{ inputs.config }}
         path: dist/libopus.tgz
 
   libx264:
@@ -450,7 +450,7 @@ jobs:
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
-        name: libx264
+        name: libx264-${{ inputs.env }}-${{ inputs.config }}
         path: dist/libx264.tgz
         
   libfdkaac:
@@ -488,7 +488,7 @@ jobs:
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
-        name: libfdkaac
+        name: libfdkaac-${{ inputs.env }}-${{ inputs.config }}
         path: dist/libfdkaac.tgz
 
   libx265-12:
@@ -527,7 +527,7 @@ jobs:
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
-        name: x265_12bit
+        name: x265_12bit-${{ inputs.env }}-${{ inputs.config }}
         path: dist/x265_12bit.lib
 
   libx265-10:
@@ -566,7 +566,7 @@ jobs:
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
-        name: x265_10bit
+        name: x265_10bit-${{ inputs.env }}-${{ inputs.config }}
         path: dist/x265_10bit.lib
 
   libx265:
@@ -623,7 +623,7 @@ jobs:
     - name: Publish artifact
       uses: actions/upload-artifact@v2
       with:
-        name: libx265
+        name: libx265-${{ inputs.env }}-${{ inputs.config }}
         path: di/libx265.tgz
 
   cartwheel:
@@ -671,7 +671,7 @@ jobs:
     - name: Publish artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ inputs.config }} package build
+        name: FFmpeg (Cartwheel) ${{ inputs.env }} ${{ inputs.config }} package build
         path: dist/ffmpeg-win64-${{ inputs.type }}-${{ inputs.config }}.tar.gz
 
   ffmpeg:
@@ -724,5 +724,5 @@ jobs:
     - name: Publish FFmpeg artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ inputs.config }} package build
+        name: FFmpeg ${{ inputs.env }} ${{ inputs.config }}${{ inputs.config }} package build
         path: dist/ffmpeg-win64-${{ inputs.type }}-${{ inputs.config }}.tar.gz
