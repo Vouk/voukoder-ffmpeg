@@ -28,14 +28,3 @@ jobs:
       nvencRef: sdk/9.1
       amfRef: master
       
-  ffmpeg-shared-debug:
-    uses: ./.github/workflows/ffmpeg.yml
-    with:
-      env: windows-2022
-      source: ffmpeg
-      type: shared
-      config: debug
-      ffmpegRef: release/5.0
-      nvencRef: sdk/11.0
-      amfRef: master
-      
