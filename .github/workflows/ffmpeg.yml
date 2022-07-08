@@ -617,7 +617,7 @@ jobs:
         move ${{ inputs.config }}\x265-static.lib ..\..\..\..\build\
         move x265_config.h ..\..\..\..\dist\include\
         cd ..\..\..\..
-        "${{ env.vsPath }}VC\Tools\MSVC\14.29.30133\bin\Hostx64\x64\lib.exe" /ignore:4006 /ignore:4221 /OUT:dist\lib\x265.lib build\x265-static.lib build\x265_10bit\x265_10bit.lib build\x265_12bit\x265_12bit.lib
+        "${{ env.vsPath }}VC\Tools\MSVC\14.29.30133\bin\Hostx64\x64\lib.exe" /ignore:4006 /ignore:4221 /OUT:dist\lib\x265.lib build\x265-static.lib build\x265_10bit-${{ inputs.env }}-${{ inputs.config }}\x265_10bit.lib build\x265_12bit-${{ inputs.env }}-${{ inputs.config }}\x265_12bit.lib
         copy x265\source\x265.h dist\include\
         D:\a\_temp\setup-msys2\msys2.cmd -c 'cd dist ; tar czf ../di/libx265.tgz *'
     - name: Publish artifact
