@@ -97,7 +97,6 @@ jobs:
 
   liboggvorbis:
     runs-on: ${{ inputs.env }}
-    if: ${{ inputs.source == 'cartwheel' }}
     steps:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/liboggvorbis
@@ -107,7 +106,6 @@ jobs:
         
   libsvtav1:
     runs-on: ${{ inputs.env }}
-    if: ${{ inputs.source == 'cartwheel' }}
     steps:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/libsvtav1
