@@ -113,7 +113,7 @@ jobs:
     runs-on: ${{ inputs.env }}
     steps:
     - id: libvpl
-      uses: ./.github/workflows/libvpl.yml
+      uses: ./.github/actions/libvpl.yml
       with:
         env: ${{ inputs.env }}
         config: ${{ inputs.config }}
