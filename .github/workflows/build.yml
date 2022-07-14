@@ -13,7 +13,7 @@ jobs:
       source: ffmpeg
       type: static
       config: debug
-      ffmpegRef: master
+      ffmpegRef: release/5.0
 
   ffmpeg-static-release:
     uses: ./.github/workflows/ffmpeg.yml
@@ -22,4 +22,4 @@ jobs:
       source: ffmpeg
       type: static
       config: release
-      ffmpegRef: master
+      ffmpegRef: release/5.0
