@@ -12,6 +12,7 @@ runs:
   using: "composite"
   steps:
   - name: Set up GIT
+    shell: cmd
     run: |
       git config --global core.autocrlf false
       git config --global core.eol lf
