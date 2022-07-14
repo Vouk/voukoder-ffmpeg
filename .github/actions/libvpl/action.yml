@@ -8,10 +8,6 @@ inputs:
     type: string
     required: true
 
-env:
-  vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
-  msbuildConfig: ${{ inputs.config == 'release' && 'Release' || 'Debug' }}
-
 runs:
   using: "composite"
   steps:
@@ -40,6 +36,9 @@ runs:
   - name: Build oneVPL
     if: steps.libvpl-cache.outputs.cache-hit != 'true'
     shell: cmd
+    env:
+      vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
+      msbuildConfig: ${{ inputs.config == 'release' && 'Release' || 'Debug' }}
     run: |
       call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
       md temp build dist
