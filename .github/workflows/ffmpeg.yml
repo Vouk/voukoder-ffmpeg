@@ -49,32 +49,18 @@ on:
       env:
         type: string
         required: true
-        default: 'windows-2022' 
-        description: 'Environment'
-        
       source:
         type: string
         required: true
-        default: 'ffmpeg' 
-        description: Source
-      
       type:
         type: string
         required: true
-        default: 'static' 
-        description: Type
-
       config:
         type: string
         required: true
-        default: 'debug' 
-        description: 'Configuration'
-        
       ffmpegRef:
         type: string
         required: true
-        default: 'release/5.0' 
-        description: 'FFmpeg refId'
         
 env:
   vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
