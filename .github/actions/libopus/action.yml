@@ -1,0 +1,54 @@
+name: libopus
+
+inputs:
+  env:
+    type: string
+    required: true
+  config:
+    type: string
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+  - name: Set up GIT
+    shell: cmd
+    run: |
+      git config --global core.autocrlf false
+      git config --global core.eol lf
+  - name: Checkout OPUS
+    uses: actions/checkout@v3.0.0
+    with:
+      repository: xiph/opus
+      ref: master
+      path: opus        
+  - name: Check cache
+    id: libopus-cache
+    uses: actions/cache@v3
+    with:
+      path: dist
+      key: libopus-${{ inputs.env }}-${{ inputs.config }}-${{ hashFiles('opus') }}
+  - name: Set up MSYS2
+    if: steps.libopus-cache.outputs.cache-hit != 'true'
+    uses: msys2/setup-msys2@v2
+    with:
+      install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
+      path-type: inherit
+  - name: Build OPUS
+    if: steps.libopus-cache.outputs.cache-hit != 'true'
+    shell: cmd
+    env:
+      vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
+      cFlags: ${{ inputs.config == 'release' && '-MD' || '-MDd' }}
+      msbuildConfig: ${{ inputs.config == 'release' && 'Release' || 'Debug' }}
+    run: |
+      call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
+      md build build\include build\lib build\lib\pkgconfig dist
+      cd opus\win32\VS2015
+      MSBuild.exe /property:Configuration="${{ env.msbuildConfig }}" /property:Platform=x64 /property:PlatformToolset=v143 opus.vcxproj
+      D:\a\_temp\setup-msys2\msys2.cmd -c 'cp x64/${{ inputs.config }}/opus.lib ../../../build/lib/opus.lib ; cd ../../.. ; cp -r opus/include build/include/opus ; cp opus/opus.pc.in build/lib/pkgconfig/opus.pc ; sed -i "s#@prefix@#$(realpath ../../../build)#g" build/lib/pkgconfig/opus.pc ; sed -i "s/@exec_prefix@/\$\{prefix\}/g" build/lib/pkgconfig/opus.pc ; sed -i "s/@libdir@/\$\{prefix\}\/lib/g" build/lib/pkgconfig/opus.pc ; sed -i "s/@includedir@/\$\{prefix\}\/include/g" build/lib/pkgconfig/opus.pc ; sed -i "s/@LIBM@//g" build/lib/pkgconfig/opus.pc; sed -i "s/@VERSION@/2.0.0/g" build/lib/pkgconfig/opus.pc ; cd build ; tar czf ../dist/libopus.tgz *'
+  - name: Publish artifact
+    uses: actions/upload-artifact@v2
+    with:
+      name: libopus-${{ inputs.env }}-${{ inputs.config }}
+      path: dist/libopus.tgz

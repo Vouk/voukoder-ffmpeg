@@ -1,0 +1,52 @@
+name: libx265-12
+
+inputs:
+  env:
+    type: string
+    required: true
+  config:
+    type: string
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+  - name: Checkout X265
+    shell: cmd
+    run: |
+      git config --global core.autocrlf false
+      git config --global core.eol lf
+      git clone -b Release_3.5 https://github.com/videolan/x265.git x265
+  - name: Check cache
+    id: libx26512-cache
+    uses: actions/cache@v3
+    with:
+      path: dist
+      key: libx265-12-${{ inputs.env }}-${{ inputs.config }}-${{ hashFiles('x265') }}
+  - name: Set up MSBuild
+    if: steps.libx26512-cache.outputs.cache-hit != 'true'
+    uses: microsoft/setup-msbuild@v1.1
+  - name: Set up NASM
+    if: steps.libx26512-cache.outputs.cache-hit != 'true'
+    uses: ilammy/setup-nasm@v1.2.1
+  - name: Build X265 (12 bit)
+    if: steps.libx26512-cache.outputs.cache-hit != 'true'
+    shell: cmd
+    env:
+      vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
+      cFlags: ${{ inputs.config == 'release' && '-MD' || '-MDd' }}
+      msbuildConfig: ${{ inputs.config == 'release' && 'Release' || 'Debug' }}
+    run: |
+      call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
+      md build dist
+      cd x265/build/vc15-x86_64
+      md work
+      cd work
+      cmake -G "Visual Studio 17 2022" ..\..\..\source -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DMAIN12=ON
+      MSBuild.exe /property:Configuration="${{ env.msbuildConfig }}" x265-static.vcxproj
+      move ${{ inputs.config }}\x265-static.lib ..\..\..\..\dist\x265_12bit.lib
+  - name: Publish artifact
+    uses: actions/upload-artifact@v2
+    with:
+      name: x265_12bit-${{ inputs.env }}-${{ inputs.config }}
+      path: dist/x265_12bit.lib

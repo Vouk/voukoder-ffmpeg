@@ -96,64 +96,115 @@ jobs:
         config: ${{ inputs.config }}
 
   liboggvorbis:
-    uses: ./.github/workflows/liboggvorbis.yml
-    with:
-      env: ${{ inputs.env }}
-      config: ${{ inputs.config }}
+    runs-on: ${{ inputs.env }}
+    if: ${{ inputs.source == 'cartwheel' }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/liboggvorbis
+      with:
+        env: ${{ inputs.env }}
+        config: ${{ inputs.config }}
         
   libsvtav1:
-    uses: ./.github/workflows/libsvtav1.yml
-    with:
-      env: ${{ inputs.env }}
-      config: ${{ inputs.config }}
+    runs-on: ${{ inputs.env }}
+    if: ${{ inputs.source == 'cartwheel' }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libsvtav1
+      with:
+        env: ${{ inputs.env }}
+        config: ${{ inputs.config }}
        
   libsnappy:
-    uses: ./.github/workflows/libsnappy.yml
-    with:
-      env: ${{ inputs.env }}
-      config: ${{ inputs.config }}
+    runs-on: ${{ inputs.env }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libsnappy
+      with:
+        env: ${{ inputs.env }}
+        config: ${{ inputs.config }}
 
   libvpx:
-    uses: ./.github/workflows/libvpx.yml
-    with:
-      env: ${{ inputs.env }}
-      config: ${{ inputs.config }}
+    runs-on: ${{ inputs.env }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libvpx
+      with:
+        env: ${{ inputs.env }}
+        config: ${{ inputs.config }}
 
   libmp3lame:
-    uses: ./.github/workflows/libmp3lame.yml
-    with:
-      env: ${{ inputs.env }}
-      config: ${{ inputs.config }}
+    runs-on: ${{ inputs.env }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libmp3lame
+      with:
+        env: ${{ inputs.env }}
+        config: ${{ inputs.config }}
 
   libzimg:
-    uses: ./.github/workflows/libzimg.yml
-    with:
-      env: ${{ inputs.env }}
-      config: ${{ inputs.config }}
+    runs-on: ${{ inputs.env }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libzimg
+      with:
+        env: ${{ inputs.env }}
+        config: ${{ inputs.config }}
 
   libopus:
-    uses: ./.github/workflows/libopus.yml
-    with:
-      env: ${{ inputs.env }}
-      config: ${{ inputs.config }}
+    runs-on: ${{ inputs.env }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libopus
+      with:
+        env: ${{ inputs.env }}
+        config: ${{ inputs.config }}
 
   libfdkaac:
-    uses: ./.github/workflows/libfdkaac.yml
-    with:
-      env: ${{ inputs.env }}
-      config: ${{ inputs.config }}
+    runs-on: ${{ inputs.env }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libfdkaac
+      with:
+        env: ${{ inputs.env }}
+        config: ${{ inputs.config }}
 
   libx264:
-    uses: ./.github/workflows/libx264.yml
-    with:
-      env: ${{ inputs.env }}
-      config: ${{ inputs.config }}
+    runs-on: ${{ inputs.env }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libfdkaac
+      with:
+        env: ${{ inputs.env }}
+        config: ${{ inputs.config }}
+
+  libx265-12:
+    runs-on: ${{ inputs.env }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libx265-12
+      with:
+        env: ${{ inputs.env }}
+        config: ${{ inputs.config }}
+
+  libx265-10:
+    runs-on: ${{ inputs.env }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libx265-10
+      with:
+        env: ${{ inputs.env }}
+        config: ${{ inputs.config }}
 
   libx265:
-    uses: ./.github/workflows/libx265.yml
-    with:
-      env: ${{ inputs.env }}
-      config: ${{ inputs.config }}
+    runs-on: ${{ inputs.env }}
+    needs: [libx265-12,libx265-10]
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libx265
+      with:
+        env: ${{ inputs.env }}
+        config: ${{ inputs.config }}
 
   cartwheel:
     runs-on: ${{ inputs.env }}

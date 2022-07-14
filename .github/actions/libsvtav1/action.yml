@@ -1,0 +1,51 @@
+name: libsvtav1
+
+inputs:
+  env:
+    type: string
+    required: true
+  config:
+    type: string
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+  - name: Set up GIT
+    shell: cmd
+    run: |
+      git config --global core.autocrlf false
+      git config --global core.eol lf
+  - name: Checkout SVT AV1
+    uses: actions/checkout@v3
+    with:
+      repository: AOMediaCodec/SVT-AV1
+      ref: master
+      path: svtav1
+  - name: Check cache
+    id: libsvtav1-cache
+    uses: actions/cache@v3
+    with:
+      path: dist
+      key: libsvtav1-${{ inputs.env }}-${{ inputs.config }}-${{ hashFiles('svtav1') }}
+  - name: Set up MSYS2
+    if: steps.libsvtav1-cache.outputs.cache-hit != 'true'
+    uses: msys2/setup-msys2@v2
+    with:
+      install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
+      path-type: inherit
+  - name: Build SVT AV1
+    if: steps.libsvtav1-cache.outputs.cache-hit != 'true'
+    shell: cmd
+    env:
+      vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
+      cFlags: ${{ inputs.config == 'release' && '-MD' || '-MDd' }}
+    run: |
+      call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
+      md build build\include build\lib build\lib\pkgconfig dist
+      D:\a\_temp\setup-msys2\msys2.cmd -c 'cd svtav1/Build/windows ; ./build.bat 2022 ${{ inputs.config }} static ; cp -r ../../Source/API ../../../build/include/svt-av1 ; cp ../../Bin/${{ inputs.config }}/SvtAv1Enc.lib ../../../build/lib/ ; cp SvtAv1Enc.pc ../../../build/lib/pkgconfig/ ; cd ../../../build ; tar czf ../dist/libsvtav1.tgz *'
+  - name: Publish artifact
+    uses: actions/upload-artifact@v2
+    with:
+      name: libsvtav1-${{ inputs.env }}-${{ inputs.config }}
+      path: dist/libsvtav1.tgz

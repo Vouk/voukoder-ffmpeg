@@ -1,0 +1,52 @@
+name: libzimg
+
+inputs:
+  env:
+    type: string
+    required: true
+  config:
+    type: string
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+  - name: Set up GIT
+    shell: cmd
+    run: |
+      git config --global core.autocrlf false
+      git config --global core.eol lf
+  - name: Checkout ZIMG
+    uses: actions/checkout@v3.0.0
+    with:
+      repository: sekrit-twc/zimg
+      ref: release-2.9.2
+      path: zimg
+  - name: Check cache
+    id: libzimg-cache
+    uses: actions/cache@v3
+    with:
+      path: dist
+      key: libzimg-${{ inputs.env }}-${{ inputs.config }}-${{ hashFiles('zimg') }}
+  - name: Set up MSYS2
+    if: steps.libzimg-cache.outputs.cache-hit != 'true'
+    uses: msys2/setup-msys2@v2
+    with:
+      install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
+      path-type: inherit
+  - name: Build ZIMG
+    if: steps.libzimg-cache.outputs.cache-hit != 'true'
+    shell: cmd
+    env:
+      vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
+      cFlags: ${{ inputs.config == 'release' && '-MD' || '-MDd' }}
+      msbuildConfig: ${{ inputs.config == 'release' && 'Release' || 'Debug' }}
+    run: |
+      call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
+      md build build\include build\lib build\lib\pkgconfig dist
+      D:\a\_temp\setup-msys2\msys2.cmd -c 'cd zimg ; ./autogen.sh ; ./configure --prefix=$(realpath ../build) ; cd _msvc/zimg ; MSBuild.exe /property:Configuration="${{ env.msbuildConfig }}" /property:ConfigurationType=StaticLibrary /property:PlatformToolset=v143 /property:Platform=x64 /property:WholeProgramOptimization=false zimg.vcxproj ; cp x64/${{ inputs.config }}/z.lib ../../../build/lib/zimg.lib ; cd ../.. ; cp src/zimg/api/zimg.h  ../build/include/zimg.h ; cp zimg.pc ../build/lib/pkgconfig/zimg.pc ; cd ../build ; tar czf ../dist/libzimg.tgz *'
+  - name: Publish artifact
+    uses: actions/upload-artifact@v2
+    with:
+      name: libzimg-${{ inputs.env }}-${{ inputs.config }}
+      path: dist/libzimg.tgz
