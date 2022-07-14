@@ -171,7 +171,7 @@ jobs:
     runs-on: ${{ inputs.env }}
     steps:
     - uses: actions/checkout@v3
-    - uses: ./.github/actions/libfdkaac
+    - uses: ./.github/actions/libx264
       with:
         env: ${{ inputs.env }}
         config: ${{ inputs.config }}
