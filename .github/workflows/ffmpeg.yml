@@ -88,8 +88,8 @@ jobs:
   libvpl:
     runs-on: ${{ inputs.env }}
     steps:
-    - id: libvpl
-      uses: ./.github/actions/libvpl.yml
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libvpl
       with:
         env: ${{ inputs.env }}
         config: ${{ inputs.config }}
