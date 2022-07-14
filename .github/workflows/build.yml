@@ -10,21 +10,16 @@ jobs:
     uses: ./.github/workflows/ffmpeg.yml
     with:
       env: windows-2022
-      source: cartwheel
+      source: ffmpeg
       type: static
       config: debug
       ffmpegRef: master
-      nvencRef: sdk/9.1
-      amfRef: master
 
   ffmpeg-static-release:
     uses: ./.github/workflows/ffmpeg.yml
     with:
       env: windows-2022
-      source: cartwheel
+      source: ffmpeg
       type: static
       config: release
       ffmpegRef: master
-      nvencRef: sdk/9.1
-      amfRef: master
-      
