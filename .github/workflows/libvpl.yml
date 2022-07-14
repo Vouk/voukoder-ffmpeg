@@ -19,46 +19,45 @@ env:
   vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
   msbuildConfig: ${{ inputs.config == 'release' && 'Release' || 'Debug' }}
 
-jobs:
-  libvpl:
-    runs-on: ${{ inputs.env }}
-    steps:
-    - name: Set up GIT
-      run: |
-        git config --global core.autocrlf false
-        git config --global core.eol lf
-    - name: Checkout oneVPL
-      uses: actions/checkout@v3.0.0
-      with:
-        repository: oneapi-src/oneVPL
-        ref: master
-        path: onevpl
-    - name: Check cache
-      id: libvpl-cache
-      uses: actions/cache@v3
-      with:
-        path: dist
-        key: libvpl-${{ inputs.env }}-${{ inputs.config }}-${{ hashFiles('onevpl') }}
-    - name: Set up MSYS2
-      if: steps.libvpl-cache.outputs.cache-hit != 'true'
-      uses: msys2/setup-msys2@v2
-      with:
-        install: base-devel binutils autotools automake
-        path-type: inherit
-    - name: Build oneVPL
-      if: steps.libvpl-cache.outputs.cache-hit != 'true'
-      shell: cmd
-      run: |
-        call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
-        md temp build dist
-        cd temp
-        cmake.exe -G "Visual Studio 17 2022" ..\onevpl -T host=x64 -A x64 -DBUILD_TOOLS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=..\build -DCMAKE_VS_INCLUDE_INSTALL_TO_DEFAULT_BUILD=ON
-        MSBuild.exe -t:VPL,INSTALL -p:Configuration=${{ env.msbuildConfig }} -m vpl.sln
-        cd ..\build
-        IF EXIST "lib\vpld.lib" move "lib\vpld.lib" "lib\vpl.lib"
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'rm -rf bin/cmake ; tar czf ../dist/libvpl.tgz *'
-    - name: Publish artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: libvpl-${{ inputs.env }}-${{ inputs.config }}
-        path: dist/libvpl.tgz
+runs:
+  using: "composite"
+  steps:
+  - name: Set up GIT
+    run: |
+      git config --global core.autocrlf false
+      git config --global core.eol lf
+  - name: Checkout oneVPL
+    uses: actions/checkout@v3.0.0
+    with:
+      repository: oneapi-src/oneVPL
+      ref: master
+      path: onevpl
+  - name: Check cache
+    id: libvpl-cache
+    uses: actions/cache@v3
+    with:
+      path: dist
+      key: libvpl-${{ inputs.env }}-${{ inputs.config }}-${{ hashFiles('onevpl') }}
+  - name: Set up MSYS2
+    if: steps.libvpl-cache.outputs.cache-hit != 'true'
+    uses: msys2/setup-msys2@v2
+    with:
+      install: base-devel binutils autotools automake
+      path-type: inherit
+  - name: Build oneVPL
+    if: steps.libvpl-cache.outputs.cache-hit != 'true'
+    shell: cmd
+    run: |
+      call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
+      md temp build dist
+      cd temp
+      cmake.exe -G "Visual Studio 17 2022" ..\onevpl -T host=x64 -A x64 -DBUILD_TOOLS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=..\build -DCMAKE_VS_INCLUDE_INSTALL_TO_DEFAULT_BUILD=ON
+      MSBuild.exe -t:VPL,INSTALL -p:Configuration=${{ env.msbuildConfig }} -m vpl.sln
+      cd ..\build
+      IF EXIST "lib\vpld.lib" move "lib\vpld.lib" "lib\vpl.lib"
+      D:\a\_temp\setup-msys2\msys2.cmd -c 'rm -rf bin/cmake ; tar czf ../dist/libvpl.tgz *'
+  - name: Publish artifact
+    uses: actions/upload-artifact@v2
+    with:
+      name: libvpl-${{ inputs.env }}-${{ inputs.config }}
+      path: dist/libvpl.tgz
