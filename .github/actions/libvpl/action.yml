@@ -4,13 +4,9 @@ inputs:
   env:
     type: string
     required: true
-    default: 'windows-2022' 
-    description: 'Environment'
   config:
     type: string
     required: true
-    default: 'debug' 
-    description: 'Configuration'
 
 env:
   vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
