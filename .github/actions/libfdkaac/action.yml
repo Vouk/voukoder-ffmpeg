@@ -20,7 +20,7 @@ runs:
     uses: actions/checkout@v3
     with:
       repository: mstorsjo/fdk-aac
-      ref: master
+      ref: v2.0.2
       path: fdkaac
   - name: Check cache
     id: libfdkaac-cache
