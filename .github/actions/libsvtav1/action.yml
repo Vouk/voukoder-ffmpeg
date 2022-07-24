@@ -20,7 +20,7 @@ runs:
     uses: actions/checkout@v3
     with:
       repository: AOMediaCodec/SVT-AV1
-      ref: master
+      ref: tags/v1.1.0
       path: svtav1
   - name: Check cache
     id: libsvtav1-cache
