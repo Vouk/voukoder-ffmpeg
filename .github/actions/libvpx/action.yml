@@ -16,7 +16,7 @@ runs:
     run: |
       git config --global core.autocrlf false
       git config --global core.eol lf
-      git clone https://github.com/webmproject/libvpx.git vpx
+      git clone --depth 1 -b v1.12.0 https://github.com/webmproject/libvpx.git vpx
   - name: Check cache
     id: libvpx-cache
     uses: actions/cache@v3
