@@ -20,7 +20,7 @@ runs:
     uses: actions/checkout@v3
     with:
       repository: google/snappy
-      ref: "1.1.8"
+      ref: 1.1.9
       path: snappy
   - name: Check cache
     id: libsnappy-cache
