@@ -20,7 +20,7 @@ runs:
     uses: actions/checkout@v3.0.0
     with:
       repository: sekrit-twc/zimg
-      ref: release-2.9.2
+      ref: release-3.0.4
       path: zimg
   - name: Check cache
     id: libzimg-cache
