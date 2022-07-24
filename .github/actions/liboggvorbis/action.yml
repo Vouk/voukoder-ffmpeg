@@ -20,13 +20,13 @@ runs:
     uses: actions/checkout@v3
     with:
       repository: xiph/ogg
-      ref: master
+      ref: v1.3.5
       path: ogg
   - name: Checkout Vorbis
     uses: actions/checkout@v3.0.0
     with:
       repository: xiph/vorbis
-      ref: master
+      ref: v1.3.7
       path: vorbis
   - name: Check cache
     id: liboggvorbis-cache
