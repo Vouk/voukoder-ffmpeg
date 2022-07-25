@@ -44,6 +44,7 @@ runs:
       call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
       md build build\include build\lib build\lib\pkgconfig dist
       cd snappy
+      git submodule update --init
       md work
       cd work
       cmake -G "Visual Studio 17 2022" .. -DCMAKE_INSTALL_PREFIX=..\..\build -DBUILD_SHARED_LIBS=OFF -DSNAPPY_BUILD_TESTS=OFF
