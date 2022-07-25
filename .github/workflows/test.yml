@@ -1,0 +1,81 @@
+name: Snappy
+
+on:
+  workflow_dispatch:
+    inputs:
+      env:
+        type: choice
+        required: true
+        default: 'windows-2022' 
+        description: 'Environment'
+        options: 
+        - windows-2022
+
+      source:
+        type: choice
+        required: true
+        default: 'ffmpeg' 
+        description: Source
+        options: 
+        - ffmpeg
+        - cartwheel
+      
+      type:
+        type: choice
+        required: true
+        default: 'static' 
+        description: Type
+        options: 
+        - static
+        - shared
+
+      config:
+        type: choice
+        required: true
+        default: 'debug' 
+        description: 'Configuration'
+        options: 
+        - debug
+        - release
+        
+      ffmpegRef:
+        type: string
+        required: true
+        default: 'release/5.0' 
+        description: 'FFmpeg refId'
+        
+  workflow_call:
+    inputs:
+      env:
+        type: string
+        required: true
+      source:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      config:
+        type: string
+        required: true
+      ffmpegRef:
+        type: string
+        required: true
+        
+env:
+  vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
+  COMPONENTS: "--enable-libsvtav1 --enable-libsnappy --enable-libmp3lame --enable-libzimg --enable-libopus --enable-libvorbis --enable-libx264 --enable-libx265 --enable-libfdk-aac --enable-libvpx "
+  NASM_EXECUTABLE: nasm
+  cFlags: ${{ inputs.config == 'release' && '-MD' || '-MDd' }}
+  variant: ${{ inputs.type == 'static' && ' --pkg-config-flags="--static" --disable-shared --enable-static' || ' --disable-static --enable-shared' }}
+  msbuildConfig: ${{ inputs.config == 'release' && 'Release' || 'Debug' }}
+  
+jobs:
+  libsnappy:
+    runs-on: ${{ inputs.env }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libsnappy
+      with:
+        env: ${{ inputs.env }}
+        config: ${{ inputs.config }}
