@@ -22,20 +22,12 @@ runs:
       repository: AOMediaCodec/SVT-AV1
       ref: ${{ inputs.refId }}
       path: svtav1
-  - name: Check cache
-    id: libsvtav1-cache
-    uses: actions/cache@v3
-    with:
-      path: dist
-      key: libsvtav1-${{ runner.os }}-${{ inputs.config }}-${{ hashFiles('svtav1') }}
   - name: Set up MSYS2
-    if: steps.libsvtav1-cache.outputs.cache-hit != 'true'
     uses: msys2/setup-msys2@v2
     with:
       install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
       path-type: inherit
   - name: Build SVT AV1
-    if: steps.libsvtav1-cache.outputs.cache-hit != 'true'
     shell: cmd
     env:
       vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
