@@ -16,7 +16,7 @@ runs:
     run: |
       git config --global core.autocrlf false
       git config --global core.eol lf
-      git clone -b Release_3.5 https://github.com/videolan/x265.git x265
+      git clone -b ${{ inputs.refId }} https://github.com/videolan/x265.git x265
   - name: Set up MSBuild
     uses: microsoft/setup-msbuild@v1.1
   - name: Set up NASM
