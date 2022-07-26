@@ -34,8 +34,8 @@ runs:
       cFlags: ${{ inputs.config == 'release' && '-MD' || '-MDd' }}
     run: |
       call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
-      md build
-      D:\a\_temp\setup-msys2\msys2.cmd -c 'cd ogg ; autoreconf -i ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) --disable-shared ; make -j ; make install'
+      md build dist
+      D:\a\_temp\setup-msys2\msys2.cmd -c 'cd ogg ; autoreconf -i ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) --disable-shared ; make -j ; make install ; cd ../build ; ls -la ; tar czf ../dist/libogg.tgz *'
   - name: Publish artifact
     uses: actions/upload-artifact@v2
     with:
