@@ -68,14 +68,23 @@ jobs:
         refId: master
         config: ${{ inputs.config }}
 
-  liboggvorbis:
+  libogg:
     runs-on: ${{ inputs.system }}
     steps:
     - uses: actions/checkout@v3
-    - uses: ./.github/actions/liboggvorbis
+    - uses: ./.github/actions/libogg
       with:
-        libogg_refId: v1.3.5
-        libvorbis_refId: v1.3.7
+        refId: v1.3.5
+        config: ${{ inputs.config }}
+        
+  libvorbis:
+    runs-on: ${{ inputs.system }}
+    needs: [libogg]
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libvorbis
+      with:
+        refId: v1.3.7
         config: ${{ inputs.config }}
         
   libsvtav1:
@@ -180,7 +189,7 @@ jobs:
 
   ffmpeg:
     runs-on: ${{ inputs.system }}
-    needs: [libvpl,libopus,libsvtav1,libsnappy,libmp3lame,libzimg,liboggvorbis,libx264,libx265,libfdkaac,libvpx]
+    needs: [libvpl,libopus,libsvtav1,libsnappy,libmp3lame,libzimg,libogg,libvorbis,libx264,libx265,libfdkaac,libvpx]
     steps:
     - name: Set up MSYS2
       uses: msys2/setup-msys2@v2
