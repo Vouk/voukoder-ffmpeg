@@ -1,7 +1,7 @@
 name: libzimg
 
 inputs:
-  env:
+  refId:
     type: string
     required: true
   config:
@@ -20,22 +20,14 @@ runs:
     uses: actions/checkout@v3.0.0
     with:
       repository: sekrit-twc/zimg
-      ref: release-3.0.4
+      ref: ${{ inputs.refId }}
       path: zimg
-  - name: Check cache
-    id: libzimg-cache
-    uses: actions/cache@v3
-    with:
-      path: dist
-      key: libzimg-${{ inputs.env }}-${{ inputs.config }}-${{ hashFiles('zimg') }}
   - name: Set up MSYS2
-    if: steps.libzimg-cache.outputs.cache-hit != 'true'
     uses: msys2/setup-msys2@v2
     with:
       install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
       path-type: inherit
   - name: Build ZIMG
-    if: steps.libzimg-cache.outputs.cache-hit != 'true'
     shell: cmd
     env:
       vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
@@ -48,5 +40,5 @@ runs:
   - name: Publish artifact
     uses: actions/upload-artifact@v2
     with:
-      name: libzimg-${{ inputs.env }}-${{ inputs.config }}
+      name: libzimg-${{ runner.os }}-${{ inputs.config }}
       path: dist/libzimg.tgz
