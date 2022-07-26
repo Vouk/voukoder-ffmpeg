@@ -31,20 +31,12 @@ runs:
       repository: xiph/vorbis
       ref: ${{ inputs.libvorbis_refId }}
       path: vorbis
-  - name: Check cache
-    id: liboggvorbis-cache
-    uses: actions/cache@v3
-    with:
-      path: dist
-      key: liboggvorbis-${{ runner.os }}-${{ inputs.config }}-${{ hashFiles('ogg') }}-${{ hashFiles('vorbis') }}
   - name: Set up MSYS2
-    if: steps.liboggvorbis-cache.outputs.cache-hit != 'true'
     uses: msys2/setup-msys2@v2
     with:
       install: base-devel binutils autotools automake
       path-type: inherit
   - name: Build Ogg
-    if: steps.liboggvorbis-cache.outputs.cache-hit != 'true'
     shell: cmd
     env:
       vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
@@ -54,7 +46,6 @@ runs:
       md build
       D:\a\_temp\setup-msys2\msys2.cmd -c 'cd ogg ; autoreconf -i ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) --disable-shared ; make -j ; make install'
   - name: Build Vorbis
-    if: steps.liboggvorbis-cache.outputs.cache-hit != 'true'
     shell: cmd
     env:
       vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
