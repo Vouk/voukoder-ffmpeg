@@ -1,7 +1,7 @@
 name: libsvtav1
 
 inputs:
-  env:
+  refId:
     type: string
     required: true
   config:
@@ -20,14 +20,14 @@ runs:
     uses: actions/checkout@v3
     with:
       repository: AOMediaCodec/SVT-AV1
-      ref: v1.1.0
+      ref: ${{ inputs.refId }}
       path: svtav1
   - name: Check cache
     id: libsvtav1-cache
     uses: actions/cache@v3
     with:
       path: dist
-      key: libsvtav1-${{ inputs.env }}-${{ inputs.config }}-${{ hashFiles('svtav1') }}
+      key: libsvtav1-${{ runner.os }}-${{ inputs.config }}-${{ hashFiles('svtav1') }}
   - name: Set up MSYS2
     if: steps.libsvtav1-cache.outputs.cache-hit != 'true'
     uses: msys2/setup-msys2@v2
@@ -47,5 +47,5 @@ runs:
   - name: Publish artifact
     uses: actions/upload-artifact@v2
     with:
-      name: libsvtav1-${{ inputs.env }}-${{ inputs.config }}
+      name: libsvtav1-${{ runner.os }}-${{ inputs.config }}
       path: dist/libsvtav1.tgz
