@@ -22,24 +22,16 @@ runs:
       repository: oneapi-src/oneVPL
       ref: ${{ inputs.refId }}
       path: onevpl
-  - name: Check cache
-    id: libvpl-cache
-    uses: actions/cache@v3
-    with:
-      path: dist
-      key: libvpl-${{ runner.os }}-${{ inputs.config }}-${{ hashFiles('onevpl') }}
   - name: Set up MSYS2
-    if: steps.libvpl-cache.outputs.cache-hit != 'true'
     uses: msys2/setup-msys2@v2
     with:
       install: base-devel binutils autotools automake
       path-type: inherit
   - name: Build oneVPL
-    if: steps.libvpl-cache.outputs.cache-hit != 'true'
     shell: cmd
-    env:
-      vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
-      msbuildConfig: ${{ inputs.config == 'release' && 'Release' || 'Debug' }}
+    #env:
+     # vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
+     # msbuildConfig: ${{ inputs.config == 'release' && 'Release' || 'Debug' }}
     run: |
       call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
       md temp build dist
