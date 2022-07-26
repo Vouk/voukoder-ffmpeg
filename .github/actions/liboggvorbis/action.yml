@@ -1,7 +1,10 @@
 name: liboggvorbis
 
 inputs:
-  env:
+  libogg_refId:
+    type: string
+    required: true  
+  libvorbis_refId:
     type: string
     required: true
   config:
@@ -20,20 +23,20 @@ runs:
     uses: actions/checkout@v3
     with:
       repository: xiph/ogg
-      ref: v1.3.5
+      ref: ${{ inputs.libogg_refId }}
       path: ogg
   - name: Checkout Vorbis
     uses: actions/checkout@v3.0.0
     with:
       repository: xiph/vorbis
-      ref: v1.3.7
+      ref: ${{ inputs.libvorbis_refId }}
       path: vorbis
   - name: Check cache
     id: liboggvorbis-cache
     uses: actions/cache@v3
     with:
       path: dist
-      key: liboggvorbis-${{ inputs.env }}-${{ inputs.config }}-${{ hashFiles('ogg') }}-${{ hashFiles('vorbis') }}
+      key: liboggvorbis-${{ runner.os }}-${{ inputs.config }}-${{ hashFiles('ogg') }}-${{ hashFiles('vorbis') }}
   - name: Set up MSYS2
     if: steps.liboggvorbis-cache.outputs.cache-hit != 'true'
     uses: msys2/setup-msys2@v2
@@ -63,5 +66,5 @@ runs:
   - name: Publish artifact
     uses: actions/upload-artifact@v2
     with:
-      name: liboggvorbis-${{ inputs.env }}-${{ inputs.config }}
+      name: liboggvorbis-${{ runner.os }}-${{ inputs.config }}
       path: dist/liboggvorbis.tgz
