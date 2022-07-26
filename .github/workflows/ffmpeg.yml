@@ -170,7 +170,7 @@ jobs:
         config: ${{ inputs.config }}
 
   libx265:
-    runs-on: ${{ env.system }}
+    runs-on: ${{ inputs.system }}
     needs: [libx265-12,libx265-10]
     steps:
     - uses: actions/checkout@v3
