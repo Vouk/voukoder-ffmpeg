@@ -1,7 +1,7 @@
 name: libmp3lame
 
 inputs:
-  env:
+  refId:
     type: string
     required: true
   config:
@@ -24,9 +24,9 @@ runs:
     run: |
       call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
       md build dist
-      D:\a\_temp\setup-msys2\msys2.cmd -c 'svn co https://svn.code.sf.net/p/lame/svn/tags/RELEASE__3_100/lame lame ; cd lame ; autoreconf -i ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) --enable-nasm --disable-frontend --disable-shared --enable-static ; make -j ; make install ; cd ../build ; tar czf ../dist/libmp3lame.tgz *
+      D:\a\_temp\setup-msys2\msys2.cmd -c 'svn co https://svn.code.sf.net/p/lame/svn/${{ inputs.refId }}/lame lame ; cd lame ; autoreconf -i ; CC=cl.exe CXX=cl.exe CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) --enable-nasm --disable-frontend --disable-shared --enable-static ; make -j ; make install ; cd ../build ; tar czf ../dist/libmp3lame.tgz *
   - name: Publish artifact
     uses: actions/upload-artifact@v2
     with:
-      name: libmp3lame-${{ inputs.env }}-${{ inputs.config }}
+      name: libmp3lame-${{ runner.os }}-${{ inputs.config }}
       path: dist/libmp3lame.tgz
