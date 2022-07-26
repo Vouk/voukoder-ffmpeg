@@ -1,7 +1,7 @@
 name: libsnappy
 
 inputs:
-  env:
+  refId:
     type: string
     required: true
   config:
@@ -20,14 +20,14 @@ runs:
     uses: actions/checkout@v3
     with:
       repository: google/snappy
-      ref: 1.1.9
+      ref: ${{ inputs.refId }}
       path: snappy
   - name: Check cache
     id: libsnappy-cache
     uses: actions/cache@v3
     with:
       path: dist
-      key: libsnappy-${{ inputs.env }}-${{ inputs.config }}-${{ hashFiles('snappy') }}
+      key: libsnappy-${{ runner.os }}-${{ inputs.config }}-${{ hashFiles('snappy') }}
   - name: Set up MSYS2
     if: steps.libsnappy-cache.outputs.cache-hit != 'true'
     uses: msys2/setup-msys2@v2
@@ -53,5 +53,5 @@ runs:
   - name: Publish artifact
     uses: actions/upload-artifact@v2
     with:
-      name: libsnappy-${{ inputs.env }}-${{ inputs.config }}
+      name: libsnappy-${{ runner.os }}-${{ inputs.config }}
       path: dist/libsnappy.tgz
