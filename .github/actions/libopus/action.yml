@@ -1,7 +1,7 @@
 name: libopus
 
 inputs:
-  env:
+  refId:
     type: string
     required: true
   config:
@@ -22,20 +22,12 @@ runs:
       repository: xiph/opus
       ref: v1.3.1
       path: opus        
-  - name: Check cache
-    id: libopus-cache
-    uses: actions/cache@v3
-    with:
-      path: dist
-      key: libopus-${{ inputs.env }}-${{ inputs.config }}-${{ hashFiles('opus') }}
   - name: Set up MSYS2
-    if: steps.libopus-cache.outputs.cache-hit != 'true'
     uses: msys2/setup-msys2@v2
     with:
       install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
       path-type: inherit
   - name: Build OPUS
-    if: steps.libopus-cache.outputs.cache-hit != 'true'
     shell: cmd
     env:
       vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
@@ -50,5 +42,5 @@ runs:
   - name: Publish artifact
     uses: actions/upload-artifact@v2
     with:
-      name: libopus-${{ inputs.env }}-${{ inputs.config }}
+      name: libopus-${{ runner.os }}-${{ inputs.config }}
       path: dist/libopus.tgz
