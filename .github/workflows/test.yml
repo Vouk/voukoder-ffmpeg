@@ -1,0 +1,79 @@
+name: 'test'
+
+on:
+  workflow_dispatch:
+    inputs:
+      system:
+        type: choice
+        required: true
+        default: 'windows-2022' 
+        description: 'System'
+        options: 
+        - windows-2022
+
+      type:
+        type: choice
+        required: true
+        default: 'static' 
+        description: Type
+        options: 
+        - static
+        - shared
+
+      config:
+        type: choice
+        required: true
+        default: 'debug' 
+        description: 'Configuration'
+        options: 
+        - debug
+        - release
+        
+      ffmpegRef:
+        type: string
+        required: true
+        default: 'release/5.0' 
+        description: 'FFmpeg refId'
+        
+  workflow_call:
+    inputs:
+      system:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      config:
+        type: string
+        required: true
+      ffmpegRef:
+        type: string
+        required: true
+        
+env:
+  vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
+  COMPONENTS: "--enable-libsvtav1 --enable-libsnappy --enable-libmp3lame --enable-libzimg --enable-libopus --enable-libvorbis --enable-libx264 --enable-libx265 --enable-libfdk-aac --enable-libvpx "
+  NASM_EXECUTABLE: nasm
+  cFlags: ${{ inputs.config == 'release' && '-MD' || '-MDd' }}
+  variant: ${{ inputs.type == 'static' && ' --pkg-config-flags="--static" --disable-shared --enable-static' || ' --disable-static --enable-shared' }}
+  msbuildConfig: ${{ inputs.config == 'release' && 'Release' || 'Debug' }}
+
+jobs:
+  libogg:
+    runs-on: ${{ inputs.system }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libogg
+      with:
+        refId: v1.3.5
+        config: ${{ inputs.config }}
+        
+  libvorbis:
+    runs-on: ${{ inputs.system }}
+    needs: [libogg]
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libvorbis
+      with:
+        refId: v1.3.7
+        config: ${{ inputs.config }}
