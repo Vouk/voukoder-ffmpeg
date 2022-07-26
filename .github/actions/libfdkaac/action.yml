@@ -1,7 +1,7 @@
 name: libfdkaac
 
 inputs:
-  env:
+  refId:
     type: string
     required: true
   config:
@@ -20,22 +20,14 @@ runs:
     uses: actions/checkout@v3
     with:
       repository: mstorsjo/fdk-aac
-      ref: v2.0.2
+      ref: ${{ inputs.refId }}
       path: fdkaac
-  - name: Check cache
-    id: libfdkaac-cache
-    uses: actions/cache@v3
-    with:
-      path: dist
-      key: libfdkaac-${{ inputs.env }}-${{ inputs.config }}-${{ hashFiles('fdkaac') }}
   - name: Set up MSYS2
-    if: steps.libfdkaac-cache.outputs.cache-hit != 'true'
     uses: msys2/setup-msys2@v2
     with:
       install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
       path-type: inherit
   - name: Build FDK AAC
-    if: steps.libfdkaac-cache.outputs.cache-hit != 'true'
     shell: cmd
     env:
       vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
@@ -47,5 +39,5 @@ runs:
   - name: Publish artifact
     uses: actions/upload-artifact@v2
     with:
-      name: libfdkaac-${{ inputs.env }}-${{ inputs.config }}
+      name: libfdkaac-${{ runner.os }}-${{ inputs.config }}
       path: dist/libfdkaac.tgz
