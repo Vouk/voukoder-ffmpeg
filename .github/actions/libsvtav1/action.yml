@@ -17,8 +17,7 @@ runs:
       git config --global core.autocrlf false
       git config --global core.eol lf
       git clone -b ${{ inputs.refId }} https://gitlab.com/AOMediaCodec/SVT-AV1 svtav1
-      dir /s  
-      cd svtav1 ; git apply --ignore-whitespace --verbose ..\.github\actions\libsvtav1\patches\A01-metadata-copy-segfault-fix.patch ; cd ..
+      cd svtav1 ; dir ; dir ..\.github\actions\libsvtav1\patches ; git apply --ignore-whitespace --verbose ..\.github\actions\libsvtav1\patches\A01-metadata-copy-segfault-fix.patch ; cd ..
   #- name: Checkout SVT AV1
   #  uses: actions/checkout@v3
   #  with:
