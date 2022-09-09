@@ -17,46 +17,7 @@ runs:
       git config --global core.autocrlf false
       git config --global core.eol lf
       git clone -b ${{ inputs.refId }} https://gitlab.com/AOMediaCodec/SVT-AV1 svtav1
-      (
-      echo From 213854249dc8d69653a9f3281cdd4c2063cd3779 Mon Sep 17 00:00:00 2001
-      echo From: Christopher Degawa <christopher.degawa@intel.com>
-      echo Date: Wed, 10 Aug 2022 13:53:17 -0500
-      echo Subject: [PATCH] copy_input_buffer: only copy metadata if a frame was actaully
-      echo  sent
-      echo 
-      echo Fixes a segfault if EOS was send through the library without zeroing
-      echo out the metadata array
-      echo 
-      echo Signed-off-by: Christopher Degawa <christopher.degawa@intel.com>
-      echo ---
-      echo  Source/Lib/Encoder/Globals/EbEncHandle.c | 9 +++++----
-      echo  1 file changed, 5 insertions(+), 4 deletions(-)
-      echo 
-      echo diff --git a/Source/Lib/Encoder/Globals/EbEncHandle.c b/Source/Lib/Encoder/Globals/EbEncHandle.c
-      echo index ba5e719a4..fc7a2b1f4 100644
-      echo --- a/Source/Lib/Encoder/Globals/EbEncHandle.c
-      echo +++ b/Source/Lib/Encoder/Globals/EbEncHandle.c
-      echo @@ -4814,11 +4814,12 @@ static void copy_input_buffer(SequenceControlSet* scs, EbBufferHeaderType* dst,
-      echo      } else if (pass != ENCODE_FIRST_PASS || copy_frame) {
-      echo          // Bypass copy for the unecessary picture in IPPP pass
-      echo          // Copy the picture buffer
-      echo -        if (src->p_buffer != NULL)
-      echo +        if (src->p_buffer != NULL) {
-      echo              copy_frame_buffer(scs, dst->p_buffer, dst_y8b->p_buffer, src->p_buffer, pass);
-      echo -        // Copy the metadata array
-      echo -        if (svt_aom_copy_metadata_buffer(dst, src->metadata) != EB_ErrorNone)
-      echo -            dst->metadata = NULL;
-      echo +            // Copy the metadata array
-      echo +            if (svt_aom_copy_metadata_buffer(dst, src->metadata) != EB_ErrorNone)
-      echo +                dst->metadata = NULL;
-      echo +        }
-      echo      }
-      echo  
-      echo      // Copy the private data list
-      echo -- 
-      echo GitLab
-      ) > "segfault.patch"
-      cd svt1av1 ; git apply --ignore-whitespace --verbose ..\segfault.patch ; cd ..
+      cd svtav1 ; git apply --ignore-whitespace --verbose ..\A01-metadata-copy-segfault-fix.patch ; cd ..
   #- name: Checkout SVT AV1
   #  uses: actions/checkout@v3
   #  with:
