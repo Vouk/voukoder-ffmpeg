@@ -118,6 +118,3 @@ jobs:
       with:
         name: FFmpeg ${{ inputs.system }} ${{ inputs.config }}${{ inputs.config }} package build
         path: dist/ffmpeg-win64-${{ inputs.type }}-${{ inputs.config }}.tar.gz
-        
-        Libs: -L./lib -llibmfx -ladvapi32 -lole32 -luuid
-Cflags: -I./include
