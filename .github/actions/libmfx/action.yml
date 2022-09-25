@@ -23,7 +23,7 @@ runs:
     run: |
       call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
       md build build/pkgconfig dist
-      D:\a\_temp\setup-msys2\msys2.cmd -c 'printf "prefix=$(realpath build)\nexec_prefix=\${prefix}\nincludedir=\${prefix}/include\nlibdir=\${exec_prefix}/lib\nName: libmfx\nDescription: Intel Media SDK Dispatched static library\nVersion: 1.34\nLibs: -L\${libdir} -llibmfx -ladvapi32 -lole32 -luuid\nCflags: -I\${includedir}\n" > .github/actions/libmfx/lib/pkgconfig/libmfx.pc ; tar czf dist/libmfx.tgz .github/actions/libmfx/include .github/actions/libmfx/lib'
+      D:\a\_temp\setup-msys2\msys2.cmd -c 'tar czf dist/libmfx.tgz .github/actions/libmfx/include .github/actions/libmfx/lib'
       dir /s
   - name: Publish artifact
     uses: actions/upload-artifact@v2
