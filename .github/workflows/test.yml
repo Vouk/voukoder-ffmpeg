@@ -1,4 +1,4 @@
-name: 'SVT-AV1'
+name: mfx
 
 on:
   workflow_dispatch:
@@ -37,18 +37,18 @@ on:
         
 env:
   vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
-  COMPONENTS: "--enable-libsvtav1 --enable-libsnappy --enable-libmp3lame --enable-libzimg --enable-libopus --enable-libvorbis --enable-libx264 --enable-libx265 --enable-libfdk-aac --enable-libvpx "
+  COMPONENTS: "--enable-mfx "
   NASM_EXECUTABLE: nasm
   cFlags: ${{ inputs.config == 'release' && '-MD' || '-MDd' }}
   variant: ${{ inputs.type == 'static' && ' --pkg-config-flags="--static" --disable-shared --enable-static' || ' --disable-static --enable-shared' }}
   msbuildConfig: ${{ inputs.config == 'release' && 'Release' || 'Debug' }}
 
 jobs:
-  libsvtav1:
+  libmfx:
     runs-on: ${{ inputs.system }}
     steps:
     - uses: actions/checkout@v3
-    - uses: ./.github/actions/libsvtav1
+    - uses: ./.github/actions/libmfx
       with:
         refId: v1.2.0
         config: ${{ inputs.config }}
