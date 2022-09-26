@@ -63,7 +63,7 @@ jobs:
     runs-on: ${{ inputs.system }}
     steps:
     - uses: actions/checkout@v3
-    - uses: ./.github/actions/libvpl
+    - uses: ./.github/actions/libmfx
       with:
         refId: master
         config: ${{ inputs.config }}
