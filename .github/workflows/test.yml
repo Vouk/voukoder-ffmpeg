@@ -23,7 +23,7 @@ on:
       config:
         type: choice
         required: true
-        default: 'debug' 
+        default: 'release' 
         description: 'Configuration'
         options: 
         - debug
