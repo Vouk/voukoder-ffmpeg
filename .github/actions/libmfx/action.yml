@@ -35,7 +35,7 @@ runs:
     run: |
       call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
       md build build\include build\lib build\lib\pkgconfig dist
-      D:\a\_temp\setup-msys2\msys2.cmd -c 'cd libmfx ; autoreconf -i ; CC=cl CXX=cl CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) ; make -j ; make install ; sed -i "s#$(realpath ../build)#\${pcfiledir}/../..#" ../build/lib/pkgconfig/libmfx.pc ; cat ../build/lib/pkgconfig/libmfx.pc ; cd ../build ; tar czf ../dist/libmfx.tgz *'
+      D:\a\_temp\setup-msys2\msys2.cmd -c 'cd libmfx ; autoreconf -i ; CC=cl CXX=cl CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) --libdir=../build/lib ; make -j $(nproc) ; make install ; cd ../build ; tar czf ../dist/libmfx.tgz *'
   - name: Publish artifact
     uses: actions/upload-artifact@v2
     with:
