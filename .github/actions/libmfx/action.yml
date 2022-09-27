@@ -17,8 +17,9 @@ runs:
       vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
     run: |
       call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
-      md build build\pkgconfig dist
-      tar -czvf dist\libmfx.tgz .github\actions\libmfx\include .github\actions\libmfx\lib
+      dir
+      md dist
+      move libmfx.tgz dist/
       dir /s .github\actions\libmfx
   - name: Publish artifact
     uses: actions/upload-artifact@v2
