@@ -16,6 +16,7 @@ runs:
     run: |
       md build build\pkgconfig dist
       tar -czvf dist\libmfx.tgz .github\actions\libmfx\include .github\actions\libmfx\lib
+      dir /s
 #  - name: Set up GIT
 #    shell: cmd
 #    run: |
