@@ -11,31 +11,15 @@ inputs:
 runs:
   using: "composite"
   steps:
-  - name: Set up GIT
-    shell: cmd
-    run: |
-      git config --global core.autocrlf false
-      git config --global core.eol lf
-  - name: Checkout libmfx
-    uses: actions/checkout@v3
-    with:
-      repository: lu-zero/mfx_dispatch
-      ref: ${{ inputs.refId }}
-      path: libmfx
-  - name: Set up MSYS2
-   uses: msys2/setup-msys2@v2
-    with:
-      install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
-      path-type: inherit
-  - name: Build libmfx
+  - name: Build MFX
     shell: cmd
     env:
       vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
-      cFlags: ${{ inputs.config == 'release' && '-MD' || '-MDd' }}
     run: |
       call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
-      md build build\include build\lib build\lib\pkgconfig dist
-      D:\a\_temp\setup-msys2\msys2.cmd -c 'cd libmfx ; autoreconf -i ; CC=cl CXX=cl CXXFLAGS=${{ env.cFlags }} ./configure --prefix=$(realpath ../build) ; make -j $(nproc) ; make install ; cd ../build ; tar czf ../dist/libmfx.tgz *'
+      md build build\pkgconfig dist
+      tar -czvf dist\libmfx.tgz .github\actions\libmfx\include .github\actions\libmfx\lib
+      dir /s .github\actions\libmfx
   - name: Publish artifact
     uses: actions/upload-artifact@v2
     with:
