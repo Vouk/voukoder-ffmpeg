@@ -1,4 +1,4 @@
-name: 'Build FFmpeg'
+name: 'Test'
 
 on:
   workflow_dispatch:
