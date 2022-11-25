@@ -59,14 +59,23 @@ env:
   msbuildConfig: ${{ inputs.config == 'release' && 'Release' || 'Debug' }}
 
 jobs:
-  libvpl:
+  libmfx:
     runs-on: ${{ inputs.system }}
     steps:
     - uses: actions/checkout@v3
-    - uses: ./.github/actions/libvpl
+    - uses: ./.github/actions/libmfx
       with:
         refId: master
         config: ${{ inputs.config }}
+        
+  #libvpl:
+  #  runs-on: ${{ inputs.system }}
+  #  steps:
+  #  - uses: actions/checkout@v3
+  #  - uses: ./.github/actions/libvpl
+  #    with:
+  #      refId: master
+  #      config: ${{ inputs.config }}
 
   liboggvorbis:
     runs-on: ${{ inputs.system }}
@@ -84,7 +93,7 @@ jobs:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/libsvtav1
       with:
-        refId: v1.2.0
+        refId: v1.3.0
         config: ${{ inputs.config }}
        
   libsnappy:
@@ -180,7 +189,7 @@ jobs:
 
   ffmpeg:
     runs-on: ${{ inputs.system }}
-    needs: [libvpl,libopus,libsvtav1,libsnappy,libmp3lame,libzimg,liboggvorbis,libx264,libx265,libfdkaac,libvpx]
+    needs: [libmfx,libopus,libsvtav1,libsnappy,libmp3lame,libzimg,liboggvorbis,libx264,libx265,libfdkaac,libvpx]
     steps:
     - name: Set up MSYS2
       uses: msys2/setup-msys2@v2
