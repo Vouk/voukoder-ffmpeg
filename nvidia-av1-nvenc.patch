@@ -1,0 +1,558 @@
+diff --git a/configure b/configure
+index 957b7fe13e..75639477e7 100755
+--- a/configure
++++ b/configure
+@@ -3181,6 +3181,8 @@ nvenc_deps_any="libdl LoadLibrary"
+ aac_mf_encoder_deps="mediafoundation"
+ ac3_mf_encoder_deps="mediafoundation"
+ av1_cuvid_decoder_deps="cuvid CUVIDAV1PICPARAMS"
++av1_nvenc_encoder_deps="nvenc"
++av1_nvenc_encoder_select="atsc_a53"
+ h263_v4l2m2m_decoder_deps="v4l2_m2m h263_v4l2_m2m"
+ h263_v4l2m2m_encoder_deps="v4l2_m2m h263_v4l2_m2m"
+ h264_amf_encoder_deps="amf"
+diff --git a/libavcodec/Makefile b/libavcodec/Makefile
+index 592d9347f6..ca35d72662 100644
+--- a/libavcodec/Makefile
++++ b/libavcodec/Makefile
+@@ -244,6 +244,7 @@ OBJS-$(CONFIG_AURA_DECODER)            += cyuv.o
+ OBJS-$(CONFIG_AURA2_DECODER)           += aura.o
+ OBJS-$(CONFIG_AV1_DECODER)             += av1dec.o
+ OBJS-$(CONFIG_AV1_CUVID_DECODER)       += cuviddec.o
++OBJS-$(CONFIG_AV1_NVENC_ENCODER)       += nvenc_av1.o nvenc.o
+ OBJS-$(CONFIG_AVRN_DECODER)            += avrndec.o
+ OBJS-$(CONFIG_AVRP_DECODER)            += r210dec.o
+ OBJS-$(CONFIG_AVRP_ENCODER)            += r210enc.o
+diff --git a/libavcodec/allcodecs.c b/libavcodec/allcodecs.c
+index cfeb01ac1c..62cc449591 100644
+--- a/libavcodec/allcodecs.c
++++ b/libavcodec/allcodecs.c
+@@ -827,6 +827,7 @@ extern const FFCodec ff_libaom_av1_decoder;
+ extern const FFCodec ff_av1_cuvid_decoder;
+ extern const FFCodec ff_av1_qsv_decoder;
+ extern const FFCodec ff_av1_amf_encoder;
++extern const FFCodec ff_av1_nvenc_encoder;
+ extern const FFCodec ff_libopenh264_encoder;
+ extern const FFCodec ff_libopenh264_decoder;
+ extern const FFCodec ff_h264_amf_encoder;
+diff --git a/libavcodec/nvenc.c b/libavcodec/nvenc.c
+index 11bd21f365..fcdb6ae33a 100644
+--- a/libavcodec/nvenc.c
++++ b/libavcodec/nvenc.c
+@@ -65,6 +65,26 @@ const enum AVPixelFormat ff_nvenc_pix_fmts[] = {
+     AV_PIX_FMT_NONE
+ };
+ 
++const enum AVPixelFormat ff_av1_nvenc_pix_fmts[] = {
++    AV_PIX_FMT_YUV420P,
++    AV_PIX_FMT_NV12,
++    AV_PIX_FMT_P010,
++    AV_PIX_FMT_P016,      // Truncated to 10bits
++    AV_PIX_FMT_0RGB32,
++    AV_PIX_FMT_RGB32,
++    AV_PIX_FMT_0BGR32,
++    AV_PIX_FMT_BGR32,
++    AV_PIX_FMT_X2RGB10,
++    AV_PIX_FMT_X2BGR10,
++    AV_PIX_FMT_GBRP,
++    AV_PIX_FMT_GBRP16,    // Truncated to 10bits
++    AV_PIX_FMT_CUDA,
++#if CONFIG_D3D11VA
++    AV_PIX_FMT_D3D11,
++#endif
++    AV_PIX_FMT_NONE
++};
++
+ const AVCodecHWConfigInternal *const ff_nvenc_hw_configs[] = {
+     HW_CONFIG_ENCODER_FRAMES(CUDA,  CUDA),
+     HW_CONFIG_ENCODER_DEVICE(NONE,  CUDA),
+@@ -222,7 +242,13 @@ static void nvenc_map_preset(NvencContext *ctx)
+ 
+ static void nvenc_print_driver_requirement(AVCodecContext *avctx, int level)
+ {
+-#if NVENCAPI_CHECK_VERSION(11, 2)
++#if NVENCAPI_CHECK_VERSION(12, 0)
++# if defined(_WIN32) || defined(__CYGWIN__)
++const char* minver = "520.0";
++# else
++const char* minver = "520.0";
++# endif
++#elif NVENCAPI_CHECK_VERSION(11, 2)
+     const char *minver = "(unknown)";
+ #elif NVENCAPI_CHECK_VERSION(11, 1)
+ # if defined(_WIN32) || defined(__CYGWIN__)
+@@ -658,6 +684,11 @@ static av_cold int nvenc_setup_device(AVCodecContext *avctx)
+     case AV_CODEC_ID_HEVC:
+         ctx->init_encode_params.encodeGUID = NV_ENC_CODEC_HEVC_GUID;
+         break;
++#ifdef NVENC_HAVE_AV1
++    case AV_CODEC_ID_AV1:
++        ctx->init_encode_params.encodeGUID = NV_ENC_CODEC_AV1_GUID;
++        break;
++#endif
+     default:
+         return AVERROR_BUG;
+     }
+@@ -761,6 +792,10 @@ static av_cold void set_constqp(AVCodecContext *avctx)
+ {
+     NvencContext *ctx = avctx->priv_data;
+     NV_ENC_RC_PARAMS *rc = &ctx->encode_config.rcParams;
++	int qmax = 51;
++#ifdef NVENC_HAVE_AV1
++    qmax = avctx->codec->id != AV_CODEC_ID_AV1 ? 51 : 255;
++#endif
+ 
+     rc->rateControlMode = NV_ENC_PARAMS_RC_CONSTQP;
+ 
+@@ -771,9 +806,9 @@ static av_cold void set_constqp(AVCodecContext *avctx)
+             rc->constQP.qpInterB = ctx->init_qp_b;
+         } else if (avctx->i_quant_factor != 0.0 && avctx->b_quant_factor != 0.0) {
+             rc->constQP.qpIntra = av_clip(
+-                rc->constQP.qpInterP * fabs(avctx->i_quant_factor) + avctx->i_quant_offset + 0.5, 0, 51);
++                rc->constQP.qpInterP * fabs(avctx->i_quant_factor) + avctx->i_quant_offset + 0.5, 0, qmax);
+             rc->constQP.qpInterB = av_clip(
+-                rc->constQP.qpInterP * fabs(avctx->b_quant_factor) + avctx->b_quant_offset + 0.5, 0, 51);
++                rc->constQP.qpInterP * fabs(avctx->b_quant_factor) + avctx->b_quant_offset + 0.5, 0, qmax);
+         } else {
+             rc->constQP.qpIntra = rc->constQP.qpInterP;
+             rc->constQP.qpInterB = rc->constQP.qpInterP;
+@@ -781,9 +816,9 @@ static av_cold void set_constqp(AVCodecContext *avctx)
+     } else if (ctx->cqp >= 0) {
+         rc->constQP.qpInterP = rc->constQP.qpInterB = rc->constQP.qpIntra = ctx->cqp;
+         if (avctx->b_quant_factor != 0.0)
+-            rc->constQP.qpInterB = av_clip(ctx->cqp * fabs(avctx->b_quant_factor) + avctx->b_quant_offset + 0.5, 0, 51);
++            rc->constQP.qpInterB = av_clip(ctx->cqp * fabs(avctx->b_quant_factor) + avctx->b_quant_offset + 0.5, 0, qmax);
+         if (avctx->i_quant_factor != 0.0)
+-            rc->constQP.qpIntra = av_clip(ctx->cqp * fabs(avctx->i_quant_factor) + avctx->i_quant_offset + 0.5, 0, 51);
++            rc->constQP.qpIntra = av_clip(ctx->cqp * fabs(avctx->i_quant_factor) + avctx->i_quant_offset + 0.5, 0, qmax);
+     }
+ 
+     avctx->qmin = -1;
+@@ -1199,7 +1234,8 @@ static av_cold int nvenc_setup_h264_config(AVCodecContext *avctx)
+         h264->entropyCodingMode = ctx->coder;
+ 
+ #ifdef NVENC_HAVE_BFRAME_REF_MODE
+-    h264->useBFramesAsRef = ctx->b_ref_mode;
++    if (ctx->b_ref_mode >= 0)
++        h264->useBFramesAsRef = ctx->b_ref_mode;
+ #endif
+ 
+ #ifdef NVENC_HAVE_MULTIPLE_REF_FRAMES
+@@ -1314,7 +1350,8 @@ static av_cold int nvenc_setup_hevc_config(AVCodecContext *avctx)
+     hevc->tier = ctx->tier;
+ 
+ #ifdef NVENC_HAVE_HEVC_BFRAME_REF_MODE
+-    hevc->useBFramesAsRef = ctx->b_ref_mode;
++    if (ctx->b_ref_mode >= 0)
++        hevc->useBFramesAsRef = ctx->b_ref_mode;
+ #endif
+ 
+ #ifdef NVENC_HAVE_MULTIPLE_REF_FRAMES
+@@ -1325,6 +1362,106 @@ static av_cold int nvenc_setup_hevc_config(AVCodecContext *avctx)
+     return 0;
+ }
+ 
++#ifdef NVENC_HAVE_AV1
++static av_cold int nvenc_setup_av1_config(AVCodecContext* avctx)
++{
++    NvencContext* ctx = avctx->priv_data;
++    NV_ENC_CONFIG* cc = &ctx->encode_config;
++    NV_ENC_CONFIG_AV1* av1 = &cc->encodeCodecConfig.av1Config;
++
++    const AVPixFmtDescriptor* pixdesc = av_pix_fmt_desc_get(ctx->data_pix_fmt);
++
++    if ((pixdesc->flags & AV_PIX_FMT_FLAG_RGB) && !IS_GBRP(ctx->data_pix_fmt)) {
++        av1->matrixCoefficients = AVCOL_SPC_BT470BG;
++        av1->colorPrimaries = avctx->color_primaries;
++        av1->transferCharacteristics = avctx->color_trc;
++        av1->colorRange = 0;
++    }
++    else {
++        av1->matrixCoefficients = IS_GBRP(ctx->data_pix_fmt) ? AVCOL_SPC_RGB : avctx->colorspace;
++        av1->colorPrimaries = avctx->color_primaries;
++        av1->transferCharacteristics = avctx->color_trc;
++        av1->colorRange = (avctx->color_range == AVCOL_RANGE_JPEG
++            || ctx->data_pix_fmt == AV_PIX_FMT_YUVJ420P || ctx->data_pix_fmt == AV_PIX_FMT_YUVJ422P || ctx->data_pix_fmt == AV_PIX_FMT_YUVJ444P);
++    }
++
++    if (ctx->intra_refresh) {
++        av1->enableIntraRefresh = 1;
++        av1->intraRefreshPeriod = avctx->gop_size;
++        av1->intraRefreshCnt = avctx->gop_size - 1;
++    }
++
++    av1->disableSeqHdr = 0;
++    av1->repeatSeqHdr = 1;
++
++    if (ctx->dpb_size >= 0) {
++        /* 0 means "let the hardware decide" */
++        av1->maxNumRefFramesInDPB = ctx->dpb_size;
++    }
++
++    if (ctx->intra_refresh) {
++        av1->idrPeriod = NVENC_INFINITE_GOPLENGTH;
++    }
++    else if (avctx->gop_size >= 0) {
++        av1->idrPeriod = avctx->gop_size;
++    }
++
++    av1->enableTimingInfo = 1;
++
++    switch (ctx->profile) {
++    case NV_ENC_AV1_PROFILE_MAIN:
++        cc->profileGUID = NV_ENC_AV1_PROFILE_MAIN_GUID;
++        avctx->profile = FF_PROFILE_AV1_MAIN;
++        break;
++    }
++
++    av1->chromaFormatIDC = 1;
++
++    av1->inputPixelBitDepthMinus8 = IS_10BIT(ctx->data_pix_fmt) ? 2 : 0;
++    av1->pixelBitDepthMinus8 = ctx->highbitdepth ? 2 : av1->inputPixelBitDepthMinus8;
++
++    av1->level = ctx->level;
++
++    av1->tier = ctx->tier;
++
++    if (ctx->b_ref_mode >= 0)
++        av1->useBFramesAsRef = ctx->b_ref_mode;
++
++    av1->numFwdRefs = avctx->refs;
++    av1->numBwdRefs = avctx->refs;
++
++    if (ctx->highbitdepth)
++        av1->pixelBitDepthMinus8 = 2;
++
++    if (ctx->tilecolumns > 1 || ctx->tilerows > 1)
++    {
++        av1->enableCustomTileConfig = 1;
++        av1->numTileColumns = ctx->tilecolumns;
++        av1->numTileRows = ctx->tilerows;
++        int smb_w = (avctx->width + 63) >> 6;
++        int smb_h = (avctx->height + 63) >> 6;
++        int sum = 0;
++        for (int i = 0; i < av1->numTileColumns - 1; i++)
++        {
++            ctx->tileWidths[i] = (smb_w + av1->numTileColumns - 1) / av1->numTileColumns;
++            sum += ctx->tileWidths[i];
++        }
++        ctx->tileWidths[av1->numTileColumns - 1] = smb_w  - sum;
++        sum = 0;
++        for (int i = 0; i < av1->numTileRows - 1; i++)
++        {
++            ctx->tileHeights[i] = (smb_h + av1->numTileRows - 1) / av1->numTileRows;
++            sum += ctx->tileHeights[i];
++        }
++        ctx->tileHeights[av1->numTileRows - 1] = smb_h - sum;
++        av1->tileWidths = ctx->tileWidths;
++        av1->tileHeights = ctx->tileHeights;
++    }
++
++    return 0;
++}
++#endif
++
+ static av_cold int nvenc_setup_codec_config(AVCodecContext *avctx)
+ {
+     switch (avctx->codec->id) {
+@@ -1332,6 +1469,10 @@ static av_cold int nvenc_setup_codec_config(AVCodecContext *avctx)
+         return nvenc_setup_h264_config(avctx);
+     case AV_CODEC_ID_HEVC:
+         return nvenc_setup_hevc_config(avctx);
++#ifdef NVENC_HAVE_AV1
++    case AV_CODEC_ID_AV1:
++        return nvenc_setup_av1_config(avctx);
++#endif
+     /* Earlier switch/case will return if unknown codec is passed. */
+     }
+ 
+@@ -1344,12 +1485,22 @@ static void compute_dar(AVCodecContext *avctx, int *dw, int *dh) {
+     sw = avctx->width;
+     sh = avctx->height;
+ 
+-    if (avctx->sample_aspect_ratio.num > 0 && avctx->sample_aspect_ratio.den > 0) {
+-        sw *= avctx->sample_aspect_ratio.num;
+-        sh *= avctx->sample_aspect_ratio.den;
++    switch (avctx->codec->id) {
++    case AV_CODEC_ID_H264:
++    case AV_CODEC_ID_HEVC:
++        if (avctx->sample_aspect_ratio.num > 0 && avctx->sample_aspect_ratio.den > 0) {
++            sw *= avctx->sample_aspect_ratio.num;
++            sh *= avctx->sample_aspect_ratio.den;
++        }
++        av_reduce(dw, dh, sw, sh, 1024 * 1024);
++        break;
++#ifdef NVENC_HAVE_AV1
++    case AV_CODEC_ID_AV1:
++        *dw = sw;
++        *dh = sh;
++        break;
++#endif
+     }
+-
+-    av_reduce(dw, dh, sw, sh, 1024 * 1024);
+ }
+ 
+ static av_cold int nvenc_setup_encoder(AVCodecContext *avctx)
+@@ -2075,6 +2226,10 @@ static int process_output_surface(AVCodecContext *avctx, AVPacket *pkt, NvencSur
+     case AV_CODEC_ID_H265:
+       slice_mode_data = ctx->encode_config.encodeCodecConfig.hevcConfig.sliceModeData;
+       break;
++#ifdef NVENC_HAVE_AV1
++    case AV_CODEC_ID_AV1:
++      break;
++#endif
+     default:
+       av_log(avctx, AV_LOG_ERROR, "Unknown codec name\n");
+       res = AVERROR(EINVAL);
+diff --git a/libavcodec/nvenc.h b/libavcodec/nvenc.h
+index 9eb129952e..18d1e8381b 100644
+--- a/libavcodec/nvenc.h
++++ b/libavcodec/nvenc.h
+@@ -77,6 +77,11 @@ typedef void ID3D11Device;
+ #define NVENC_HAVE_SINGLE_SLICE_INTRA_REFRESH
+ #endif
+ 
++// SDK 12.0 compile time feature checks
++#if NVENCAPI_CHECK_VERSION(12, 0)
++#define NVENC_HAVE_AV1
++#endif
++
+ typedef struct NvencSurface
+ {
+     NV_ENC_INPUT_PTR input_surface;
+@@ -136,6 +141,13 @@ enum {
+     NV_ENC_HEVC_PROFILE_REXT,
+ };
+ 
++#ifdef NVENC_HAVE_AV1
++enum {
++    NV_ENC_AV1_PROFILE_MAIN,
++    NV_ENC_AV1_PROFILE_HIGH,
++};
++#endif
++
+ enum {
+     NVENC_LOWLATENCY = 1,
+     NVENC_LOSSLESS   = 2,
+@@ -236,6 +248,11 @@ typedef struct NvencContext
+     int single_slice_intra_refresh;
+     int constrained_encoding;
+     int udu_sei;
++    int highbitdepth;
++    int tilecolumns;
++    int tilerows;
++    unsigned int tileWidths[256];
++    unsigned int tileHeights[256];
+ } NvencContext;
+ 
+ int ff_nvenc_encode_init(AVCodecContext *avctx);
+@@ -247,6 +264,7 @@ int ff_nvenc_receive_packet(AVCodecContext *avctx, AVPacket *pkt);
+ void ff_nvenc_encode_flush(AVCodecContext *avctx);
+ 
+ extern const enum AVPixelFormat ff_nvenc_pix_fmts[];
++extern const enum AVPixelFormat ff_av1_nvenc_pix_fmts[];
+ extern const AVCodecHWConfigInternal *const ff_nvenc_hw_configs[];
+ 
+ #endif /* AVCODEC_NVENC_H */
+diff --git a/libavcodec/nvenc_av1.c b/libavcodec/nvenc_av1.c
+new file mode 100644
+index 0000000000..1f51ad057e
+--- /dev/null
++++ b/libavcodec/nvenc_av1.c
+@@ -0,0 +1,169 @@
++/*
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++#include "libavutil/internal.h"
++
++#include "avcodec.h"
++#include "codec_internal.h"
++
++#include "nvenc.h"
++
++#define OFFSET(x) offsetof(NvencContext, x)
++#define VE AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
++static const AVOption options[] = {
++    { "preset",       "Set the encoding preset",            OFFSET(preset),       AV_OPT_TYPE_INT,   { .i64 = PRESET_P4 },     PRESET_P1, PRESET_P7,          VE, "preset" },
++    { "p1",          "fastest (lowest quality)",            0,                    AV_OPT_TYPE_CONST, { .i64 = PRESET_P1 },                  0, 0, VE, "preset" },
++    { "p2",          "faster (lower quality)",              0,                    AV_OPT_TYPE_CONST, { .i64 = PRESET_P2 },                  0, 0, VE, "preset" },
++    { "p3",          "fast (low quality)",                  0,                    AV_OPT_TYPE_CONST, { .i64 = PRESET_P3 },                  0, 0, VE, "preset" },
++    { "p4",          "medium (default)",                    0,                    AV_OPT_TYPE_CONST, { .i64 = PRESET_P4 },                  0, 0, VE, "preset" },
++    { "p5",          "slow (good quality)",                 0,                    AV_OPT_TYPE_CONST, { .i64 = PRESET_P5 },                  0, 0, VE, "preset" },
++    { "p6",          "slower (better quality)",             0,                    AV_OPT_TYPE_CONST, { .i64 = PRESET_P6 },                  0, 0, VE, "preset" },
++    { "p7",          "slowest (best quality)",              0,                    AV_OPT_TYPE_CONST, { .i64 = PRESET_P7 },                  0, 0, VE, "preset" },
++    { "tune",        "Set the encoding tuning info",        OFFSET(tuning_info),  AV_OPT_TYPE_INT,   { .i64 = NV_ENC_TUNING_INFO_HIGH_QUALITY }, NV_ENC_TUNING_INFO_HIGH_QUALITY, NV_ENC_TUNING_INFO_ULTRA_LOW_LATENCY,  VE, "tune" },
++    { "hq",          "High quality",                        0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_TUNING_INFO_HIGH_QUALITY },             0, 0, VE, "tune" },
++    { "ll",          "Low latency",                         0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_TUNING_INFO_LOW_LATENCY },              0, 0, VE, "tune" },
++    { "ull",         "Ultra low latency",                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_TUNING_INFO_ULTRA_LOW_LATENCY },        0, 0, VE, "tune" },
++    { "profile",      "Set the encoding profile",           OFFSET(profile),      AV_OPT_TYPE_INT,   { .i64 = NV_ENC_AV1_PROFILE_MAIN }, NV_ENC_AV1_PROFILE_MAIN, NV_ENC_AV1_PROFILE_MAIN, VE, "profile" },
++    { "main",         "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_AV1_PROFILE_MAIN },      0, 0, VE, "profile" },
++    { "level",        "Set the encoding level restriction", OFFSET(level),        AV_OPT_TYPE_INT,   { .i64 = NV_ENC_LEVEL_AV1_AUTOSELECT }, NV_ENC_LEVEL_AV1_2, NV_ENC_LEVEL_AV1_AUTOSELECT, VE, "level" },
++    { "2",            "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_LEVEL_AV1_2 },        0, 0, VE, "level" },
++    { "2.0",          "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_LEVEL_AV1_2 },        0, 0, VE, "level" },
++    { "2.1",          "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_LEVEL_AV1_21 },       0, 0, VE, "level" },
++    { "3",            "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_LEVEL_AV1_3 },        0, 0, VE, "level" },
++    { "3.0",          "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_LEVEL_AV1_3 },        0, 0, VE, "level" },
++    { "3.1",          "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_LEVEL_AV1_31 },       0, 0, VE, "level" },
++    { "4",            "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_LEVEL_AV1_4 },        0, 0, VE, "level" },
++    { "4.0",          "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_LEVEL_AV1_4 },        0, 0, VE, "level" },
++    { "4.1",          "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_LEVEL_AV1_41 },       0, 0, VE, "level" },
++    { "5",            "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_LEVEL_AV1_5 },        0, 0, VE, "level" },
++    { "5.0",          "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_LEVEL_AV1_5 },        0, 0, VE, "level" },
++    { "5.1",          "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_LEVEL_AV1_51 },       0, 0, VE, "level" },
++    { "5.2",          "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_LEVEL_AV1_52 },       0, 0, VE, "level" },
++    { "5.3",          "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_LEVEL_AV1_53 },       0, 0, VE, "level" },
++    { "6",            "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_LEVEL_AV1_6 },        0, 0, VE, "level" },
++    { "6.0",          "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_LEVEL_AV1_6 },        0, 0, VE, "level" },
++    { "6.1",          "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_LEVEL_AV1_61 },       0, 0, VE, "level" },
++    { "6.2",          "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_LEVEL_AV1_62 },       0, 0, VE, "level" },
++    { "6.3",          "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_LEVEL_AV1_63 },       0, 0, VE, "level" },
++    { "auto",         "",                                   0,                    AV_OPT_TYPE_CONST, {.i64 = NV_ENC_LEVEL_AV1_AUTOSELECT },0, 0, VE, "level" },
++    { "rc",           "Override the preset rate-control",   OFFSET(rc),           AV_OPT_TYPE_INT,   { .i64 = -1 },                                  -1, INT_MAX, VE, "rc" },
++    { "constqp",      "Constant QP mode",                   0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_PARAMS_RC_CONSTQP },                   0, 0, VE, "rc" },
++    { "vbr",          "Variable bitrate mode",              0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_PARAMS_RC_VBR },                       0, 0, VE, "rc" },
++    { "cbr",          "Constant bitrate mode",              0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_PARAMS_RC_CBR },                       0, 0, VE, "rc" },
++    { "rc-lookahead", "Number of frames to look ahead for rate-control",
++                                                            OFFSET(rc_lookahead), AV_OPT_TYPE_INT,   { .i64 = 0 }, 0, INT_MAX, VE },
++    { "surfaces",     "Number of concurrent surfaces",      OFFSET(nb_surfaces),  AV_OPT_TYPE_INT,   { .i64 = 0 }, 0, MAX_REGISTERED_FRAMES, VE },
++    { "cbr",          "Use cbr encoding mode",              OFFSET(cbr),          AV_OPT_TYPE_BOOL,  { .i64 = 0 },   0, 1, VE },
++    { "2pass",        "Use 2pass encoding mode",            OFFSET(twopass),      AV_OPT_TYPE_BOOL,  { .i64 = -1 }, -1, 1, VE },
++    { "gpu",          "Selects which NVENC capable GPU to use. First GPU is 0, second is 1, and so on.",
++                                                            OFFSET(device),       AV_OPT_TYPE_INT,   { .i64 = ANY_DEVICE },   -2, INT_MAX, VE, "gpu" },
++    { "any",          "Pick the first device available",    0,                    AV_OPT_TYPE_CONST, { .i64 = ANY_DEVICE },          0, 0, VE, "gpu" },
++    { "list",         "List the available devices",         0,                    AV_OPT_TYPE_CONST, { .i64 = LIST_DEVICES },        0, 0, VE, "gpu" },
++    { "delay",        "Delay frame output by the given amount of frames",
++                                                            OFFSET(async_depth),  AV_OPT_TYPE_INT,   { .i64 = INT_MAX }, 0, INT_MAX, VE },
++    { "no-scenecut",  "When lookahead is enabled, set this to 1 to disable adaptive I-frame insertion at scene cuts",
++                                                            OFFSET(no_scenecut),  AV_OPT_TYPE_BOOL,  { .i64 = 0 }, 0,  1, VE },
++    { "forced-idr",   "If forcing keyframes, force them as IDR frames.",
++                                                            OFFSET(forced_idr),   AV_OPT_TYPE_BOOL,  { .i64 = 0 }, -1, 1, VE },
++    { "b_adapt",      "When lookahead is enabled, set this to 0 to disable adaptive B-frame decision",
++                                                            OFFSET(b_adapt),      AV_OPT_TYPE_BOOL,  { .i64 = 1 }, 0,  1, VE },
++    { "spatial-aq",   "set to 1 to enable Spatial AQ",      OFFSET(aq),           AV_OPT_TYPE_BOOL,  { .i64 = 0 }, 0,  1, VE },
++    { "spatial_aq",   "set to 1 to enable Spatial AQ",      OFFSET(aq),           AV_OPT_TYPE_BOOL,  { .i64 = 0 }, 0,  1, VE },
++    { "temporal-aq",  "set to 1 to enable Temporal AQ",     OFFSET(temporal_aq),  AV_OPT_TYPE_BOOL,  { .i64 = 0 }, 0,  1, VE },
++    { "temporal_aq",  "set to 1 to enable Temporal AQ",     OFFSET(temporal_aq),  AV_OPT_TYPE_BOOL,  { .i64 = 0 }, 0,  1, VE },
++    { "zerolatency",  "Set 1 to indicate zero latency operation (no reordering delay)",
++                                                            OFFSET(zerolatency),  AV_OPT_TYPE_BOOL,  { .i64 = 0 }, 0,  1, VE },
++    { "nonref_p",     "Set this to 1 to enable automatic insertion of non-reference P-frames",
++                                                            OFFSET(nonref_p),     AV_OPT_TYPE_BOOL,  { .i64 = 0 }, 0,  1, VE },
++    { "strict_gop",   "Set 1 to minimize GOP-to-GOP rate fluctuations",
++                                                            OFFSET(strict_gop),   AV_OPT_TYPE_BOOL,  { .i64 = 0 }, 0,  1, VE },
++    { "aq-strength",  "When Spatial AQ is enabled, this field is used to specify AQ strength. AQ strength scale is from 1 (low) - 15 (aggressive)",
++                                                            OFFSET(aq_strength),  AV_OPT_TYPE_INT,   { .i64 = 8 }, 1, 15, VE },
++    { "cq",           "Set target quality level (0 to 51, 0 means automatic) for constant quality mode in VBR rate control",
++                                                            OFFSET(quality),      AV_OPT_TYPE_FLOAT, { .dbl = 0.}, 0., 51., VE },
++    { "init_qpP",     "Initial QP value for P frame",       OFFSET(init_qp_p),    AV_OPT_TYPE_INT,   { .i64 = -1 }, -1, 255, VE },
++    { "init_qpB",     "Initial QP value for B frame",       OFFSET(init_qp_b),    AV_OPT_TYPE_INT,   { .i64 = -1 }, -1, 255, VE },
++    { "init_qpI",     "Initial QP value for I frame",       OFFSET(init_qp_i),    AV_OPT_TYPE_INT,   { .i64 = -1 }, -1, 255, VE },
++    { "qp",           "Constant quantization parameter rate control method",
++                                                            OFFSET(cqp),          AV_OPT_TYPE_INT,   { .i64 = -1 }, -1, 255, VE },
++    { "qp_cb_offset", "Quantization parameter offset for cb channel",
++                                                            OFFSET(qp_cb_offset), AV_OPT_TYPE_INT,   { .i64 = 0 }, -12, 12, VE },
++    { "qp_cr_offset", "Quantization parameter offset for cr channel",
++                                                            OFFSET(qp_cr_offset), AV_OPT_TYPE_INT,   { .i64 = 0 }, -12, 12, VE },
++    { "b_ref_mode",   "Use B frames as references",         OFFSET(b_ref_mode),   AV_OPT_TYPE_INT,   { .i64 = -1 }, -1, NV_ENC_BFRAME_REF_MODE_MIDDLE, VE, "b_ref_mode" },
++    { "disabled",     "B frames will not be used for reference", 0,               AV_OPT_TYPE_CONST, { .i64 = NV_ENC_BFRAME_REF_MODE_DISABLED }, 0, 0, VE, "b_ref_mode" },
++    { "each",         "Each B frame will be used for reference", 0,               AV_OPT_TYPE_CONST, { .i64 = NV_ENC_BFRAME_REF_MODE_EACH }, 0, 0, VE, "b_ref_mode" },
++    { "middle",       "Only (number of B frames)/2 will be used for reference", 0,AV_OPT_TYPE_CONST, { .i64 = NV_ENC_BFRAME_REF_MODE_MIDDLE }, 0, 0, VE, "b_ref_mode" },
++    { "dpb_size",     "Specifies the DPB size used for encoding (0 means automatic)",
++                                                            OFFSET(dpb_size),     AV_OPT_TYPE_INT,   { .i64 = 0 }, 0, INT_MAX, VE },
++    { "multipass",    "Set the multipass encoding",         OFFSET(multipass),    AV_OPT_TYPE_INT,   { .i64 = NV_ENC_MULTI_PASS_DISABLED },         NV_ENC_MULTI_PASS_DISABLED, NV_ENC_TWO_PASS_FULL_RESOLUTION, VE, "multipass" },
++    { "disabled",     "Single Pass",                        0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_MULTI_PASS_DISABLED },         0,                          0,                               VE, "multipass" },
++    { "qres",         "Two Pass encoding is enabled where first Pass is quarter resolution",
++                                                            0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_TWO_PASS_QUARTER_RESOLUTION }, 0,                          0,                               VE, "multipass" },
++    { "fullres",      "Two Pass encoding is enabled where first Pass is full resolution",
++                                                            0,                    AV_OPT_TYPE_CONST, { .i64 = NV_ENC_TWO_PASS_FULL_RESOLUTION },    0,                          0,                               VE, "multipass" },
++    { "ldkfs",        "Low delay key frame scale; Specifies the Scene Change frame size increase allowed in case of single frame VBV and CBR",
++                                                            OFFSET(ldkfs),        AV_OPT_TYPE_INT,   { .i64 = 0 }, 0, UCHAR_MAX, VE },
++    { "intra-refresh","Use Periodic Intra Refresh instead of IDR frames",
++                                                            OFFSET(intra_refresh),AV_OPT_TYPE_BOOL,  { .i64 = 0 }, 0, 1, VE },
++    { "highbitdepth",  "set to 1 to enable 10 bit encodes for 8 bit input",
++                                                            OFFSET(highbitdepth), AV_OPT_TYPE_BOOL,  {.i64 = 0 }, 0,  1, VE },
++    { "tilecolumns",  "tile columns",                       OFFSET(tilecolumns),  AV_OPT_TYPE_INT,   {.i64 = 1 }, 1,  256, VE },
++    { "tilerows",     "tile rows",                          OFFSET(tilerows),     AV_OPT_TYPE_INT,   {.i64 = 1 }, 1,  256, VE },
++    { NULL }
++};
++
++static const FFCodecDefault defaults[] = {
++    { "b", "2M" },
++    { "qmin", "-1" },
++    { "qmax", "-1" },
++    { "qdiff", "-1" },
++    { "qblur", "-1" },
++    { "qcomp", "-1" },
++    { "g", "250" },
++    { "bf", "-1" },
++    { "refs", "0" },
++    { NULL },
++};
++
++static const AVClass av1_nvenc_class = {
++    .class_name = "av1_nvenc",
++    .item_name = av_default_item_name,
++    .option = options,
++    .version = LIBAVUTIL_VERSION_INT,
++};
++
++const FFCodec ff_av1_nvenc_encoder = {
++    .p.name         = "av1_nvenc",
++    .p.long_name    = NULL_IF_CONFIG_SMALL("NVIDIA NVENC AV1 encoder"),
++    .p.type         = AVMEDIA_TYPE_VIDEO,
++    .p.id           = AV_CODEC_ID_AV1,
++    .init           = ff_nvenc_encode_init,
++     FF_CODEC_RECEIVE_PACKET_CB(ff_nvenc_receive_packet),
++    .close          = ff_nvenc_encode_close,
++    .flush          = ff_nvenc_encode_flush,
++    .priv_data_size = sizeof(NvencContext),
++    .p.priv_class   = &av1_nvenc_class,
++    .defaults       = defaults,
++    .p.capabilities = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_HARDWARE |
++                      AV_CODEC_CAP_ENCODER_FLUSH | AV_CODEC_CAP_DR1,
++    .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
++    .p.pix_fmts     = ff_av1_nvenc_pix_fmts,
++    .p.wrapper_name = "nvenc",
++    .hw_configs     = ff_nvenc_hw_configs,
++};
+diff --git a/libavcodec/nvenc_h264.c b/libavcodec/nvenc_h264.c
+index a178827291..347ba2a33c 100644
+--- a/libavcodec/nvenc_h264.c
++++ b/libavcodec/nvenc_h264.c
+@@ -166,7 +166,7 @@ static const AVOption options[] = {
+     { "each",         "Each B frame will be used for reference", 0,               AV_OPT_TYPE_CONST, { .i64 = NV_ENC_BFRAME_REF_MODE_EACH }, 0, 0, VE, "b_ref_mode" },
+     { "middle",       "Only (number of B frames)/2 will be used for reference", 0,AV_OPT_TYPE_CONST, { .i64 = NV_ENC_BFRAME_REF_MODE_MIDDLE }, 0, 0, VE, "b_ref_mode" },
+ #else
+-    { "b_ref_mode",   "(not supported)",                    OFFSET(b_ref_mode),   AV_OPT_TYPE_INT,   { .i64 = 0 }, 0, INT_MAX, VE, "b_ref_mode" },
++    { "b_ref_mode",   "(not supported)",                    OFFSET(b_ref_mode),   AV_OPT_TYPE_INT,   { .i64 = -1 }, -1, INT_MAX, VE, "b_ref_mode" },
+     { "disabled",     "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = 0 }, 0, 0,       VE, "b_ref_mode" },
+     { "each",         "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = 1 }, 0, 0,       VE, "b_ref_mode" },
+     { "middle",       "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = 2 }, 0, 0,       VE, "b_ref_mode" },
+diff --git a/libavcodec/nvenc_hevc.c b/libavcodec/nvenc_hevc.c
+index ae4d73e497..1938de6b91 100644
+--- a/libavcodec/nvenc_hevc.c
++++ b/libavcodec/nvenc_hevc.c
+@@ -146,7 +146,7 @@ static const AVOption options[] = {
+     { "each",         "Each B frame will be used for reference", 0,               AV_OPT_TYPE_CONST, { .i64 = NV_ENC_BFRAME_REF_MODE_EACH }, 0, 0, VE, "b_ref_mode" },
+     { "middle",       "Only (number of B frames)/2 will be used for reference", 0,AV_OPT_TYPE_CONST, { .i64 = NV_ENC_BFRAME_REF_MODE_MIDDLE }, 0, 0, VE, "b_ref_mode" },
+ #else
+-    { "b_ref_mode",   "(not supported)",                    OFFSET(b_ref_mode),   AV_OPT_TYPE_INT,   { .i64 = 0 }, 0, INT_MAX, VE, "b_ref_mode" },
++    { "b_ref_mode",   "(not supported)",                    OFFSET(b_ref_mode),   AV_OPT_TYPE_INT,   { .i64 = -1 }, -1, INT_MAX, VE, "b_ref_mode" },
+     { "disabled",     "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = 0 }, 0, 0,       VE, "b_ref_mode" },
+     { "each",         "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = 1 }, 0, 0,       VE, "b_ref_mode" },
+     { "middle",       "",                                   0,                    AV_OPT_TYPE_CONST, { .i64 = 2 }, 0, 0,       VE, "b_ref_mode" },
