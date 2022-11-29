@@ -94,10 +94,10 @@ index 1ab98d2f78..96abb58226 100644
  extern const AVCodecHWConfigInternal *const ff_amfenc_hw_configs[];
 diff --git a/libavcodec/amfenc_av1.c b/libavcodec/amfenc_av1.c
 new file mode 100644
-index 0000000000..a4e536ece8
+index 0000000000..c0443f90ea
 --- /dev/null
 +++ b/libavcodec/amfenc_av1.c
-@@ -0,0 +1,365 @@
+@@ -0,0 +1,361 @@
 +/*
 + * This file is part of FFmpeg.
 + *
@@ -170,10 +170,6 @@ index 0000000000..a4e536ece8
 +    { "vbr_latency",            "Latency Constrained Variable Bitrate", 0, AV_OPT_TYPE_CONST, {.i64 = AMF_VIDEO_ENCODER_AV1_RATE_CONTROL_METHOD_LATENCY_CONSTRAINED_VBR }, 0, 0, VE, "rc" },
 +    { "vbr_peak",               "Peak Contrained Variable Bitrate",     0, AV_OPT_TYPE_CONST, {.i64 = AMF_VIDEO_ENCODER_AV1_RATE_CONTROL_METHOD_PEAK_CONSTRAINED_VBR    }, 0, 0, VE, "rc" },
 +    { "cbr",                    "Constant Bitrate",                     0, AV_OPT_TYPE_CONST, {.i64 = AMF_VIDEO_ENCODER_AV1_RATE_CONTROL_METHOD_CBR                     }, 0, 0, VE, "rc" },
-+    { "vbr_quality",            "Quality Variable Bitrate",             0, AV_OPT_TYPE_CONST, {.i64 = AMF_VIDEO_ENCODER_AV1_RATE_CONTROL_METHOD_QUALITY_VBR             }, 0, 0, VE, "rc" },
-+    { "vbr_high_quality",       "High Quality Variable Bitrate",        0, AV_OPT_TYPE_CONST, {.i64 = AMF_VIDEO_ENCODER_AV1_RATE_CONTROL_METHOD_HIGH_QUALITY_VBR        }, 0, 0, VE, "rc" },
-+    { "cbr_high_quality",       "High Quality Constant Bitrate",        0, AV_OPT_TYPE_CONST, {.i64 = AMF_VIDEO_ENCODER_AV1_RATE_CONTROL_METHOD_HIGH_QUALITY_CBR        }, 0, 0, VE, "rc" },
-+
 +
 +    { "header_insertion_mode",  "Set header insertion mode",                OFFSET(header_insertion_mode),          AV_OPT_TYPE_INT,{.i64 = AMF_VIDEO_ENCODER_AV1_HEADER_INSERTION_MODE_NONE }, AMF_VIDEO_ENCODER_AV1_HEADER_INSERTION_MODE_NONE, AMF_VIDEO_ENCODER_AV1_HEADER_INSERTION_MODE_KEY_FRAME_ALIGNED, VE, "hdrmode" },
 +    { "none",                   "", 0, AV_OPT_TYPE_CONST, {.i64 = AMF_VIDEO_ENCODER_AV1_HEADER_INSERTION_MODE_NONE              }, 0, 0, VE, "hdrmode" },
