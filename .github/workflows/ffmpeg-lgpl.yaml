@@ -56,7 +56,7 @@ env:
   #--enable-libvorbis
   NASM_EXECUTABLE: nasm
   cFlags: ${{ inputs.config == 'release' && '-MD' || '-MDd' }}
-  variant: ${{ inputs.type == 'static' && ' --pkg-config-flags="--static" --disable-shared --enable-static' || ' --disable-static --enable-shared' }}
+  variant: ${{ inputs.type == 'static' && ' --pkg-config-flags="--static" --disable-shared --enable-static' || ' --disable-static --enable-shared --build-suffix=-voukoderpro' }}
   msbuildConfig: ${{ inputs.config == 'release' && 'Release' || 'Debug' }}
 
 jobs:
