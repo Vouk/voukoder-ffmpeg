@@ -1,0 +1,184 @@
+name: 'Build FFmpeg (LGPL)'
+
+on:
+  workflow_dispatch:
+    inputs:
+      system:
+        type: choice
+        required: true
+        default: 'windows-2022' 
+        description: 'System'
+        options: 
+        - windows-2022
+
+      type:
+        type: choice
+        required: true
+        default: 'shared' 
+        description: Type
+        options: 
+        - static
+        - shared
+
+      config:
+        type: choice
+        required: true
+        default: 'release' 
+        description: 'Configuration'
+        options: 
+        - debug
+        - release
+        
+      ffmpegRef:
+        type: string
+        required: true
+        default: 'master' 
+        description: 'FFmpeg refId'
+        
+  workflow_call:
+    inputs:
+      system:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
+      config:
+        type: string
+        required: true
+      ffmpegRef:
+        type: string
+        required: true
+        
+env:
+  vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
+  COMPONENTS: "--enable-libvpl --enable-libsvtav1 --enable-libsnappy --enable-libmp3lame --enable-libzimg --enable-libvpx --enable-libvorbis --enable-libopus "
+  NASM_EXECUTABLE: nasm
+  cFlags: ${{ inputs.config == 'release' && '-MD' || '-MDd' }}
+  variant: ${{ inputs.type == 'static' && ' --pkg-config-flags="--static" --disable-shared --enable-static' || ' --disable-static --enable-shared' }}
+  msbuildConfig: ${{ inputs.config == 'release' && 'Release' || 'Debug' }}
+
+jobs:
+  libvpl:
+    runs-on: ${{ inputs.system }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libvpl
+      with:
+        refId: master
+        config: ${{ inputs.config }}
+
+  liboggvorbis:
+    runs-on: ${{ inputs.system }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/liboggvorbis
+      with:
+        libogg_refId: v1.3.5
+        libvorbis_refId: v1.3.7
+        config: ${{ inputs.config }}
+               
+  libsvtav1:
+    runs-on: ${{ inputs.system }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libsvtav1
+      with:
+        refId: v1.4.1
+        config: ${{ inputs.config }}
+
+  libsnappy:
+    runs-on: ${{ inputs.system }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libsnappy
+      with:
+        refId: 1.1.9
+        config: ${{ inputs.config }}
+
+  libvpx:
+    runs-on: ${{ inputs.system }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libvpx
+      with:
+        refId: v1.12.0
+        config: ${{ inputs.config }}
+
+  libmp3lame:
+    runs-on: ${{ inputs.system }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libmp3lame
+      with:
+        refId: tags/RELEASE__3_100
+        config: ${{ inputs.config }}
+
+  libzimg:
+    runs-on: ${{ inputs.system }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libzimg
+      with:
+        refId: release-3.0.4
+        config: ${{ inputs.config }}
+
+  libopus:
+    runs-on: ${{ inputs.system }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libopus
+      with:
+        refId: v1.3.1
+        config: ${{ inputs.config }}
+
+  ffmpeg:
+    runs-on: ${{ inputs.system }}
+    needs: [libvpl,libsvtav1,libsnappy,libvpx,libmp3lame,libzimg,liboggvorbis,libopus]
+    steps:
+    - name: Set up MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        install: base-devel binutils mingw-w64-x86_64-cmake nasm
+        path-type: inherit
+    - name: Set up GIT
+      run: |
+        git config --global core.autocrlf false
+        git config --global core.eol lf
+        git config --global user.email "daniel.stankewitz@gmail.com"
+        git config --global user.name "Daniel Stankewitz"
+    - name: Checkout patches
+      uses: actions/checkout@v3.0.0
+    - name: Checkout FFmpeg
+      uses: actions/checkout@v3.0.0
+      with:
+        repository: FFmpeg/FFmpeg.git
+        ref: ${{ inputs.ffmpegRef }} 
+        path: ffmpeg
+    - name: Checkout NvEnc
+      uses: actions/checkout@v3.0.0
+      with:
+        repository: FFmpeg/nv-codec-headers
+        ref: master
+        path: nvenc
+    - name: Checkout AMF
+      uses: actions/checkout@v3.0.0
+      with:
+        repository: GPUOpen-LibrariesAndSDKs/AMF
+        ref: master
+        path: amf
+    - name: Set up artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: build_artifacts
+    - name: Build FFmpeg
+      shell: cmd
+      run: |
+        call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
+        md build dist
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd build ; for file in `ls ../build_artifacts/**/*.tgz`; do tar -xzf $file; done ; rm -f bin/*.dll ; cd ../nvenc ; make PREFIX=../build install ; cp -a ../amf/amf/public/include ../build/include/AMF ; cd ../ffmpeg ; PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags="${{ env.cFlags }} -I../build/include" --extra-ldflags="-LIBPATH:../build/lib" --prefix=../build --extra-libs=Ole32.lib --extra-libs=Advapi32.lib --disable-doc ${{ env.variant }} --enable-runtime-cpudetect --enable-w32threads ${{ env.COMPONENTS }} ; make -j 2 ; make install ; cd ../build/lib ; for file in *.a; do mv "$file" "`basename "$file" .a`.lib" ; done ; rm -rf fdk-aac.lib cmake pkgconfig *.la ../share ; cd .. ; tar czf ../dist/ffmpeg-win64-${{ inputs.type }}-${{ inputs.config }}.tar.gz *'
+    - name: Publish FFmpeg artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: FFmpeg ${{ inputs.system }} ${{ inputs.config }}${{ inputs.config }} package build
+        path: dist/ffmpeg-win64-${{ inputs.type }}-${{ inputs.config }}.tar.gz
