@@ -52,8 +52,8 @@ on:
         
 env:
   vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
-  COMPONENTS: "--enable-libvpl --enable-libsvtav1 "
-  #--enable-libvorbis --enable-libsnappy --enable-libmp3lame --enable-libzimg --enable-libopus --enable-libx264 --enable-libx265 --enable-libvpx 
+  COMPONENTS: "--enable-libvpl --enable-libsvtav1 --enable-libsnappy --enable-libmp3lame --enable-libzimg --enable-libvpx "
+  #--enable-libvorbis  --enable-libopus --enable-libx264 --enable-libx265
   NASM_EXECUTABLE: nasm
   cFlags: ${{ inputs.config == 'release' && '-MD' || '-MDd' }}
   variant: ${{ inputs.type == 'static' && ' --pkg-config-flags="--static" --disable-shared --enable-static' || ' --disable-static --enable-shared' }}
@@ -88,42 +88,42 @@ jobs:
         refId: v1.4.1
         config: ${{ inputs.config }}
 
-#  libsnappy:
-#    runs-on: ${{ inputs.system }}
-#    steps:
-#    - uses: actions/checkout@v3
-#    - uses: ./.github/actions/libsnappy
-#      with:
-#        refId: 1.1.9
-#        config: ${{ inputs.config }}
-#
-#  libvpx:
-#    runs-on: ${{ inputs.system }}
-#    steps:
-#    - uses: actions/checkout@v3
-#    - uses: ./.github/actions/libvpx
-#      with:
-#        refId: v1.12.0
-#        config: ${{ inputs.config }}
-#
-#  libmp3lame:
-#    runs-on: ${{ inputs.system }}
-#    steps:
-#    - uses: actions/checkout@v3
-#    - uses: ./.github/actions/libmp3lame
-#      with:
-#        refId: tags/RELEASE__3_100
-#        config: ${{ inputs.config }}
-#
-#  libzimg:
-#    runs-on: ${{ inputs.system }}
-#    steps:
-#    - uses: actions/checkout@v3
-#    - uses: ./.github/actions/libzimg
-#      with:
-#        refId: release-3.0.4
-#        config: ${{ inputs.config }}
-#
+  libsnappy:
+    runs-on: ${{ inputs.system }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libsnappy
+      with:
+        refId: 1.1.9
+        config: ${{ inputs.config }}
+
+  libvpx:
+    runs-on: ${{ inputs.system }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libvpx
+      with:
+        refId: v1.12.0
+        config: ${{ inputs.config }}
+
+  libmp3lame:
+    runs-on: ${{ inputs.system }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libmp3lame
+      with:
+        refId: tags/RELEASE__3_100
+        config: ${{ inputs.config }}
+
+  libzimg:
+    runs-on: ${{ inputs.system }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libzimg
+      with:
+        refId: release-3.0.4
+        config: ${{ inputs.config }}
+
 #  libopus:
 #    runs-on: ${{ inputs.system }}
 #    steps:
@@ -181,7 +181,7 @@ jobs:
 
   ffmpeg:
     runs-on: ${{ inputs.system }}
-    needs: [libvpl,libsvtav1]
+    needs: [libvpl,libsvtav1,libsnappy,libvpx,libmp3lame,libzimg]
     steps:
     - name: Set up MSYS2
       uses: msys2/setup-msys2@v2
