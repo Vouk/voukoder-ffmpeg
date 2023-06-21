@@ -143,6 +143,16 @@ jobs:
       with:
         install: base-devel binutils mingw-w64-x86_64-cmake nasm
         path-type: inherit
+    - name: Create PFX certificate
+      id: create-pfx
+      shell: pwsh
+      env:
+        PFX_CONTENT: ${{ secrets.CODESIGN_PFX }} 
+      run: |
+        $pfxPath = Join-Path -Path $env:RUNNER_TEMP -ChildPath "cert.pfx"; 
+        $encodedBytes = [System.Convert]::FromBase64String($env:PFX_CONTENT); 
+        Set-Content $pfxPath -Value $encodedBytes -AsByteStream;
+        Write-Output "::set-output name=PFX_PATH::$pfxPath";        
     - name: Set up GIT
       run: |
         git config --global core.autocrlf false
@@ -178,7 +188,9 @@ jobs:
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
         md build dist
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd build ; for file in `ls ../build_artifacts/**/*.tgz`; do tar -xzf $file; done ; rm -f bin/*.dll ; cd ../nvenc ; make PREFIX=../build install ; cp -a ../amf/amf/public/include ../build/include/AMF ; cd ../ffmpeg ; PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags="${{ env.cFlags }} -I../build/include" --extra-ldflags="-LIBPATH:../build/lib" --prefix=../build --extra-libs=Ole32.lib --extra-libs=Advapi32.lib --disable-doc ${{ env.variant }} --enable-runtime-cpudetect --enable-w32threads ${{ env.COMPONENTS }} ; make -j 2 ; make install ; cd ../build/lib ;  rm -rf cmake pkgconfig *.la ; cd .. ; tar czf ../dist/ffmpeg-win64-${{ inputs.type }}-${{ inputs.config }}.tar.gz *'
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd build ; for file in `ls ../build_artifacts/**/*.tgz`; do tar -xzf $file; done ; rm -f bin/*.dll ; cd ../nvenc ; make PREFIX=../build install ; cp -a ../amf/amf/public/include ../build/include/AMF ; cd ../ffmpeg ; PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags="${{ env.cFlags }} -I../build/include" --extra-ldflags="-LIBPATH:../build/lib" --prefix=../build --extra-libs=Ole32.lib --extra-libs=Advapi32.lib --disable-doc ${{ env.variant }} --enable-runtime-cpudetect --enable-w32threads ${{ env.COMPONENTS }} ; make -j 2 ; make install ; cd ../build/lib ;  rm -rf cmake pkgconfig *.la'
+        signtool sign /f "${{ steps.create-pfx.outputs.PFX_PATH }}" /fd SHA256 /tr http://ts.ssl.com /td sha256 /v build/lib/*.dll
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd build/lib ; tar czf ../dist/ffmpeg-win64-${{ inputs.type }}-${{ inputs.config }}.tar.gz *.dll'
     - name: Publish FFmpeg artifacts
       uses: actions/upload-artifact@v3
       with:
