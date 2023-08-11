@@ -188,7 +188,7 @@ jobs:
       run: |
         call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
         md build dist
-        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd build ; for file in `ls ../build_artifacts/**/*.tgz`; do tar -xzf $file; done ; rm -f bin/*.dll ; cd ../nvenc ; make PREFIX=../build install ; cp -a ../amf/amf/public/include ../build/include/AMF ; cd ../ffmpeg ; PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags="${{ env.cFlags }} -I../build/include" --extra-ldflags="-LIBPATH:../build/lib" --prefix=../build --extra-libs=Ole32.lib --extra-libs=Advapi32.lib --disable-doc ${{ env.variant }} --enable-runtime-cpudetect --enable-w32threads ${{ env.COMPONENTS }} ; make -j 2 ; make install ; cd ../build/lib ;  rm -rf cmake pkgconfig *.la ; cd build ; tar czf ../dist/ffmpeg-win64-${{ inputs.type }}-${{ inputs.config }}.tar.gz *'
+        D:\a\_temp\setup-msys2\msys2.cmd -c 'cd build ; for file in `ls ../build_artifacts/**/*.tgz`; do tar -xzf $file; done ; rm -f bin/*.dll ; cd ../nvenc ; make PREFIX=../build install ; cp -a ../amf/amf/public/include ../build/include/AMF ; cd ../ffmpeg ; PKG_CONFIG_PATH=../build/lib/pkgconfig ./configure --toolchain=msvc --extra-cflags="${{ env.cFlags }} -I../build/include" --extra-ldflags="-LIBPATH:../build/lib" --prefix=../build --extra-libs=Ole32.lib --extra-libs=Advapi32.lib --disable-doc ${{ env.variant }} --enable-runtime-cpudetect --enable-w32threads --enable-cuda ${{ env.COMPONENTS }} ; make -j 2 ; make install ; cd ../build/lib ;  rm -rf cmake pkgconfig *.la ; cd build ; tar czf ../dist/ffmpeg-win64-${{ inputs.type }}-${{ inputs.config }}.tar.gz *'
     - name: Publish FFmpeg artifacts
       uses: actions/upload-artifact@v3
       with:
