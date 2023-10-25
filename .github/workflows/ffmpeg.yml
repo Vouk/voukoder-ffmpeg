@@ -65,7 +65,7 @@ jobs:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/libvpl
       with:
-        refId: master
+        refId: v2023.3.1
         config: ${{ inputs.config }}
 
   liboggvorbis:
@@ -84,7 +84,7 @@ jobs:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/libsvtav1
       with:
-        refId: v1.4.1
+        refId: v1.7.0
         config: ${{ inputs.config }}
 
   libsnappy:
@@ -93,7 +93,7 @@ jobs:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/libsnappy
       with:
-        refId: 1.1.9
+        refId: 1.1.10
         config: ${{ inputs.config }}
 
   libvpx:
@@ -120,7 +120,7 @@ jobs:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/libzimg
       with:
-        refId: release-3.0.4
+        refId: release-3.0.5
         config: ${{ inputs.config }}
 
   libopus:
@@ -129,58 +129,58 @@ jobs:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/libopus
       with:
-        refId: v1.3.1
+        refId: v1.4
         config: ${{ inputs.config }}
 
-  #libfdkaac:
-  #  runs-on: ${{ inputs.system }}
-  #  steps:
-  #  - uses: actions/checkout@v3
-  #  - uses: ./.github/actions/libfdkaac
-  #    with:
-  #      refId: v2.0.2
-  #      config: ${{ inputs.config }}
+  libfdkaac:
+    runs-on: ${{ inputs.system }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libfdkaac
+      with:
+        refId: v2.0.2
+        config: ${{ inputs.config }}
 
-  #libx264:
-  #  runs-on: ${{ inputs.system }}
-  #  steps:
-  #  - uses: actions/checkout@v3
-  #  - uses: ./.github/actions/libx264
-  #    with:
-  #      refId: stable
-  #      config: ${{ inputs.config }}
-#
-#  libx265-12:
-#    runs-on: ${{ inputs.system }}
-#    steps:
-#    - uses: actions/checkout@v3
-#    - uses: ./.github/actions/libx265-12
-#      with:
-#        refId: Release_3.5
-#        config: ${{ inputs.config }}
-#
-#  libx265-10:
-#    runs-on: ${{ inputs.system }}
-#    steps:
-#    - uses: actions/checkout@v3
-#    - uses: ./.github/actions/libx265-10
-#      with:
-#        refId: Release_3.5
-#        config: ${{ inputs.config }}
-#
-#  libx265:
-#    runs-on: ${{ inputs.system }}
-#    needs: [libx265-12,libx265-10]
-#    steps:
-#    - uses: actions/checkout@v3
-#    - uses: ./.github/actions/libx265
-#      with:
-#        refId: Release_3.5
-#        config: ${{ inputs.config }}
+  libx264:
+    runs-on: ${{ inputs.system }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libx264
+      with:
+        refId: stable
+        config: ${{ inputs.config }}
+
+  libx265-12:
+    runs-on: ${{ inputs.system }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libx265-12
+      with:
+        refId: Release_3.5
+        config: ${{ inputs.config }}
+
+  libx265-10:
+    runs-on: ${{ inputs.system }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libx265-10
+      with:
+        refId: Release_3.5
+        config: ${{ inputs.config }}
+
+  libx265:
+    runs-on: ${{ inputs.system }}
+    needs: [libx265-12,libx265-10]
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libx265
+      with:
+        refId: Release_3.5
+        config: ${{ inputs.config }}
 
   ffmpeg:
     runs-on: ${{ inputs.system }}
-    needs: [libvpl,libsvtav1,libsnappy,libvpx,libmp3lame,libzimg,liboggvorbis,libopus] #,libfdkaac,libx264,libx265
+    needs: [libvpl,libsvtav1,libsnappy,libvpx,libmp3lame,libzimg,liboggvorbis,libopus,libfdkaac,libx264,libx265]
     steps:
     - name: Set up MSYS2
       uses: msys2/setup-msys2@v2
