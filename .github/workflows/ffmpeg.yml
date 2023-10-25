@@ -205,7 +205,7 @@ jobs:
       uses: actions/checkout@v3.0.0
       with:
         repository: FFmpeg/nv-codec-headers
-        ref: n12.0.16.0
+        ref: master
         path: nvenc
     - name: Checkout AMF
       uses: actions/checkout@v3.0.0
