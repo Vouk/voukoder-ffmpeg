@@ -65,7 +65,7 @@ jobs:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/libvpl
       with:
-        refId: v2023.3.1
+        refId: v2023.4.0
         config: ${{ inputs.config }}
 
   liboggvorbis:
@@ -84,7 +84,7 @@ jobs:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/libsvtav1
       with:
-        refId: v1.7.0
+        refId: v1.8.0
         config: ${{ inputs.config }}
 
   libsnappy:
@@ -102,7 +102,7 @@ jobs:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/libvpx
       with:
-        refId: v1.13.0
+        refId: v1.13.1
         config: ${{ inputs.config }}
 
   libmp3lame:
