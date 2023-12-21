@@ -1,8 +1,8 @@
 diff --git a/configure b/configure
-index 1f0b9497cb..16b2dfe1b8 100755
+index b6616f00b6..d02f5099fe 100755
 --- a/configure
 +++ b/configure
-@@ -1811,7 +1811,6 @@ EXTERNAL_LIBRARY_GPL_LIST="
+@@ -1774,7 +1774,6 @@ EXTERNAL_LIBRARY_GPL_LIST="
  
  EXTERNAL_LIBRARY_NONFREE_LIST="
      decklink
@@ -10,7 +10,7 @@ index 1f0b9497cb..16b2dfe1b8 100755
      libtls
  "
  
-@@ -1912,6 +1911,7 @@ EXTERNAL_LIBRARY_LIST="
+@@ -1873,6 +1872,7 @@ EXTERNAL_LIBRARY_LIST="
      openssl
      pocketsphinx
      vapoursynth
@@ -18,7 +18,7 @@ index 1f0b9497cb..16b2dfe1b8 100755
  "
  
  HWACCEL_AUTODETECT_LIBRARY_LIST="
-@@ -6692,9 +6692,7 @@ enabled libdav1d          && require_pkg_config libdav1d "dav1d >= 0.5.0" "dav1d
+@@ -6581,9 +6581,7 @@ enabled libdav1d          && require_pkg_config libdav1d "dav1d >= 0.5.0" "dav1d
  enabled libdavs2          && require_pkg_config libdavs2 "davs2 >= 1.6.0" davs2.h davs2_decoder_open
  enabled libdc1394         && require_pkg_config libdc1394 libdc1394-2 dc1394/dc1394.h dc1394_new
  enabled libdrm            && require_pkg_config libdrm libdrm xf86drm.h drmGetVersion
@@ -121,7 +121,7 @@ index 0000000000..9bcfdb9aba
 +#endif /* AVCODEC_LIBFDK_AAC_INTERNAL_H */
 \ No newline at end of file
 diff --git a/libavcodec/libfdk-aacdec.c b/libavcodec/libfdk-aacdec.c
-index 8c1586e25e..4d6822d140 100644
+index 8c1586e25e..25f68cdd10 100644
 --- a/libavcodec/libfdk-aacdec.c
 +++ b/libavcodec/libfdk-aacdec.c
 @@ -25,6 +25,7 @@
@@ -192,10 +192,10 @@ index 8c1586e25e..4d6822d140 100644
      if (!s->handle) {
          av_log(avctx, AV_LOG_ERROR, "Error opening decoder\n");
 diff --git a/libavcodec/libfdk-aacenc.c b/libavcodec/libfdk-aacenc.c
-index d400ac2e7c..7e9a7bcbd2 100644
+index 54549de473..9e93ce092c 100644
 --- a/libavcodec/libfdk-aacenc.c
 +++ b/libavcodec/libfdk-aacenc.c
-@@ -28,6 +28,7 @@
+@@ -27,6 +27,7 @@
  #include "codec_internal.h"
  #include "encode.h"
  #include "profiles.h"
@@ -203,16 +203,16 @@ index d400ac2e7c..7e9a7bcbd2 100644
  
  #ifdef AACENCODER_LIB_VL0
  #define FDKENC_VER_AT_LEAST(vl0, vl1) \
-@@ -47,6 +48,8 @@ typedef struct AACContext {
+@@ -46,6 +47,8 @@ typedef struct AACContext {
      int latm;
      int header_period;
      int vbr;
 +	void *hLib;
 +	aacEncLib pfn;
-     int drc_profile;
-     int drc_target_ref;
-     int comp_profile;
-@@ -127,8 +130,10 @@ static int aac_encode_close(AVCodecContext *avctx)
+ 
+     AudioFrameQueue afq;
+ } AACContext;
+@@ -111,8 +114,10 @@ static int aac_encode_close(AVCodecContext *avctx)
  {
      AACContext *s = avctx->priv_data;
  
@@ -225,11 +225,11 @@ index d400ac2e7c..7e9a7bcbd2 100644
      ff_af_queue_close(&s->afq);
  
      return 0;
-@@ -182,6 +187,21 @@ static av_cold int aac_encode_init(AVCodecContext *avctx)
-     int aot = AV_PROFILE_AAC_LOW + 1;
+@@ -128,6 +133,21 @@ static av_cold int aac_encode_init(AVCodecContext *avctx)
+     int aot = FF_PROFILE_AAC_LOW + 1;
      int sce = 0, cpe = 0;
  
-+    if (!(s->hLib = dlopen(LIBNAME, RTLD_NOW))) {
++	if (!(s->hLib = dlopen(LIBNAME, RTLD_NOW))) {
 +        av_log(avctx, AV_LOG_ERROR, "Unable to load " LIBNAME "\n");
 +        return -1;
 +    }
