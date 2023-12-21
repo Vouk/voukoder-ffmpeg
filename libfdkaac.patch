@@ -136,7 +136,7 @@ index 8c1586e25e..4d6822d140 100644
  typedef struct FDKAACDecContext {
      const AVClass *class;
      HANDLE_AACDECODER handle;
-+    void *hLib;
++	void *hLib;
 +    aacDecLib pfn;
      uint8_t *decoder_buffer;
      int decoder_buffer_size;
@@ -167,25 +167,25 @@ index 8c1586e25e..4d6822d140 100644
      FDKAACDecContext *s = avctx->priv_data;
      AAC_DECODER_ERROR err;
  
-+    if (!(s->hLib = dlopen(LIBNAME, RTLD_NOW))) {
-+        av_log(avctx, AV_LOG_ERROR, "Unable to load " LIBNAME "\n");
-+        return -1;
-+    }
++	if (!(s->hLib = dlopen(LIBNAME, RTLD_NOW))) {
++		av_log(avctx, AV_LOG_ERROR, "Unable to load " LIBNAME "\n");
++		return -1;
++	}
 +
-+    DLSYM(aacDecoder_Open);
++	DLSYM(aacDecoder_Open);
 +#define aacDecoder_Open s->pfn.aacDecoder_Open
-+    DLSYM(aacDecoder_Close);
-+    DLSYM(aacDecoder_Fill);
++	DLSYM(aacDecoder_Close);
++	DLSYM(aacDecoder_Fill);
 +#define aacDecoder_Fill s->pfn.aacDecoder_Fill
-+    DLSYM(aacDecoder_DecodeFrame);
++	DLSYM(aacDecoder_DecodeFrame);
 +#define aacDecoder_DecodeFrame s->pfn.aacDecoder_DecodeFrame
-+    DLSYM(aacDecoder_GetStreamInfo);
++	DLSYM(aacDecoder_GetStreamInfo);
 +#define aacDecoder_GetStreamInfo s->pfn.aacDecoder_GetStreamInfo
-+    DLSYM(aacDecoder_ConfigRaw);
++	DLSYM(aacDecoder_ConfigRaw);
 +#define aacDecoder_ConfigRaw s->pfn.aacDecoder_ConfigRaw
-+    DLSYM(aacDecoder_SetParam);
++	DLSYM(aacDecoder_SetParam);
 +#define aacDecoder_SetParam s->pfn.aacDecoder_SetParam
-+    DLSYM(aacDecoder_AncDataInit);
++	DLSYM(aacDecoder_AncDataInit);
 +#define aacDecoder_AncDataInit s->pfn.aacDecoder_AncDataInit
 +
      s->handle = aacDecoder_Open(avctx->extradata_size ? TT_MP4_RAW : TT_MP4_ADTS, 1);
@@ -207,8 +207,8 @@ index d400ac2e7c..7e9a7bcbd2 100644
      int latm;
      int header_period;
      int vbr;
-+    void *hLib;
-+    aacEncLib pfn;
++	void *hLib;
++	aacEncLib pfn;
      int drc_profile;
      int drc_target_ref;
      int comp_profile;
