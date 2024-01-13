@@ -32,7 +32,7 @@ on:
       ffmpegRef:
         type: string
         required: true
-        default: 'master' 
+        default: 'release/6.1' 
         description: 'FFmpeg refId'
         
   workflow_call:
