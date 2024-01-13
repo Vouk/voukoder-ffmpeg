@@ -3,23 +3,6 @@ name: 'Build FFmpeg (LGPL)'
 on:
   workflow_dispatch:
     inputs:
-      system:
-        type: choice
-        required: true
-        default: 'windows-2022' 
-        description: 'System'
-        options: 
-        - windows-2022
-
-      type:
-        type: choice
-        required: true
-        default: 'shared' 
-        description: Type
-        options: 
-        - static
-        - shared
-
       config:
         type: choice
         required: true
@@ -58,6 +41,8 @@ env:
   cFlags: ${{ inputs.config == 'release' && '-MD' || '-MDd' }}
   variant: ${{ inputs.type == 'static' && ' --pkg-config-flags="--static" --disable-shared --enable-static' || ' --disable-static --enable-shared --build-suffix=-voukoderpro' }}
   msbuildConfig: ${{ inputs.config == 'release' && 'Release' || 'Debug' }}
+  system: windows-2022
+  type: shared
 
 jobs:
   libvpl:
