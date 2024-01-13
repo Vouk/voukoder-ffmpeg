@@ -20,12 +20,6 @@ on:
         
   workflow_call:
     inputs:
-      system:
-        type: string
-        required: true
-      type:
-        type: string
-        required: true
       config:
         type: string
         required: true
@@ -39,7 +33,7 @@ env:
   #--enable-libvorbis
   NASM_EXECUTABLE: nasm
   cFlags: ${{ inputs.config == 'release' && '-MD' || '-MDd' }}
-  variant: ${{ inputs.type == 'static' && ' --pkg-config-flags="--static" --disable-shared --enable-static' || ' --disable-static --enable-shared --build-suffix=-voukoderpro' }}
+  variant: ' --disable-static --enable-shared --build-suffix=-voukoderpro'
   msbuildConfig: ${{ inputs.config == 'release' && 'Release' || 'Debug' }}
   system: windows-2022
   type: shared
