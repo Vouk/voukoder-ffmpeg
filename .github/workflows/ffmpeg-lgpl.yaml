@@ -46,7 +46,7 @@ env:
 
 jobs:
   libvpl:
-    runs-on: ${{ inputs.system }}
+    runs-on: ${{ system }}
     steps:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/libvpl
@@ -65,7 +65,7 @@ jobs:
   #      config: ${{ inputs.config }}
                
   libsvtav1:
-    runs-on: ${{ inputs.system }}
+    runs-on: ${{ system }}
     steps:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/libsvtav1
@@ -74,7 +74,7 @@ jobs:
         config: ${{ inputs.config }}
 
   libsnappy:
-    runs-on: ${{ inputs.system }}
+    runs-on: ${{ system }}
     steps:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/libsnappy
@@ -83,7 +83,7 @@ jobs:
         config: ${{ inputs.config }}
 
   libvpx:
-    runs-on: ${{ inputs.system }}
+    runs-on: ${{ system }}
     steps:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/libvpx
@@ -92,7 +92,7 @@ jobs:
         config: ${{ inputs.config }}
 
   libmp3lame:
-    runs-on: ${{ inputs.system }}
+    runs-on: ${{ system }}
     steps:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/libmp3lame
@@ -101,7 +101,7 @@ jobs:
         config: ${{ inputs.config }}
 
   libzimg:
-    runs-on: ${{ inputs.system }}
+    runs-on: ${{ system }}
     steps:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/libzimg
@@ -110,7 +110,7 @@ jobs:
         config: ${{ inputs.config }}
 
   libopus:
-    runs-on: ${{ inputs.system }}
+    runs-on: ${{ system }}
     steps:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/libopus
@@ -119,7 +119,7 @@ jobs:
         config: ${{ inputs.config }}
 
   ffmpeg:
-    runs-on: ${{ inputs.system }}
+    runs-on: ${{ system }}
     needs: [libvpl,libsvtav1,libsnappy,libvpx,libmp3lame,libzimg,libopus]
     #liboggvorbis
     steps:
@@ -177,5 +177,5 @@ jobs:
     - name: Publish FFmpeg artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: FFmpeg ${{ inputs.system }} ${{ inputs.config }}${{ inputs.config }} package build
+        name: FFmpeg ${{ system }} ${{ inputs.config }}${{ inputs.config }} package build
         path: dist/ffmpeg-win64-${{ inputs.type }}-${{ inputs.config }}.tar.gz
