@@ -3,6 +3,23 @@ name: 'Build FFmpeg (LGPL)'
 on:
   workflow_dispatch:
     inputs:
+      system:
+        type: choice
+        required: true
+        default: 'windows-2022' 
+        description: 'System'
+        options: 
+        - windows-2022
+
+      type:
+        type: choice
+        required: true
+        default: 'shared' 
+        description: Type
+        options: 
+        - static
+        - shared
+
       config:
         type: choice
         required: true
@@ -20,6 +37,12 @@ on:
         
   workflow_call:
     inputs:
+      system:
+        type: string
+        required: true
+      type:
+        type: string
+        required: true
       config:
         type: string
         required: true
@@ -33,14 +56,12 @@ env:
   #--enable-libvorbis
   NASM_EXECUTABLE: nasm
   cFlags: ${{ inputs.config == 'release' && '-MD' || '-MDd' }}
-  variant: ' --disable-static --enable-shared --build-suffix=-voukoderpro'
+  variant: ${{ inputs.type == 'static' && ' --pkg-config-flags="--static" --disable-shared --enable-static' || ' --disable-static --enable-shared --build-suffix=-voukoderpro' }}
   msbuildConfig: ${{ inputs.config == 'release' && 'Release' || 'Debug' }}
-  system: windows-2022
-  type: shared
 
 jobs:
   libvpl:
-    runs-on: ${{ env.system }}
+    runs-on: ${{ inputs.system }}
     steps:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/libvpl
@@ -59,7 +80,7 @@ jobs:
   #      config: ${{ inputs.config }}
                
   libsvtav1:
-    runs-on: ${{ env.system }}
+    runs-on: ${{ inputs.system }}
     steps:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/libsvtav1
@@ -68,7 +89,7 @@ jobs:
         config: ${{ inputs.config }}
 
   libsnappy:
-    runs-on: ${{ env.system }}
+    runs-on: ${{ inputs.system }}
     steps:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/libsnappy
@@ -77,7 +98,7 @@ jobs:
         config: ${{ inputs.config }}
 
   libvpx:
-    runs-on: ${{ env.system }}
+    runs-on: ${{ inputs.system }}
     steps:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/libvpx
@@ -86,7 +107,7 @@ jobs:
         config: ${{ inputs.config }}
 
   libmp3lame:
-    runs-on: ${{ env.system }}
+    runs-on: ${{ inputs.system }}
     steps:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/libmp3lame
@@ -95,7 +116,7 @@ jobs:
         config: ${{ inputs.config }}
 
   libzimg:
-    runs-on: ${{ env.system }}
+    runs-on: ${{ inputs.system }}
     steps:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/libzimg
@@ -104,7 +125,7 @@ jobs:
         config: ${{ inputs.config }}
 
   libopus:
-    runs-on: ${{ env.system }}
+    runs-on: ${{ inputs.system }}
     steps:
     - uses: actions/checkout@v3
     - uses: ./.github/actions/libopus
@@ -113,7 +134,7 @@ jobs:
         config: ${{ inputs.config }}
 
   ffmpeg:
-    runs-on: ${{ env.system }}
+    runs-on: ${{ inputs.system }}
     needs: [libvpl,libsvtav1,libsnappy,libvpx,libmp3lame,libzimg,libopus]
     #liboggvorbis
     steps:
@@ -171,5 +192,5 @@ jobs:
     - name: Publish FFmpeg artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: FFmpeg ${{ env.system }} ${{ inputs.config }}${{ inputs.config }} package build
-        path: dist/ffmpeg-win64-${{ env.type }}-${{ inputs.config }}.tar.gz
+        name: FFmpeg ${{ inputs.system }} ${{ inputs.config }}${{ inputs.config }} package build
+        path: dist/ffmpeg-win64-${{ inputs.type }}-${{ inputs.config }}.tar.gz
