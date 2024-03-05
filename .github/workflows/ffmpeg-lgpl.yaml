@@ -133,9 +133,18 @@ jobs:
         refId: v1.3.1
         config: ${{ inputs.config }}
 
+  libkvazaar:
+    runs-on: ${{ inputs.system }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./.github/actions/libkvazaar
+      with:
+        refId: v2.3.0
+        config: ${{ inputs.config }}
+
   ffmpeg:
     runs-on: ${{ inputs.system }}
-    needs: [libvpl,libsvtav1,libsnappy,libvpx,libmp3lame,libzimg,libopus]
+    needs: [libvpl,libsvtav1,libsnappy,libvpx,libmp3lame,libzimg,libopus,libkvazaar]
     #liboggvorbis
     steps:
     - name: Set up MSYS2
