@@ -36,7 +36,7 @@ runs:
     run: |
       call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
       md build build\include build\lib build\lib\pkgconfig dist
-      D:\a\_temp\setup-msys2\msys2.cmd -c 'cd kvazaar ; ./autogen.sh ;  CC=cl ./configure --prefix=$(realpath ../build) CPPFLAGS=-DKVZ_STATIC_LIB=1 ; cat config.log #make -j ; make install-lib-static ; cd ../build ; tar czf ../dist/libkvazaar.tgz *'
+      D:\a\_temp\setup-msys2\msys2.cmd -c 'cd kvazaar ; ./autogen.sh ;  CC=cl ./configure --prefix=$(realpath ../build) CPPFLAGS=-DKVZ_STATIC_LIB=1 || true ; cat config.log #make -j ; make install-lib-static ; cd ../build ; tar czf ../dist/libkvazaar.tgz *'
   - name: Publish artifact
     uses: actions/upload-artifact@v2
     with:
