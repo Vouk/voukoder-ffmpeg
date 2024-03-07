@@ -52,7 +52,7 @@ on:
         
 env:
   vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
-  COMPONENTS: "--enable-libvpl --enable-libsvtav1 --enable-libsnappy --enable-libmp3lame --enable-libzimg --enable-libvpx --enable-libopus --enable-libkvazaar"
+  COMPONENTS: "--enable-libvpl --enable-libsvtav1 --enable-libsnappy --enable-libmp3lame --enable-libzimg --enable-libvpx --enable-libopus"
   #--enable-libvorbis
   NASM_EXECUTABLE: nasm
   cFlags: ${{ inputs.config == 'release' && '-MD' || '-MDd' }}
