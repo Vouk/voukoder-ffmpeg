@@ -16,18 +16,18 @@ runs:
     run: |
       git config --global core.autocrlf false
       git config --global core.eol lf
-  - name: Checkout OPUS
+  - name: Checkout KVAZAAR
     uses: actions/checkout@v3.0.0
     with:
       repository: ultravideo/kvazaar
       ref: ${{ inputs.refId }}
-      path: opus        
+      path: kvazaar        
   - name: Set up MSYS2
     uses: msys2/setup-msys2@v2
     with:
       install: base-devel binutils autotools automake mingw-w64-x86_64-cmake nasm
       path-type: inherit
-  - name: Build OPUS
+  - name: Build KVAZAAR
     shell: cmd
     env:
       vsPath: C:\Program Files\Microsoft Visual Studio\2022\Enterprise\
@@ -36,13 +36,7 @@ runs:
     run: |
       call "${{ env.vsPath }}VC\Auxiliary\Build\vcvars64.bat"
       md build build\include build\lib build\lib\pkgconfig dist
-      D:\a\_temp\setup-msys2\msys2.cmd -c 'cd kvazaar ; ./autogen.sh ; CC=cl ./configure --prefix=$(realpath ../build) --disable-cli --enable-static --enable-pic --libdir=../build/lib ; make -j ; make install-lib-static ; cd ../build ; tar czf ../dist/libx264.tgz *'
-
-
-      
-      cd opus\win32\VS2015
-      MSBuild.exe /property:Configuration="${{ env.msbuildConfig }}" /property:Platform=x64 /property:PlatformToolset=v143 opus.vcxproj
-      D:\a\_temp\setup-msys2\msys2.cmd -c 'cp x64/${{ inputs.config }}/opus.lib ../../../build/lib/opus.lib ; cd ../../.. ; cp -r opus/include build/include/opus ; cp opus/opus.pc.in build/lib/pkgconfig/opus.pc ; sed -i "s#@prefix@#$(realpath ../../../build)#g" build/lib/pkgconfig/opus.pc ; sed -i "s/@exec_prefix@/\$\{prefix\}/g" build/lib/pkgconfig/opus.pc ; sed -i "s/@libdir@/\$\{prefix\}\/lib/g" build/lib/pkgconfig/opus.pc ; sed -i "s/@includedir@/\$\{prefix\}\/include/g" build/lib/pkgconfig/opus.pc ; sed -i "s/@LIBM@//g" build/lib/pkgconfig/opus.pc; sed -i "s/@VERSION@/2.0.0/g" build/lib/pkgconfig/opus.pc ; cd build ; tar czf ../dist/libopus.tgz *'
+      D:\a\_temp\setup-msys2\msys2.cmd -c 'cd kvazaar ; ./autogen.sh ;  CC=cl ./configure --prefix=$(realpath ../build) CPPFLAGS=-DKVZ_STATIC_LIB=1 ; make -j ; make install-lib-static ; cd ../build ; tar czf ../dist/libkvazaar.tgz *'
   - name: Publish artifact
     uses: actions/upload-artifact@v2
     with:
